@@ -3,3 +3,12 @@
 @theme {
   --color-primary: #ea8bf3;
 }
+
+@font-face {
+  font-family: "gimlet";
+  src: url("./fonts/gimlet-sans.woff") format("woff");
+}
+
+body {
+  font-family: "gimlet";
+}
