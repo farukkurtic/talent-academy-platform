@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { Eye, EyeOff } from "lucide-react";
 
 import doorIcon from "../assets/door.svg";
 import logo from "../assets/hnta-logo.png";
@@ -15,6 +16,9 @@ const schema = yup.object().shape({
 });
 
 export default function Register() {
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePassword = () => setShowPassword((prev) => !prev);
+
   const {
     register,
     handleSubmit,
@@ -28,35 +32,43 @@ export default function Register() {
   };
 
   return (
-    <div className="text-white flex h-screen">
-      <div className="left-box w-1/2  h-full flex items-center justify-center">
-        <img src={doorIcon} alt="vrata-vizual" className="w-5/6 h-5/6" />
+    <div className="text-white flex flex-col lg:flex-row h-screen">
+      <div className="left-box max-w-screen lg:w-1/2 max-h-full flex items-center justify-center">
+        <img
+          src={doorIcon}
+          alt="vrata-vizual"
+          className="w-3xs h-3xs lg:w-5/6 lg:h-5/6"
+        />
       </div>
-      <div className="right-box w-1/2  h-full">
-        <div className="flex items-center justify-start mt-10 mb-10">
+      <div className="right-box w-screen lg:w-1/2 max-h-full">
+        <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-start mt-10 mb-10">
           <div>
-            <img src={logo} alt="hnta-logo" className="h-40 w-40" />
+            <img
+              src={logo}
+              alt="hnta-logo"
+              className="h-20 w-20 lg:h-40 lg:w-40"
+            />
           </div>
-          <div className="color-white">
-            <h1 className="text-7xl font-black mb-4 tracking-wide">
+          <div className="color-white text-center">
+            <h1 className="text-2xl lg:text-7xl font-black mb-4 tracking-wider">
               Registruj se
             </h1>
-            <p className="text-lg font-medium tracking-wide">
+            <p className="text-lg font-medium tracking-wide text-center lg:text-left">
               Lorem ipsum dolor sit amet.
             </p>
           </div>
         </div>
-        <div>
+        <div className="flex items-center justify-center lg:justify-start">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="p-6 rounded-lg shadow-md w-96"
+            className="p-6 rounded-lg shadow-md w-96 text-center"
           >
             {/* Email Field */}
             <div className="mb-4">
               <input
                 {...register("email")}
                 type="email"
-                className="w-full p-4 mb-5 border rounded mt-1 rounded-full placeholder-white"
+                className="lg:w-full w-xs p-4 mb-5 border rounded mt-1 rounded-full placeholder-white"
                 placeholder="Email"
               />
               {errors.email && (
@@ -67,13 +79,20 @@ export default function Register() {
             </div>
 
             {/* Password Field */}
-            <div className="mb-4">
+            <div className="mb-4 relative">
               <input
                 {...register("password")}
-                type="password"
-                className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-5"
+                type={showPassword ? "text" : "password"}
+                className="lg:w-full w-xs p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center"
                 placeholder="Password"
               />
+              <button
+                type="button"
+                onClick={togglePassword}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white mr-5 lg:mr-0"
+              >
+                {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+              </button>
               {errors.password && (
                 <p className="text-red-500 tracking-wider text-sm">
                   {errors.password.message}
@@ -84,7 +103,7 @@ export default function Register() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-10 cursor-pointer"
+              className="w-xs lg:w-full bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-10 cursor-pointer"
             >
               Nastavi
             </button>
