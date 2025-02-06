@@ -2,6 +2,7 @@ const { status } = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const { userService, authService, uploadService } = require('../services')
+require("dotenv").config();
 
 const register = catchAsync(async(req, res) => {
 
@@ -23,7 +24,7 @@ const changePassword = catchAsync(async(req, res) => {
 
     await authService.changePassword(req.body._id);
     res.status(status.OK).send("Password changed");
-    
+
 })
 
 const uploadAvatar = catchAsync(async(req, res) => {
