@@ -1,10 +1,18 @@
 import logo from "../assets/hnta-logo.png";
+import ambasadaLogo from "../assets/ambasada.png";
+import ekipaLogo from "../assets/ekipa-logo.png";
+import hnLogo from "../assets/hnLogo.svg";
+import intlDev from "../assets/intl-development.png";
+
 import s1 from "../assets/lines/s1.svg";
 import s2 from "../assets/lines/s2.svg";
 import s3 from "../assets/lines/s3.svg";
 import s4 from "../assets/lines/s4.svg";
 import s5 from "../assets/lines/s5.svg";
+
 import pic from "../assets/lecture-1.jpg";
+
+import { Instagram, Facebook, Youtube, Linkedin, Globe } from "lucide-react";
 
 export default function Home() {
   return (
@@ -57,7 +65,7 @@ export default function Home() {
         </div>
       </div>
       <div className="text-white w-full flex bg-black relative overflow-hidden">
-        <img src={s5} className="absolute w-lg -left-80 -bottom-20" />
+        <img src={s3} className="absolute w-xl right-0" />
         <div className="w-1/2 flex flex-col items-end justify-center text-white">
           <h1 className="text-6xl font-bold mb-10">Skill sharing</h1>
           <p className="w-3/4 tracking-wider">
@@ -91,6 +99,53 @@ export default function Home() {
           </p>
         </div>
       </div>
+      <footer className="text-white flex items-center justify-center p-30">
+        <div className="pr-20">
+          <ul className="text-lg">
+            <li className="mb-2 cursor-pointer">Kontakt</li>
+            <li className="mb-2 cursor-pointer">Privatnost</li>
+            <li className="mb-2 cursor-pointer">Uslovi korištenja</li>
+          </ul>
+        </div>
+        <div>
+          <ul className="flex">
+            <li className="pr-2 cursor-pointer">
+              <Instagram size={25} strokeWidth={1} />
+            </li>
+            <li className="pr-2 cursor-pointer">
+              <Facebook size={25} strokeWidth={1} />
+            </li>
+            <li className="pr-2 cursor-pointer">
+              <Youtube size={25} strokeWidth={1} />
+            </li>
+            <li className="pr-2 cursor-pointer">
+              <Linkedin size={25} strokeWidth={1} />
+            </li>
+            <li className="pr-2 cursor-pointer">
+              <Globe size={25} strokeWidth={1} />
+            </li>
+          </ul>
+          <button className="p-3 border-2 border-primary rounded-full text-sm tracking-wider w-full text-primary mt-5 cursor-pointer">
+            Talent Akademija
+          </button>
+        </div>
+        <div className="ml-20 ml-auto">
+          <div>
+            <h1 className="mb-5 font-bold tracking-wider ">
+              Helem Nejse Talent Akademiju implementiraju:
+            </h1>
+            <div>
+              <img src={hnLogo} alt="helem-nejse-logo" />
+            </div>
+          </div>
+          <div>
+            <h1 className="my-5 font-bold tracking-wider">Podržano od:</h1>
+            <div className="flex items-start">
+              <img src={ambasadaLogo} alt="britanija-logo" />
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

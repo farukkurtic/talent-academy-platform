@@ -58,10 +58,10 @@ export default function Register() {
             </p>
           </div>
         </div>
-        <div className="flex items-center justify-center lg:justify-start">
+        <div className="flex lg:justify-start items-center justify-center">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="p-6 rounded-lg shadow-md w-96 text-center"
+            className="p-6 rounded-lg shadow-md w-96 "
           >
             {/* Email Field */}
             <div className="mb-4">
@@ -79,26 +79,25 @@ export default function Register() {
             </div>
 
             {/* Password Field */}
-            <div className="mb-4 relative">
+            <div className="mb-4 relative flex justify-center items-center">
               <input
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
-                className="lg:w-full w-xs p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center"
+                className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center mr-5"
                 placeholder="Password"
               />
-              <button
-                type="button"
-                onClick={togglePassword}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white mr-5 lg:mr-0"
-              >
-                {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
-              </button>
-              {errors.password && (
-                <p className="text-red-500 tracking-wider text-sm">
-                  {errors.password.message}
-                </p>
+
+              {showPassword ? (
+                <EyeOff size={30} onClick={togglePassword} />
+              ) : (
+                <Eye size={30} onClick={togglePassword} />
               )}
             </div>
+            {errors.password && (
+              <p className="text-red-500 tracking-wider text-sm">
+                {errors.password.message}
+              </p>
+            )}
 
             {/* Submit Button */}
             <button
