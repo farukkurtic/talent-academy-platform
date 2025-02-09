@@ -2,12 +2,13 @@ const { status } = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const { userService, authService, uploadService } = require('../services')
+require("dotenv").config();
 
 const register = catchAsync(async(req, res) => {
 
     const user = await userService.createUser(req.body)
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(status.CREATED).send({ token, user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email } });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '3h' });
+    res.status(status.CREATED).send({ token, user: { id: user._id, email: user.email } });
     
 })
 
@@ -15,14 +16,15 @@ const login = catchAsync(async(req, res) => {
 
     const user = await authService.loginUsingCredentials(req.body);
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(status.CREATED).send({ token, user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email } });
+    res.status(status.CREATED).send({ token, user: { id: user._id, email: user.email } });
 
 })
 
 const changePassword = catchAsync(async(req, res) => {
-    console.log(req.body)
+
     await authService.changePassword(req.body._id);
     res.status(status.OK).send("Password changed");
+
 })
 
 const uploadAvatar = catchAsync(async(req, res) => {
