@@ -1,15 +1,15 @@
 const { status } = require('http-status');
-const { User } = require('../models');
+const { User, Auth } = require('../models');
 const mongoose = require('mongoose')
 const ApiError = require('../utils/ApiError');
 
 
 const createUser = async (userBody) => {
     const { email, password } = userBody;
-    if (await User.isEmailTaken(userBody.email)) {
+    if (await Auth.isEmailTaken(userBody.email)) {
         throw new ApiError(status.BAD_REQUEST, 'Email already taken');
       }
-    const user = new User({ email, password });
+    const user = new Auth({ email, password });
     return user.save();
 }
 
