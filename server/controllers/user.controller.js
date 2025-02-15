@@ -15,9 +15,8 @@ const getUser = catchAsync(async(req, res) => {
 })
 
 const updateUser = catchAsync(async(req, res) => {
-    try {
-        
-        const user = await userService.updateUser(req.body.user)
+    try {   
+        const user = await userService.updateUser(req.body)
         res.status(status.OK).json({ user });
 
     } catch (err) {
@@ -26,4 +25,15 @@ const updateUser = catchAsync(async(req, res) => {
     }
 })
 
-module.exports = { getUser, updateUser }
+const getIsUserInitialized = catchAsync(async(req, res) => {
+    try {
+        console.log(req.params.userID)
+        const user = await userService.getIsUserInitialized(req.params)
+        res.status(status.OK).json({ isInitialized: user.isInitialized })
+    } catch (err) {
+        console.log("Error", err)
+        res.status(status.INTERNAL_SERVER_ERROR).send("Failed to get is user initialized", err)
+    }
+})
+
+module.exports = { getUser, updateUser, getIsUserInitialized }

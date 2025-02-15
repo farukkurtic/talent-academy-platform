@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const routes = require('./routes')
 const app = express();
+const { connectDB } = require('./config/db');
 const PORT = process.env.PORT || 5000;
 
 // Define allowed origins (e.g., http://localhost:3000 for React frontend)
@@ -32,10 +33,14 @@ const corsOptions = {
 const startServer = async () => {
     // Use CORS middleware
     app.use(cors(corsOptions));
+    
+    // Connect to DB
+    await connectDB();
+    console.log("MongoDB connected. Starting server...");
 
     app.use(bodyParser.json());
 
-// Routes
+    // Routes
     app.use('/', routes);
 
     app.listen(PORT, () => console.log(`Server running on ${PORT}`));

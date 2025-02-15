@@ -5,8 +5,8 @@ const validate = require('../middlewares/validate')
 
 const router = express.Router();
 
-router.post('/register', validate(authValidation.register), authController.register);
-router.post('/login', validate(authValidation.login), authController.login);
-router.put('/change-password', validate(authValidation.changePassword), authController.changePassword);
+router.post('/registracija', validate(authValidation.register), authController.register);
+router.post('/prijava', validate(authValidation.login), authController.login);
+router.put('/promijeni-lozinku', validate(authValidation.changePassword), authController.changePassword);
 
 module.exports = router;
