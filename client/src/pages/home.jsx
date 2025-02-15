@@ -110,7 +110,9 @@ export default function Home() {
           <ul className="text-lg">
             <li className="mb-2 cursor-pointer">Kontakt</li>
             <li className="mb-2 cursor-pointer">Privatnost</li>
-            <li className="mb-2 cursor-pointer">Uslovi korištenja</li>
+            <li className="mb-2 cursor-pointer">
+              <a href="/uslovi-koristenja">Uslovi korištenja</a>
+            </li>
           </ul>
         </div>
         <div className="pb-20 lg:pb-0">
