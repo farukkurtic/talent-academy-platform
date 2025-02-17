@@ -40,7 +40,7 @@ export default function Register() {
           className="w-3xs h-3xs lg:w-5/6 lg:h-5/6"
         />
       </div>
-      <div className="right-box w-screen lg:w-1/2 max-h-full">
+      <div className="right-box w-screen lg:w-1/2 max-h-full flex flex-col lg:items-start justify-center">
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-start mt-10 mb-10">
           <div>
             <img
