@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import axios from "axios";
+
 import { Eye, EyeOff } from "lucide-react";
 
 import doorIcon from "../assets/door.svg";
@@ -27,8 +29,16 @@ export default function Register() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/registracija",
+        data
+      );
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
