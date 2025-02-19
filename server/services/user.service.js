@@ -1,61 +1,83 @@
-const { status } = require('http-status');
-const { User, Auth } = require('../models');
-const mongoose = require('mongoose')
-const ApiError = require('../utils/ApiError');
+const { Auth, User } = require("../models");
+const ApiError = require("../utils/ApiError");
+const bcrypt = require("bcrypt");
 
+const createUser = async ({ email, password }) => {
+  try {
+    const existingAuthUser = await Auth.findOne({ email });
 
-const createUser = async (userBody) => {
-    const { email, password } = userBody;
-
-    if (await Auth.isEmailTaken(userBody.email)) {
-        throw new ApiError(status.BAD_REQUEST, 'Email already taken');
+    if (!existingAuthUser) {
+      throw new ApiError(404, "Korisnički ne postoji na talentakademija.ba");
     }
 
-    const user = new Auth({ email, password });
-    const defaultUser = new User(
-        {
-            _id: user._id,
-            firstName: "",
-            lastName: "",
-            yearOfAttend: "",
-            profession: "",
-            biography: "",
-            purposeOfPlatform: "",
-            image: "",
-            links: [],
-            courseID: "",
-            isInitialized: false,
-          }
-    )
+    const existingUser = await User.findById(existingAuthUser?._id);
 
-    defaultUser.save();
-    return user.save();
-}
+    if (existingUser) {
+      throw new ApiError(400, "Korisnički nalog već postoji na HNTA Connect");
+    }
 
-const getUserById = async (userBody) => {
-    const { userID } = userBody;
-    const user = User.findOne({ _id: userID })
-    return user;
-}
+    const isMatch = await bcrypt.compare(password, existingAuthUser.password);
+    if (!isMatch) {
+      throw new ApiError(400, "Pogrešni podaci za prijavu");
+    }
 
-const updateUser = async (userBody) => {
-    const { updatedUser } = userBody;
-    const filter = { _id: updatedUser._id };
-    updatedUser.isInitialized = true;
-    const update = { ...updatedUser }; // Correct way to structure the update object
-    const result = await User.findByIdAndUpdate(filter, update, { new: true });
-    return result ?? (() => { throw new ApiError(status.BAD_REQUEST, 'No item found with the given ID.'); })();
-}
+    const newUser = new User({
+      _id: existingAuthUser._id,
+      firstName: "",
+      lastName: "",
+      yearOfAttend: "",
+      profession: "",
+      biography: "",
+      purposeOfPlatform: "",
+      image: "",
+      links: [],
+      courseID: "",
+      isInitialized: true,
+    });
+    await newUser.save();
 
-const getIsUserInitialized = async (userBody) => {
-    const { userID } = userBody;
-    const user = User.findOne({ _id: userID })
-    return user;
-}
+    return {
+      status: 200,
+      message: "Korisnik je uspješno prijavljen",
+    };
+  } catch (err) {
+    console.error("Greška u createUser:", err);
+    throw err instanceof ApiError
+      ? err
+      : new ApiError(500, "Došlo je do greške na serveru");
+  }
+};
+
+const getUserById = async (userID) => {
+  const user = await User.findById(userID);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  return user;
+};
+
+const updateUser = async (updatedUser) => {
+  updatedUser.isInitialized = true;
+  const user = await User.findByIdAndUpdate(updatedUser._id, updatedUser, {
+    new: true,
+  });
+  if (!user) {
+    throw new ApiError(400, "No user found with the given ID.");
+  }
+  return user;
+};
+
+const getIsUserInitialized = async (userID) => {
+  const user = await User.findById(userID);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  return user.isInitialized;
+};
 
 module.exports = {
-    createUser,
-    getUserById,
-    updateUser,
-    getIsUserInitialized
-}
+  createUser,
+  getUserById,
+  updateUser,
+  getIsUserInitialized,
+};
