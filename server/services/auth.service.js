@@ -1,56 +1,52 @@
-const { status } = require('http-status');
-const bcrypt = require('bcrypt');
-const { Auth } = require('../models');
-const ApiError = require('../utils/ApiError');
+const bcrypt = require("bcrypt");
+const { Auth, User } = require("../models");
+const ApiError = require("../utils/ApiError");
 
+const loginUsingCredentials = async ({ email, password }) => {
+  const authUser = await Auth.findOne({ email });
+  if (!authUser) {
+    throw new ApiError(404, "User not found on talentakademija.ba");
+  }
 
-const loginUsingCredentials = async (userBody) => {
-    const { email, password } = userBody
-    const user = await Auth.findOne({ email });
-    if (!user) {
-        throw new ApiError(status.NOT_FOUND, 'User not found');
-    }
+  const user = await User.findById(authUser._id);
+  if (!user) {
+    throw new ApiError(404, "User profile not found");
+  }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        throw new ApiError(status.BAD_REQUEST, 'Invalid credentials');
-    }
+  if (user.isInitialized) {
+    throw new ApiError(400, "User is already registered on our platform");
+  }
 
-    return user;
-}
+  const isMatch = await authUser.isPasswordMatch(password);
+  if (!isMatch) {
+    throw new ApiError(400, "Invalid credentials");
+  }
 
-const changePassword = async (userBody) => {
-    const { _id, currentPassword, newPassword } = userBody;
+  // Mark user as initialized
+  user.isInitialized = true;
+  await user.save();
 
-    try {
-        const user = await Auth.findById(_id);
-        const saltRounds = 12;
-        const isMatch = await bcrypt.compare(currentPassword, user.password);
-        if (!isMatch) {
-            throw new ApiError(status.BAD_REQUEST, 'Current password not match');
-        }
+  return user;
+};
 
-        bcrypt.hash(newPassword, saltRounds).then(async function(hash) {
-            // Store hash in your password DB.
-            const filter = { _id: _id };
-            const update = { password: hash };
+const changePassword = async ({ _id, currentPassword, newPassword }) => {
+  const user = await Auth.findById(_id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
 
-            const result = await Auth.findByIdAndUpdate(filter, update, { new: true });
-            if (result) {
-                return result;
-              } else {
-                throw new ApiError(status.BAD_REQUEST, 'No item found with the given ID.');
-              }
-        });
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw new ApiError(400, "Current password is incorrect");
+  }
 
-        
-    } catch(error) {
-        console.error("Error:", error);
-        throw new ApiError(status.BAD_REQUEST, "Error updating password.");
-    }
-}
+  user.password = await bcrypt.hash(newPassword, 12);
+  await user.save();
+
+  return user;
+};
 
 module.exports = {
-    loginUsingCredentials,
-    changePassword
-}
+  loginUsingCredentials,
+  changePassword,
+};

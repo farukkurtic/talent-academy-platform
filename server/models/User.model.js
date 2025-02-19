@@ -1,61 +1,23 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema(
+  {
     _id: {
-        type: String,
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
     },
-    firstName: {
-        type: String,
-        required: true,
-        default: ""
-    },
-    lastName: {
-        type: String,
-        required: true,
-        default: ""
-    },
-    yearOfAttend: {
-        type: String,
-        required: true,
-    },
-    profession: {
-        type: String,
-        required: true,
-        default: ""
-    },
-    biography: {
-        type: String,
-        required: true,
-        default: ""
-    },
-    purposeOfPlatform: {
-        type: String,
-        required: true,
-        default: ""
-    },
-    image: {
-        type: String,
-        required: true,
-        default: ""
-    },
-    links: {
-        type: Array,
-        required: true,
-        default: [] // Ensures it's an empty array
-    },
-    courseID: {
-        type: String,
-        required: true,
-        default: ""
-    },
-    isInitialized: {
-        type: Boolean,
-        default: false // Boolean should default to false
-    }
-}, { timestamps: true });
+    firstName: { type: String, default: "" },
+    lastName: { type: String, default: "" },
+    yearOfAttend: { type: String, default: 2024 },
+    profession: { type: String, default: "" },
+    biography: { type: String, default: "" },
+    purposeOfPlatform: { type: String, default: "" },
+    image: { type: String, default: "" },
+    links: { type: Array, default: [] },
+    courseID: { type: String, default: "" },
+    isInitialized: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
 
-mongoose.Schema.Types.String.checkRequired(v => typeof v === 'string');
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
