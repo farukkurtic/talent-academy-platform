@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import { Eye, EyeOff } from "lucide-react";
 
@@ -21,6 +22,9 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
 
+  const [responseErr, setResponseErr] = useState("");
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -36,8 +40,33 @@ export default function Register() {
         data
       );
       console.log(response);
-    } catch (err) {
-      console.log(err);
+
+      if (response.status === 201) {
+        alert("Registracija je uspješna");
+        localStorage.setItem("token", response.data.token);
+        navigate("/kontakt");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 404) {
+          setResponseErr(<>Korisnički nalog nije pronađen.</>);
+        } else if (status === 400) {
+          setResponseErr(
+            <>
+              Korisnik je već registrovan.{" "}
+              <span className="text-primary cursor-pointer">Prijavi se</span>
+            </>
+          );
+        } else if (status === 401) {
+          setResponseErr(
+            <>Korisnički podaci nisu ispravni. Pokušajte ponovo.</>
+          );
+        } else {
+          setResponseErr(<>Desila se greška. Molimo pokušajte opet.</>);
+        }
+      }
     }
   };
 
@@ -117,8 +146,16 @@ export default function Register() {
               Nastavi
             </button>
             <p className="text-center mt-5 tracking-wider">
-              Već imaš račun?{" "}
-              <span className="text-primary cursor-pointer">Prijavi se.</span>
+              {responseErr ? (
+                responseErr
+              ) : (
+                <>
+                  Već imaš račun?{" "}
+                  <span className="text-primary cursor-pointer">
+                    Prijavi se.
+                  </span>
+                </>
+              )}
             </p>
           </form>
         </div>

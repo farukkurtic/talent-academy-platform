@@ -7,18 +7,21 @@ const createUser = async ({ email, password }) => {
     const existingAuthUser = await Auth.findOne({ email });
 
     if (!existingAuthUser) {
-      throw new ApiError(404, "Korisnički ne postoji na talentakademija.ba");
+      throw new ApiError(
+        404,
+        "Korisnički nalog ne postoji na talentakademija.ba"
+      );
     }
 
     const existingUser = await User.findById(existingAuthUser?._id);
 
     if (existingUser) {
-      throw new ApiError(400, "Korisnički nalog već postoji na HNTA Connect");
+      throw new ApiError(400, "Korisnički nalog već postoji. Prijavite se");
     }
 
     const isMatch = await bcrypt.compare(password, existingAuthUser.password);
     if (!isMatch) {
-      throw new ApiError(400, "Pogrešni podaci za prijavu");
+      throw new ApiError(401, "Pogrešni podaci za prijavu");
     }
 
     const newUser = new User({
@@ -37,7 +40,7 @@ const createUser = async ({ email, password }) => {
     await newUser.save();
 
     return {
-      status: 200,
+      status: 201,
       message: "Korisnik je uspješno prijavljen",
     };
   } catch (err) {
