@@ -1,6 +1,7 @@
 const express = require('express');
 const authRoutes = require('./auth.route')
 const userRoutes = require('./user.route')
+const feedRoutes = require('./feed.route')
 
 const router = express.Router();
 
@@ -13,6 +14,10 @@ const defaultRoutes = [
         path: '/api/user',
         route: userRoutes,
     },
+    {
+      path: '/api/posts',
+      route: feedRoutes,
+  },
   ];
 
 defaultRoutes.forEach((route) => {
