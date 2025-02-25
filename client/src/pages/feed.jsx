@@ -1,15 +1,19 @@
 import hntaLogo from "../assets/hnta-logo.png";
 import textLogo from "../assets/textLogo.svg";
+import defaultPic from "../assets/default-image.png";
+import defaultBadge from "../assets/default-badge.png";
+import randomPic from "../assets/lecture-1.jpg";
 
 import { MessageSquare, GraduationCap, UserPen } from "lucide-react";
 
 import CreatePost from "../components/createPost";
+import Post from "../components/post";
 
 export default function Feed() {
   return (
     <div className="text-white h-screen relative flex items-center justify-center">
       {/* Sidebar */}
-      <div className="absolute w-85 top-0 bottom-0 left-0 border-r-1">
+      <div className="fixed w-85 top-0 bottom-0 left-0 border-r-1">
         {/* Logo Section */}
         <div className="logo-container flex items-center justify-center">
           <img src={hntaLogo} alt="hnta-logo" className="w-20" />
@@ -49,8 +53,34 @@ export default function Feed() {
           </button>
         </div>
       </div>
-      <div className="absolute top-10">
-        <CreatePost />
+      <div className="flex flex-col items-center gap-4 absolute top-10">
+        <div>
+          <CreatePost />
+        </div>
+        <div>
+          <Post
+            profilePic={defaultPic}
+            username="Faruk Kurtić"
+            badge={defaultBadge}
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec blandit orci. Cras gravida quam fermentum sapien pharetra, quis fringilla mauris gravida. Aenean dui urna, molestie quis lacus sed, finibus commodo quam."
+            picture={randomPic}
+            gif={"https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif"}
+          />
+          <Post
+            profilePic={defaultPic}
+            username="Faruk Kurtić"
+            badge={defaultBadge}
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec blandit orci. Cras gravida quam fermentum sapien pharetra, quis fringilla mauris gravida. Aenean dui urna, molestie quis lacus sed, finibus commodo quam."
+            picture={randomPic}
+          />
+          <Post
+            profilePic={defaultPic}
+            username="Faruk Kurtić"
+            badge={defaultBadge}
+            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec blandit orci. Cras gravida quam fermentum sapien pharetra, quis fringilla mauris gravida. Aenean dui urna, molestie quis lacus sed, finibus commodo quam."
+            gif={"https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif"}
+          />
+        </div>
       </div>
     </div>
   );
