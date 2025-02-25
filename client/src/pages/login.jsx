@@ -5,7 +5,8 @@ import * as yup from "yup";
 import { Eye, EyeOff } from "lucide-react";
 
 import logo from "../assets/hnta-logo.png";
-import pencilIcon from "../assets/pencil.svg";
+import pencilIcon from "../assets/pencil-alt.svg";
+
 
 const schema = yup.object().shape({
   email: yup.string().required("Ovo polje je obavezno"),
@@ -29,12 +30,12 @@ export default function Login() {
   };
 
   return (
-    <div className="text-white flex flex-col lg:flex-row h-screen">
-      <div className="left-box relative max-w-screen lg:w-1/2 max-h-full lg:block flex items-center justify-center">
+    <div className="text-white flex flex-col lg:flex-row h-screen -translate-y-100 lg:translate-y-0">
+      <div className="left-box flex justify-center items-start lg:w-1/2 ">
         <img
           src={pencilIcon}
           alt="olovka-vizual"
-          className="absolute lg:static max-w-screen h-3xs lg:w-max lg:max-h-screen"
+          className="h-3xs lg:h-full w-full max-h-screen object-contain"
         />
       </div>
       <div className="right-box w-screen lg:w-1/2 max-h-full">
@@ -48,7 +49,7 @@ export default function Login() {
           </div>
           <div className="color-white text-wrap">
             <h1 className="text-2xl lg:text-7xl font-black mb-4 tracking-wider lg:whitespace-pre-line">
-              Dobro došli nazad
+              Dobro {'\n'} došli nazad
             </h1>
             <p className="text-lg font-medium tracking-wide text-center lg:text-left">
               Lorem ipsum dolor sit amet.
