@@ -6,14 +6,14 @@ import Register from "./pages/register.jsx";
 import UsloviKoristenja from "./pages/uslovi-koristenja.jsx";
 import Kontakt from "./pages/kontakt.jsx";
 import Feed from "./pages/feed.jsx";
+import Details from "./pages/detalji.jsx";
+
 import "./App.css";
 
 import Modal from "react-modal";
 Modal.setAppElement("#root");
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <Router>
@@ -23,6 +23,7 @@ function App() {
           <Route path="/uslovi-koristenja" element={<UsloviKoristenja />} />
           <Route path="/kontakt" element={<Kontakt />} />
           <Route path="/feed" element={<Feed />} />
+          <Route path="/profil-detalji" element={<Details />} />
         </Routes>
       </Router>
     </>
