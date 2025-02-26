@@ -52,7 +52,7 @@ const createUser = async ({ email, password }) => {
 };
 
 const getUserById = async (userID) => {
-  const user = await User.findById(userID);
+  const user = await User.findById(userID.userID);
   if (!user) {
     throw new ApiError(404, "User not found");
   }

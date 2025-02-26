@@ -10,7 +10,7 @@ const getUser = catchAsync(async(req, res) => {
 
     } catch (err) {
         console.log("Error", err)
-        res.status(status.INTERNAL_SERVER_ERROR).send("Failed to get Interview", err)
+        res.status(status.INTERNAL_SERVER_ERROR).send("Failed to get User", err)
     }
 })
 
