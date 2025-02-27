@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 import { Eye, EyeOff } from "lucide-react";
 
 import doorIcon from "../assets/door.svg";
@@ -19,6 +22,9 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
 
+  const [responseErr, setResponseErr] = useState("");
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -27,8 +33,41 @@ export default function Register() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/registracija",
+        data
+      );
+      console.log(response);
+
+      if (response.status === 201) {
+        alert("Registracija je uspješna");
+        localStorage.setItem("token", response.data.token);
+        navigate("/kontakt");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 404) {
+          setResponseErr(<>Korisnički nalog nije pronađen.</>);
+        } else if (status === 400) {
+          setResponseErr(
+            <>
+              Korisnik je već registrovan.{" "}
+              <span className="text-primary cursor-pointer">Prijavi se</span>
+            </>
+          );
+        } else if (status === 401) {
+          setResponseErr(
+            <>Korisnički podaci nisu ispravni. Pokušajte ponovo.</>
+          );
+        } else {
+          setResponseErr(<>Desila se greška. Molimo pokušajte opet.</>);
+        }
+      }
+    }
   };
 
   return (
@@ -40,7 +79,7 @@ export default function Register() {
           className="w-3xs h-3xs lg:w-5/6 lg:h-5/6"
         />
       </div>
-      <div className="right-box w-screen lg:w-1/2 max-h-full">
+      <div className="right-box w-screen lg:w-1/2 max-h-full flex flex-col lg:items-start justify-center">
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-start mt-10 mb-10">
           <div>
             <img
@@ -107,8 +146,16 @@ export default function Register() {
               Nastavi
             </button>
             <p className="text-center mt-5 tracking-wider">
-              Već imaš račun?{" "}
-              <span className="text-primary cursor-pointer">Prijavi se.</span>
+              {responseErr ? (
+                responseErr
+              ) : (
+                <>
+                  Već imaš račun?{" "}
+                  <span className="text-primary cursor-pointer">
+                    Prijavi se.
+                  </span>
+                </>
+              )}
             </p>
           </form>
         </div>

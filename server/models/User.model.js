@@ -1,44 +1,24 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: true,
+const UserSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
     },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    yearOfAttend: {
-        type: Date,
-        required: true
-    },
-    profession: {
-        type: String,
-        required: true
-    },
-    biography: {
-        type: String,
-        required: true
-    },
-    purposeOfPlatform: {
-        type: String,
-        required: true
-    },
-    image: {
-        type: String,
-        required: true
-    },
-    links: {
-        type: Array,
-        required: true
-    },
-    courseID: {
-        type: String,
-        required: true
-    }
-}, { timestamps: true });
+    firstName: { type: String, default: "" },
+    lastName: { type: String, default: "" },
+    major: { type: String, default: "" },
+    yearOfAttend: { type: String, default: 2024 },
+    profession: { type: String, default: "" },
+    biography: { type: String, default: "" },
+    purposeOfPlatform: { type: Array, default: [] },
+    image: { type: String, default: "" },
+    links: { type: Array, default: [] },
+    courseID: { type: String, default: "" },
+    isInitialized: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
 
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
