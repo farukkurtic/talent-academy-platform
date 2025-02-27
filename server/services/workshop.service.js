@@ -31,7 +31,7 @@ const updateWorkshop = async (updatedWorkshop) => {
 
 const getWorkshopById = async (workshopId) => {
   const workshop = Workshop.findById(workshopId);
-  if (!workshop.workshop) {
+  if (!workshop) {
     throw new ApiError(404, "Workshop not found");
   }
   return workshop;

@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/:workshopId', workshopController.getWorkshop);
 router.post('/', workshopController.createWorkshop);
 router.get('/', workshopController.getAllWorkshops)
-router.get('/user/:createdBy', workshopController.getAllUserWorkshops)
+router.get('/:createdBy', workshopController.getAllUserWorkshops)
 router.delete('/:workshopId', workshopController.deleteWorkshop);
 router.put('/', workshopController.updateWorkshop);
 
