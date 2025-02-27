@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 import { Eye, EyeOff } from "lucide-react";
 
 import logo from "../assets/hnta-logo.png";
 import pencilIcon from "../assets/pencil-alt.svg";
-
 
 const schema = yup.object().shape({
   email: yup.string().required("Ovo polje je obavezno"),
@@ -17,6 +19,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
 
+  const [responseErr, setResponseErr] = useState("");
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -25,8 +30,32 @@ export default function Login() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/prijava",
+        data
+      );
+      console.log(response);
+
+      if (response.status === 200) {
+        alert("Prijava je uspješna");
+        localStorage.setItem("token", response.data.token);
+        navigate("/kontakt");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 400) {
+          setResponseErr(<>Neispravni podaci za prijavu.</>);
+        } else if (status === 404) {
+          setResponseErr(<>Korisnik nije pronađen.</>);
+        } else {
+          setResponseErr(<>Desila se greška. Molimo pokušajte opet.</>);
+        }
+      }
+    }
   };
 
   return (
@@ -49,7 +78,7 @@ export default function Login() {
           </div>
           <div className="color-white text-wrap">
             <h1 className="text-2xl lg:text-7xl font-black mb-4 tracking-wider lg:whitespace-pre-line">
-              Dobro {'\n'} došli nazad
+              Dobro {"\n"} došli nazad
             </h1>
             <p className="text-lg font-medium tracking-wide text-center lg:text-left">
               Lorem ipsum dolor sit amet.
@@ -71,7 +100,9 @@ export default function Login() {
                 placeholder="Email"
               />
               {errors.email && (
-                <p className="text-red-500 tracking-wider text-sm">{errors.email.message}</p>
+                <p className="text-red-500 tracking-wider text-sm">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -104,6 +135,10 @@ export default function Login() {
             >
               Nastavi
             </button>
+
+            {responseErr && (
+              <p className="text-center mt-5 tracking-wider"> {responseErr} </p>
+            )}
 
             <p className="text-center mt-5 tracking-wider">
               Zaboravili ste šifru?
