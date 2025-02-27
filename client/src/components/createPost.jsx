@@ -16,7 +16,7 @@ const CreatePost = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const textareaRef = useRef(null);
 
-  const fileInputRef = useRef(null); // Reference to the file input
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -41,17 +41,17 @@ const CreatePost = () => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
       setImageFile(file);
-      setSelectedImage(URL.createObjectURL(file)); // Preview image
+      setSelectedImage(URL.createObjectURL(file));
     } else {
       alert("Please select a valid image file.");
-      e.target.value = ""; // Reset the input value
+      e.target.value = "";
     }
   };
 
   const handleRemoveImage = () => {
     setSelectedImage(null);
     setImageFile(null);
-    fileInputRef.current.value = ""; // Reset the file input value
+    fileInputRef.current.value = "";
   };
 
   const onSubmit = (data) => {
@@ -60,7 +60,6 @@ const CreatePost = () => {
     if (imageFile) formData.append("image", imageFile);
     if (selectedGif) formData.append("gif", selectedGif);
 
-    // Log FormData contents
     for (let [key, value] of formData.entries()) {
       console.log(`${key}:`, value);
     }
@@ -121,7 +120,7 @@ const CreatePost = () => {
           <label className="cursor-pointer">
             <Image size={24} />
             <input
-              ref={fileInputRef} // Attach the ref to the file input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               className="hidden"
