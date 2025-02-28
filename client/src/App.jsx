@@ -27,7 +27,7 @@ function App() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/profil-detalji" element={<Details />} />
           <Route path="/profil-detalji-dodatno" element={<DetaljiFinalno />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/prijava" element={<Login />} />
         </Routes>
       </Router>
     </>

@@ -38,10 +38,10 @@ export default function Login() {
       );
       console.log(response);
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         alert("Prijava je uspješna");
         localStorage.setItem("token", response.data.token);
-        navigate("/kontakt");
+        navigate("/feed");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -50,7 +50,14 @@ export default function Login() {
         if (status === 400) {
           setResponseErr(<>Neispravni podaci za prijavu.</>);
         } else if (status === 404) {
-          setResponseErr(<>Korisnik nije pronađen.</>);
+          setResponseErr(
+            <div>
+              Korisnik nije pronađen.{" "}
+              <span className="text-primary cursor-pointer">
+                <a href="/registracija">Registrujte se</a>
+              </span>
+            </div>
+          );
         } else {
           setResponseErr(<>Desila se greška. Molimo pokušajte opet.</>);
         }
@@ -59,15 +66,15 @@ export default function Login() {
   };
 
   return (
-    <div className="text-white flex flex-col lg:flex-row h-screen -translate-y-100 lg:translate-y-0">
+    <div className="text-white flex flex-col lg:flex-row h-screen lg:-translate-y-100 lg:translate-y-0">
       <div className="left-box flex justify-center items-start lg:w-1/2 ">
         <img
           src={pencilIcon}
           alt="olovka-vizual"
-          className="h-3xs lg:h-full w-full max-h-screen object-contain"
+          className="h-3xs lg:h-full w-1/2 lg:w-full max-h-screen object-contain"
         />
       </div>
-      <div className="right-box w-screen lg:w-1/2 max-h-full">
+      <div className="right-box w-screen lg:w-1/2 max-h-full flex flex-col items-center lg:items-start justify-center">
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-start mt-10 mb-10">
           <div>
             <img
@@ -120,13 +127,12 @@ export default function Login() {
               ) : (
                 <Eye size={30} onClick={togglePassword} />
               )}
-
-              {errors.password && (
-                <p className="text-red-500 tracking-wider text-sm">
-                  {errors.password.message}
-                </p>
-              )}
             </div>
+            {errors.password && (
+              <p className="text-red-500 tracking-wider text-sm">
+                {errors.password.message}
+              </p>
+            )}
 
             {/* Submit Button */}
             <button
@@ -136,18 +142,20 @@ export default function Login() {
               Nastavi
             </button>
 
-            {responseErr && (
-              <p className="text-center mt-5 tracking-wider"> {responseErr} </p>
+            {/* Display responseErr or "Nemate korisnički račun?" */}
+            {responseErr ? (
+              <p className="text-center mt-5 tracking-wider">{responseErr}</p>
+            ) : (
+              <p className="text-center mt-5 tracking-wider">
+                Nemate korisnički račun?{" "}
+                <span className="text-primary cursor-pointer">
+                  <a href="/registracija">Kreirajte ga ovdje</a>
+                </span>
+              </p>
             )}
 
-            <p className="text-center mt-5 tracking-wider">
+            <p className="text-center mt-5 tracking-wider cursor-pointer">
               Zaboravili ste šifru?
-            </p>
-            <p className="text-center mt-5 tracking-wider">
-              Nemate korisnički račun?{" "}
-              <span className="text-primary cursor-pointer">
-                Kreirajte ga ovdje.
-              </span>
             </p>
           </form>
         </div>
