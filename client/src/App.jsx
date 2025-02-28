@@ -7,8 +7,9 @@ import UsloviKoristenja from "./pages/uslovi-koristenja.jsx";
 import Kontakt from "./pages/kontakt.jsx";
 import Feed from "./pages/feed.jsx";
 import Details from "./pages/detalji.jsx";
-import DetaljiFinalno from "./pages/detalji-finalno.jsx";
+import DetaljiFinalno from "./pages/detalji-finalno.jsx;
 import Login from "./pages/login.jsx";
+import Profile from "./pages/korisnik-profil.jsx";
 
 import "./App.css";
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/profil-detalji" element={<Details />} />
           <Route path="/profil-detalji-dodatno" element={<DetaljiFinalno />} />
           <Route path="/prijava" element={<Login />} />
+          <Route path="/profil/:userId" element={<Profile />} />
         </Routes>
       </Router>
     </>
