@@ -28,10 +28,11 @@ const createUser = async ({ email, password }) => {
       _id: existingAuthUser._id,
       firstName: "",
       lastName: "",
+      major: "",
       yearOfAttend: "",
       profession: "",
       biography: "",
-      purposeOfPlatform: "",
+      purposeOfPlatform: [],
       image: "",
       links: [],
       courseID: "",
@@ -39,10 +40,8 @@ const createUser = async ({ email, password }) => {
     });
     await newUser.save();
 
-    return {
-      status: 201,
-      message: "Korisnik je uspješno prijavljen",
-    };
+    // 🔥 Return the new user object with _id
+    return newUser;
   } catch (err) {
     console.error("Greška u createUser:", err);
     throw err instanceof ApiError
@@ -61,7 +60,8 @@ const getUserById = async (userId) => {
 };
 
 const updateUser = async (updatedUser) => {
-  updatedUser.isInitialized = true;
+  // ovooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+  // updatedUser.isInitialized = true;
   const user = await User.findByIdAndUpdate(updatedUser._id, updatedUser, {
     new: true,
   });

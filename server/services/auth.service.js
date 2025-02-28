@@ -5,27 +5,20 @@ const ApiError = require("../utils/ApiError");
 const loginUsingCredentials = async ({ email, password }) => {
   const authUser = await Auth.findOne({ email });
   if (!authUser) {
-    throw new ApiError(404, "User not found on talentakademija.ba");
+    throw new ApiError(404, "Korisnik nije pronađen");
   }
 
   const user = await User.findById(authUser._id);
   if (!user) {
-    throw new ApiError(404, "User profile not found");
-  }
-
-  if (user.isInitialized) {
-    throw new ApiError(400, "User is already registered on our platform");
+    throw new ApiError(404, "Korisnik nije pronađen");
   }
 
   const isMatch = await authUser.isPasswordMatch(password);
   if (!isMatch) {
-    throw new ApiError(400, "Invalid credentials");
+    throw new ApiError(400, "Pogrešni podaci za prijavu");
   }
 
-  // Mark user as initialized
-  user.isInitialized = true;
-  await user.save();
-
+  // 🔥 Return the full user object instead of just a message
   return user;
 };
 
