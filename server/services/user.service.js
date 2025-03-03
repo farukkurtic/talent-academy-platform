@@ -2,6 +2,26 @@ const { Auth, User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcrypt");
 
+const getUsers = async (filter, options) => {
+  try {
+    const users = await User.paginate(filter, options)
+    return users;
+  } catch (err) {
+    console.error("Error when getting tasks:", err);
+    throw new ApiError(status.INTERNAL_SERVER_ERROR, "Server error");
+  }
+}
+
+const getUsersByName = async (filter, options) => {
+  try {
+    const users = await User.paginate(filter, options)
+    return users;
+  } catch (err) {
+    console.error("Error when getting tasks:", err);
+    throw new ApiError(status.INTERNAL_SERVER_ERROR, "Server error");
+  }
+}
+
 const createUser = async ({ email, password }) => {
   try {
     const existingAuthUser = await Auth.findOne({ email });
@@ -80,6 +100,8 @@ const getIsUserInitialized = async (userID) => {
 };
 
 module.exports = {
+  getUsers,
+  getUsersByName,
   createUser,
   getUserById,
   updateUser,
