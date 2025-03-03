@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 import hntaLogo from "../assets/hnta-logo.png";
 import textLogo from "../assets/textLogo.svg";
@@ -6,15 +9,135 @@ import defaultPic from "../assets/default-image.png";
 import defaultBadge from "../assets/default-badge.png";
 import randomPic from "../assets/lecture-1.jpg";
 
+import line1 from "../assets/lines/s1.svg";
+import line2 from "../assets/lines/s2.svg";
+import line3 from "../assets/lines/s3.svg";
+import line4 from "../assets/lines/s4.svg";
+import line5 from "../assets/lines/s5.svg";
+
+// badges
+import kodiranje from "../assets/kodiranje.svg";
+import pisanje from "../assets/kreativnoPisanje.svg";
+import graficki from "../assets/grafickiDizajn.svg";
+import novinarstvo from "../assets/novinarstvo.svg";
+import muzika from "../assets/muzickaProdukcija.svg";
+
 import { MessageSquare, GraduationCap, UserPen, Menu } from "lucide-react";
 
 import CreatePost from "../components/createPost";
 import Post from "../components/post";
 
 export default function Feed() {
+  const [allPosts, setAllPosts] = useState([]);
+  const [userId, setUserId] = useState(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/prijava");
+    } else {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.id);
+    }
+  }, []);
+
+  // Function to fetch posts and update the state
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/posts");
+      const posts = response.data.posts;
+
+      // Fetch user data for each post
+      const postsWithUsers = await Promise.all(
+        posts.map(async (post) => {
+          try {
+            const userResponse = await axios.get(
+              `http://localhost:5000/api/user/${post.userId}`
+            );
+
+            if (userResponse.data.user.major === "Odgovorno kodiranje") {
+              return {
+                ...post,
+                user: userResponse.data.user,
+                badge: kodiranje,
+              };
+            } else if (userResponse.data.user.major === "Kreativno pisanje") {
+              return {
+                ...post,
+                user: userResponse.data.user,
+                badge: pisanje,
+              };
+            } else if (userResponse.data.user.major === "Grafički dizajn") {
+              return {
+                ...post,
+                user: userResponse.data.user,
+                badge: graficki,
+              };
+            } else if (userResponse.data.user.major === "Novinarstvo") {
+              return {
+                ...post,
+                user: userResponse.data.user,
+                badge: novinarstvo,
+              };
+            } else if (userResponse.data.user.major === "Muzička produkcija") {
+              return {
+                ...post,
+                user: userResponse.data.user,
+                badge: muzika,
+              };
+            }
+          } catch (userError) {
+            console.error("Error fetching user:", userError);
+            return { ...post, user: null }; // Handle missing user data gracefully
+          }
+        })
+      );
+
+      setAllPosts(postsWithUsers);
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+    }
+  };
+
+  const deletePost = async (postId) => {
+    try {
+      console.log("Deleting post with ID:", postId); // Debugging
+      const response = await axios.delete(
+        `http://localhost:5000/api/posts/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("Delete response:", response.data); // Debugging
+      fetchPosts(); // Refresh posts after deletion
+    } catch (err) {
+      console.error("Error deleting post:", err.response?.data || err.message); // Debugging
+    }
+  };
+
+  // Fetch posts when the component mounts
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    console.log(allPosts);
+  }, [allPosts]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for hamburger menu
+
   return (
     <div className="text-white h-screen relative flex items-center justify-center">
+      <img src={line1} className="fixed -top-40 right-0 rotate-180" />
+      <img src={line2} className="fixed -top-10 left-80" />
+      <img src={line3} className="fixed top-0 right-80" />
+      <img src={line5} className="fixed bottom-0 -right-63" />
+
       {/* Header (Mobile Only) */}
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
         {/* Logo Section */}
@@ -114,31 +237,30 @@ export default function Feed() {
       )}
       <div className="flex flex-col items-center gap-4 absolute top-10">
         <div>
-          <CreatePost />
+          <CreatePost userId={userId} refreshFeed={fetchPosts} />
         </div>
         <div>
-          <Post
-            profilePic={defaultPic}
-            username="Faruk Kurtić"
-            badge={defaultBadge}
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec blandit orci. Cras gravida quam fermentum sapien pharetra, quis fringilla mauris gravida. Aenean dui urna, molestie quis lacus sed, finibus commodo quam."
-            picture={randomPic}
-            gif={"https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif"}
-          />
-          <Post
-            profilePic={defaultPic}
-            username="Faruk Kurtić"
-            badge={defaultBadge}
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec blandit orci. Cras gravida quam fermentum sapien pharetra, quis fringilla mauris gravida. Aenean dui urna, molestie quis lacus sed, finibus commodo quam."
-            picture={randomPic}
-          />
-          <Post
-            profilePic={defaultPic}
-            username="Faruk Kurtić"
-            badge={defaultBadge}
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec blandit orci. Cras gravida quam fermentum sapien pharetra, quis fringilla mauris gravida. Aenean dui urna, molestie quis lacus sed, finibus commodo quam."
-            gif={"https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif"}
-          />
+          {allPosts.map((post) => (
+            <Post
+              key={post._id}
+              profilePic={post.user?.image || defaultPic}
+              firstName={post.user.firstName}
+              lastName={post.user.lastName}
+              content={post.content}
+              picture={
+                post.image
+                  ? `http://localhost:5000/api/posts/image/${post.image}`
+                  : null
+              }
+              gif={post.gif}
+              badge={post.badge}
+              likes={post.likes}
+              postId={post._id}
+              postUserId={post.userId}
+              currentUserId={userId}
+              deletePost={deletePost}
+            />
+          ))}
         </div>
       </div>
     </div>

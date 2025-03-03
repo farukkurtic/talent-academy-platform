@@ -1,130 +1,131 @@
-const { status } = require('http-status');
-const { Post } = require('../models');
-const ApiError = require('../utils/ApiError');
+const { status } = require("http-status");
+const { Post } = require("../models");
+const ApiError = require("../utils/ApiError");
 const { getGfsBucket } = require("../config/db");
-const { Readable } = require("stream");
-const fs = require("fs");
+const stream = require("stream");
 
 const createPost = async (postBody) => {
-    const { text, userId } = postBody;
+  const { text, gif, image, userId } = postBody;
 
-    try {
-        console.log("test", postBody)
-        let newPost;
-        newPost = new Post({ userId: "userId", content: "text", image: '', gif: '', likes: [], comments: [] });
+  try {
+    // Create the post
+    const newPost = new Post({
+      userId,
+      content: text,
+      image: null, // Initially null, will be updated after image upload
+      gif: gif || "",
+      likes: [],
+      comments: [],
+    });
 
-        return await newPost.save();
+    const savedPost = await newPost.save();
 
-      } catch (err) {
-        console.error("Greška u createPost:", err);
-        throw err instanceof ApiError
-          ? err
-          : new ApiError(500, "Došlo je do greške na serveru");
-      }
-}
+    // If an image is provided, upload it to GridFS
+    if (image) {
+      const imageId = await uploadImageToGridFS(image, savedPost._id);
+      savedPost.image = imageId; // Update the post with the image ID
+      await savedPost.save();
+    }
+
+    return savedPost;
+  } catch (err) {
+    console.error("Error in createPost:", err);
+    throw err instanceof ApiError
+      ? err
+      : new ApiError(500, "Došlo je do greške na serveru");
+  }
+};
 
 const getPosts = async () => {
-  const posts = await Post.aggregate([
-    {
-      $lookup: {
-        from: "feed.files", // GridFS stores files here
-        localField: "_id", // Match post's ID
-        foreignField: "metadata.postId", // Match file's postId
-        as: "feed" // Store the result in an array
-      }
-    },
-    { $sort: { createdAt: -1 } } // Sort posts by creation date
-  ]);
+  try {
+    const posts = await Post.aggregate([
+      {
+        $lookup: {
+          from: "fs.files", // GridFS stores files here
+          localField: "image", // Match post's image field
+          foreignField: "_id", // Match file's ID
+          as: "imageData", // Store the result in an array
+        },
+      },
+      { $sort: { createdAt: -1 } }, // Sort posts by creation date
+    ]);
 
-  const postsWithImages = posts.map((post) => {
-    // Get the first image if exists
-    const image = post.feed.length > 0 ? `/image/${post.feed[0]._id}` : null;
+    // Map posts to include image URLs
+    const postsWithImages = posts.map((post) => {
+      const imageUrl =
+        post.imageData.length > 0
+          ? `/api/image/${post.imageData[0]._id}` // Ensure this matches the route
+          : null;
 
-    return {
-      userId: post?.userId,
-      content: post?.content,
-      image: image
-    };
-  });
+      return {
+        ...post,
+        imageUrl, // Add the image URL to the post
+      };
+    });
 
-  return postsWithImages;
+    return postsWithImages;
+  } catch (err) {
+    console.error("Error in getPosts:", err);
+    throw new ApiError(500, "Failed to fetch posts");
+  }
 };
 
 const postReact = async (req) => {
   const { postId } = req.params;
-  const { userId } = req.body; 
+  const { userId } = req.body;
 
   const post = await Post.findById(postId);
-  if (!post) return new ApiError(status.INTERNAL_SERVER_ERROR, "Došlo je do greške na serveru");
- 
-  if(post.likes.includes(userId)) post.likes = post.likes.filter((r) => r !== userId);
-  else post.likes.push(userId);
+  if (!post) throw new ApiError(404, "Post not found");
 
-  return await post.save();
-}
-
-const postComment = async (req) => {
-  const { postId } = req.params;
-  const { userId, text } = req.body;
-
-  const post = await Post.findById(postId);
-  if (!post) return new ApiError(status.INTERNAL_SERVER_ERROR, "Došlo je do greške na serveru");
-
-  post.comments.push({ userId: userId, content: text })
-  return await post.save();
-}
-
-const uploadImage = async (req) => {
-  const { file } = req;
-  console.log("upload", req.postId)
-  const gfsBucket = await getGfsBucket();
-
-    // Prepare readable stream
-    if(file) {
-      const readableStream = new Readable();
-      readableStream.push(file.buffer);
-      readableStream.push(null);
-  
-      // Upload to GridFS
-      const uploadStream = gfsBucket.openUploadStream(file.originalname, {
-          contentType: file.mimetype,
-          metadata: { postId: req.postId}
-      });
-  
-      readableStream.pipe(uploadStream);
-  
-      return new Promise((resolve, reject) => {
-          uploadStream.on("finish", async () => {
-              try {
-                  const tempFilePath = `./temp_${file.originalname}`;
-  
-                  // Save uploaded file locally
-                  const downloadStream = gfsBucket.openDownloadStream(uploadStream.id);
-                  const writeStream = fs.createWriteStream(tempFilePath);
-                  downloadStream.pipe(writeStream);
-                  await new Promise((res, rej) => {
-                      writeStream.on("finish", res);
-                      writeStream.on("error", rej);
-                  });
-  
-                  resolve();
-              } catch (err) {
-                  console.error("Error during upload and transcription:", err);
-                  reject(err);
-              }
-          });
-  
-          uploadStream.on("error", reject);
-      });
-    }
+  if (post.likes.includes(userId)) {
+    post.likes = post.likes.filter((id) => id !== userId);
+  } else {
+    post.likes.push(userId);
   }
 
+  await post.save();
+  return post;
+};
 
+const postUnreact = async (req) => {
+  const { postId } = req.params;
+  const { userId } = req.body;
 
-module.exports = {
-  createPost,
-  getPosts,
-  postReact,
-  postComment,
-  uploadImage
-}
+  const post = await Post.findById(postId);
+  if (!post) throw new ApiError(404, "Post not found");
+
+  post.likes = post.likes.filter((id) => id !== userId);
+  await post.save();
+  return post;
+};
+
+const uploadImageToGridFS = async (file, postId) => {
+  const gfsBucket = getGfsBucket();
+
+  // Create a readable stream from the file buffer
+  const readableStream = new stream.Readable();
+  readableStream.push(file.buffer); // Push the file buffer into the stream
+  readableStream.push(null); // Signal the end of the stream
+
+  // Create an upload stream to GridFS
+  const uploadStream = gfsBucket.openUploadStream(file.originalname, {
+    contentType: file.mimetype,
+    metadata: { postId }, // Link the file to the post
+  });
+
+  // Pipe the readable stream to the upload stream
+  readableStream.pipe(uploadStream);
+
+  return new Promise((resolve, reject) => {
+    uploadStream.on("finish", () => {
+      resolve(uploadStream.id); // Return the file ID
+    });
+
+    uploadStream.on("error", (err) => {
+      console.error("Error uploading file:", err);
+      reject(err);
+    });
+  });
+};
+
+module.exports = { createPost, getPosts, postReact, postUnreact };

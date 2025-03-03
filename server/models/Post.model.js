@@ -1,26 +1,36 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
 
-const PostSchema = new mongoose.Schema({
+const PostSchema = new mongoose.Schema(
+  {
     userId: {
-        type: String,
+      type: String,
+      required: true,
     },
     likes: {
-        type: Array,
+      type: Array,
+      default: [],
     },
-    comments: {
-        type: Array,
-    },
+    comments: [
+      {
+        userId: { type: String, required: true },
+        text: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     content: {
-        type: String,
+      type: String,
+      required: true,
     },
     image: {
-        type: String, 
-        ref: "feed.files" 
+      type: mongoose.Schema.Types.ObjectId, // Reference to GridFS file
+      ref: "fs.files", // GridFS collection
     },
     gif: {
-        type: String,
-    }
-}, { timestamps: true });
+      type: String,
+      default: "",
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model("Post", PostSchema);

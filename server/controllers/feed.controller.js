@@ -1,69 +1,54 @@
-const { status } = require('http-status');
-const catchAsync = require('../utils/catchAsync');
-const { feedService } = require('../services')
-const { Types } = require('mongoose')
+const { status } = require("http-status");
+const catchAsync = require("../utils/catchAsync");
+const { feedService } = require("../services");
 
-const createPost = catchAsync(async(req, res, next) => {
-    try {
-        console.log("Creating post...")
-        const post = await feedService.createPost(req.body);
-
-        console.log(post);
-        req.postId = post._id;  // Set post ID for file upload
-        //res.status(status.CREATED).json({ post });
-        next();
-    } catch (err) {
-        console.log("Error", err)
-        res.status(status.INTERNAL_SERVER_ERROR).send("Failed to create post", err)
-    }
-})
-
-const getPosts = catchAsync(async(req, res) => {
-    try {   
-        const posts = await feedService.getPosts(req.body)
-        res.status(status.OK).json({ posts });
-
-    } catch (err) {
-        console.log("Error", err)
-        res.status(status.INTERNAL_SERVER_ERROR).send("Failed to get posts", err)
-    }
-})
-
-const postReact = catchAsync(async(req, res) => {
-    try {
-        const postReact = await feedService.postReact(req)
-        res.status(status.OK).json({ postReact: postReact })
-    } catch (err) {
-        console.log("Error", err)
-        res.status(status.INTERNAL_SERVER_ERROR).send("Failed to rect post", err)
-    }
-})
-
-const postUnreact = catchAsync(async(req, res) => {
-    try {
-        const postUnreact = await feedService.postUnreact(req)
-        res.status(status.OK).json({ postUnreact: postUnreact })
-    } catch (err) {
-        console.log("Error", err)
-        res.status(status.INTERNAL_SERVER_ERROR).send("Failed to unreact post", err)
-    }
-})
-
-
-const uploadImage = catchAsync(async(req, res) => {
+const createPost = catchAsync(async (req, res) => {
   try {
-      console.log("File received:", req.file);
-      if (!req.file) {
-          res.status(status.OK);
-          //return;
-      }
+    const { text, gif, userId } = req.body;
+    const imageFile = req.file;
 
-      const post = await feedService.uploadImage(req);
-      res.status(status.OK).json(post);
+    const post = await feedService.createPost({
+      text,
+      gif,
+      image: imageFile,
+      userId,
+    });
+
+    res.status(status.CREATED).json({ post });
   } catch (err) {
-      console.error("Error in uploadImage:", err);
-      res.status(status.INTERNAL_SERVER_ERROR).send("Failed to upload image");
+    console.log("Error:", err);
+    res.status(status.INTERNAL_SERVER_ERROR).send("Failed to create post");
   }
 });
 
-module.exports = { createPost, getPosts, postReact, postUnreact, uploadImage }
+const getPosts = catchAsync(async (req, res) => {
+  try {
+    const posts = await feedService.getPosts();
+    res.status(status.OK).json({ posts });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(status.INTERNAL_SERVER_ERROR).send("Failed to fetch posts");
+  }
+});
+
+const postReact = catchAsync(async (req, res) => {
+  try {
+    const postReact = await feedService.postReact(req);
+    res.status(status.OK).json({ postReact });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(status.INTERNAL_SERVER_ERROR).send("Failed to react to post");
+  }
+});
+
+const postUnreact = catchAsync(async (req, res) => {
+  try {
+    const postUnreact = await feedService.postUnreact(req);
+    res.status(status.OK).json({ postUnreact });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(status.INTERNAL_SERVER_ERROR).send("Failed to unreact to post");
+  }
+});
+
+module.exports = { createPost, getPosts, postReact, postUnreact };
