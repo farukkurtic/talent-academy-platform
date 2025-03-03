@@ -35,7 +35,7 @@ export default function DetaljiFinalno() {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
     }
-  }, [navigate]);
+  }, []);
 
   const {
     register,

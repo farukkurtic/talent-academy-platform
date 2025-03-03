@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { GridFsStorage } = require("multer-gridfs-storage");
 const { GridFSBucket } = require("mongodb");
 
 let gfsBucket;
@@ -9,15 +8,15 @@ const connectDB = async () => {
     const connection = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-  });
+    });
 
-  console.log("Mongoose connection successful");
+    console.log("Mongoose connection successful");
 
-  const db = connection.connection.db; // Access db directly
-  gfsBucket = new GridFSBucket(db, { bucketName: "feed" });
-  
-  console.log("gfsBucket:", gfsBucket);
-  console.log("gfsBucket initialized successfully");
+    // Initialize GridFSBucket
+    const db = connection.connection.db; // Access the database directly
+    gfsBucket = new GridFSBucket(db, { bucketName: "fs" }); // Use "fs" as the bucket name
+
+    console.log("gfsBucket initialized successfully");
   } catch (err) {
     console.error("Error connecting to MongoDB:", err.message);
     process.exit(1);
@@ -26,8 +25,11 @@ const connectDB = async () => {
 
 // Getter function to access gfsBucket
 const getGfsBucket = () => {
+  if (!gfsBucket) {
+    throw new Error("GridFS bucket not initialized");
+  }
+  console.log("GridFS bucket accessed successfully"); // Add this log
   return gfsBucket;
 };
-
 
 module.exports = { connectDB, getGfsBucket };
