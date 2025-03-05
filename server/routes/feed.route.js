@@ -114,7 +114,7 @@ router.post("/:postId/comment", authMiddleware, async (req, res) => {
 
     // Fetch the user who posted the comment
     const userResponse = await axios.get(
-      `http://localhost:5000/api/user/${userId}`
+      `http://localhost:5000/api/user/id/${userId}`
     );
     const user = userResponse.data.user;
 
@@ -142,7 +142,7 @@ router.get("/:postId/comments", async (req, res) => {
     const commentsWithUserDetails = await Promise.all(
       post.comments.map(async (comment) => {
         const userResponse = await axios.get(
-          `http://localhost:5000/api/user/${comment.userId}`
+          `http://localhost:5000/api/user/id/${comment.userId}`
         );
         const user = userResponse.data.user;
 

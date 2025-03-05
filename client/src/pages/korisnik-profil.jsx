@@ -64,7 +64,7 @@ export default function Profile() {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/${paramsId}`
+          `http://localhost:5000/api/user/id/${paramsId}`
         );
         setUserData(response.data.user); // Assuming the user data is inside `response.data.user`
       } catch (error) {

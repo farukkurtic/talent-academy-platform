@@ -11,6 +11,7 @@ import DetaljiFinalno from "./pages/detalji-finalno.jsx";
 import Login from "./pages/login.jsx";
 import Profile from "./pages/korisnik-profil.jsx";
 import MyProfile from "./pages/mojProfil.jsx";
+import Filters from "./pages/filteri.jsx";
 
 import "./App.css";
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="/prijava" element={<Login />} />
           <Route path="/profil/:userId" element={<Profile />} />
           <Route path="/moj-profil" element={<MyProfile />} />
+          <Route path="/filteri" element={<Filters />} />
         </Routes>
       </Router>
     </>

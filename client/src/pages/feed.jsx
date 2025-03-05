@@ -31,6 +31,9 @@ export default function Feed() {
   const [allPosts, setAllPosts] = useState([]);
   const [userId, setUserId] = useState(null);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function Feed() {
         posts.map(async (post) => {
           try {
             const userResponse = await axios.get(
-              `http://localhost:5000/api/user/${post.userId}`
+              `http://localhost:5000/api/user/id/${post.userId}`
             );
 
             if (userResponse.data.user.major === "Odgovorno kodiranje") {
@@ -120,6 +123,24 @@ export default function Feed() {
     }
   };
 
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+
+    if (query.length > 1) {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/user/search?name=${query}`
+        );
+        setSearchResults(response.data.users);
+      } catch (err) {
+        console.error("Error searching users:", err);
+        setSearchResults([]);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
   // Fetch posts when the component mounts
   useEffect(() => {
     fetchPosts();
@@ -134,7 +155,7 @@ export default function Feed() {
   return (
     <div className="text-white h-screen relative flex items-center justify-center">
       <img src={line1} className="fixed -top-40 right-0 rotate-180" />
-      <img src={line2} className="fixed -top-10 left-80" />
+
       <img src={line3} className="fixed top-0 right-80" />
       <img src={line5} className="fixed bottom-0 -right-63" />
 
@@ -163,9 +184,64 @@ export default function Feed() {
         {/* Search Bar */}
         <div className="text-center my-6">
           <input
+            type="text"
             placeholder="Pretraži korisnike..."
-            className="border p-3 rounded-full w-full text-white"
+            className="border p-3 rounded-full w-full text-white px-4"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
           />
+          {searchQuery !== "" && (
+            <div className="absolute w-5/6 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
+              {searchResults.length === 0 ? (
+                <div>Korisnik nije pronađen</div>
+              ) : (
+                <div>
+                  {searchResults.map((user) => (
+                    <div
+                      key={user._id}
+                      className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
+                      onClick={() => {
+                        if (userId === user?._id) {
+                          navigate(`/moj-profil`);
+                        } else {
+                          navigate(`/profil/${user._id}`);
+                        }
+                      }}
+                    >
+                      <img
+                        src={user.image || defaultPic}
+                        alt={`${user.firstName} ${user.lastName}`}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <span>
+                        {user.firstName} {user.lastName}
+                      </span>
+                      <span>
+                        {(() => {
+                          switch (user.major) {
+                            case "Muzička produkcija":
+                              return <img src={muzika} className="w-4" />; // You can return whatever you want for this case
+                            case "Odgovorno kodiranje":
+                              return <img src={kodiranje} className="w-4" />; // Default case, in case no match
+                            case "Novinarstvo":
+                              return <img src={novinarstvo} className="w-4" />; // Default case, in case no match
+                            case "Kreativno pisanje":
+                              return <img src={pisanje} className="w-4" />; // Default case, in case no match
+                            case "Grafički dizajn":
+                              return <img src={graficki} className="w-4" />; // Default case, in case no match
+                          }
+                        })()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
+                <a href="/filteri">Prikaži sve korisnike</a>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Navigation Links and Logout Button at the Bottom */}
@@ -200,9 +276,66 @@ export default function Feed() {
           {/* Search Bar */}
           <div className="text-center my-4">
             <input
+              type="text"
               placeholder="Pretraži korisnike..."
-              className="border p-3 rounded-full w-full bg-gray-700 text-white"
+              className="border p-3 rounded-full w-full text-white px-4"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
             />
+            {searchQuery !== "" && (
+              <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
+                {searchResults.length === 0 ? (
+                  <div>Korisnik nije pronađen</div>
+                ) : (
+                  <div>
+                    {searchResults.map((user) => (
+                      <div
+                        key={user._id}
+                        className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
+                        onClick={() => {
+                          if (userId === user?._id) {
+                            navigate(`/moj-profil`);
+                          } else {
+                            navigate(`/profil/${user._id}`);
+                          }
+                        }}
+                      >
+                        <img
+                          src={user.image || defaultPic}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <span>
+                          {user.firstName} {user.lastName}
+                        </span>
+                        <span>
+                          {(() => {
+                            switch (user.major) {
+                              case "Muzička produkcija":
+                                return <img src={muzika} className="w-4" />; // You can return whatever you want for this case
+                              case "Odgovorno kodiranje":
+                                return <img src={kodiranje} className="w-4" />; // Default case, in case no match
+                              case "Novinarstvo":
+                                return (
+                                  <img src={novinarstvo} className="w-4" />
+                                ); // Default case, in case no match
+                              case "Kreativno pisanje":
+                                return <img src={pisanje} className="w-4" />; // Default case, in case no match
+                              case "Grafički dizajn":
+                                return <img src={graficki} className="w-4" />; // Default case, in case no match
+                            }
+                          })()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
+                  Prikaži sve korisnike
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Navigation Links */}
