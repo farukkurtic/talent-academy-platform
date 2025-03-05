@@ -49,7 +49,7 @@ export default function Post({
       const users = await Promise.all(
         likes.map(async (userId) => {
           const response = await axios.get(
-            `http://localhost:5000/api/user/${userId}`
+            `http://localhost:5000/api/user/id/${userId}`
           );
           return response.data.user;
         })
@@ -99,7 +99,7 @@ export default function Post({
 
         // Fetch the current user's data and add it to likes
         const response = await axios.get(
-          `http://localhost:5000/api/user/${currentUserId}`
+          `http://localhost:5000/api/user/id/${currentUserId}`
         );
         setLikes((prev) => [...prev, currentUserId]);
         setLikedUsers((prev) => [...prev, response.data.user]);
