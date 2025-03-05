@@ -31,7 +31,6 @@ import novinarstvo from "../assets/novinarstvo.svg";
 import muzika from "../assets/muzickaProdukcija.svg";
 
 export default function Profile() {
-  // Define badges for each major
   const badges = {
     "Odgovorno kodiranje": kodiranje,
     "Kreativno pisanje": pisanje,
@@ -42,12 +41,12 @@ export default function Profile() {
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State for hamburger menu
+  const [profilePicUrl, setProfilePicUrl] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
   const paramsId = params.userId;
 
-  // Check for user authentication and decode JWT token
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -59,14 +58,13 @@ export default function Profile() {
     }
   }, [navigate]);
 
-  // Fetch user data when the paramsUserId changes
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
           `http://localhost:5000/api/user/id/${paramsId}`
         );
-        setUserData(response.data.user); // Assuming the user data is inside `response.data.user`
+        setUserData(response.data.user);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
@@ -84,13 +82,11 @@ export default function Profile() {
     <div className="text-white h-screen relative flex flex-col lg:flex-row lg:items-center lg:justify-center">
       {/* Header (Mobile Only) */}
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
-        {/* Logo Section */}
         <div className="flex items-center">
           <img src={hntaLogo} alt="hnta-logo" className="w-10" />
           <img src={textLogo} alt="hnta-text-logo" className="w-32 h-10 ml-2" />
         </div>
 
-        {/* Hamburger Menu */}
         <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
           <Menu size={32} className="text-primary" />
         </button>
@@ -98,7 +94,6 @@ export default function Profile() {
 
       {/* Sidebar (Desktop Only) */}
       <div className="hidden lg:block fixed w-85 top-0 bottom-0 left-0 border-r border-gray-700 bg-black p-6">
-        {/* Logo Section */}
         <a href="/feed">
           <div className="logo-container flex items-center justify-center">
             <img src={hntaLogo} alt="hnta-logo" className="w-20" />
@@ -110,7 +105,6 @@ export default function Profile() {
           </div>
         </a>
 
-        {/* Search Bar */}
         <div className="text-center my-6">
           <input
             placeholder="Pretraži korisnike..."
@@ -118,7 +112,6 @@ export default function Profile() {
           />
         </div>
 
-        {/* Navigation Links and Logout Button at the Bottom */}
         <div className="absolute bottom-10 left-20 p-6">
           <ul className="text-2xl w-full">
             <li className="flex items-center gap-x-4 py-2">
@@ -147,7 +140,6 @@ export default function Profile() {
       {/* Hamburger Menu (Mobile Only) */}
       {isMenuOpen && (
         <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
-          {/* Search Bar */}
           <div className="text-center my-4">
             <input
               placeholder="Pretraži korisnike..."
@@ -155,7 +147,6 @@ export default function Profile() {
             />
           </div>
 
-          {/* Navigation Links */}
           <div className="flex flex-col items-center justify-center h-full relative">
             <div className="absolute bottom-35">
               <ul className="text-2xl">
@@ -203,7 +194,12 @@ export default function Profile() {
 
         <div className="flex flex-col items-center lg:items-start">
           <img
-            src={userData?.image ? userData?.image : defaultPic}
+            //src={profilePicUrl || defaultPic}
+            src={
+              userData?.image
+                ? `http://localhost:5000/api/posts/image/${userData?.image}`
+                : defaultPic
+            }
             className="w-35 h-35 mb-10 rounded-full"
             alt="Profile"
           />
@@ -228,14 +224,12 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Bio Section */}
             <div className="w-full lg:w-1/3">
               <div className="border rounded-xl p-4 w-full h-95 lg:h-80">
                 {userData?.biography}
               </div>
             </div>
 
-            {/* Social Media Links */}
             <div className="w-full lg:w-1/3">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
@@ -257,7 +251,6 @@ export default function Profile() {
                   <Globe className="mr-3 hover:text-primary" />
                   Web
                 </div>
-                {/* Javi se Button */}
                 <div className="col-span-1 lg:col-span-2">
                   <button className="text-white rounded-full bg-primary p-3 w-full cursor-pointer font-bold tracking-wider">
                     Javi se!

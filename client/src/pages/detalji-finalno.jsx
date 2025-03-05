@@ -76,9 +76,17 @@ export default function DetaljiFinalno() {
         formData.append("image", imageFile);
       }
 
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
+      const response = await axios.put(
+        `http://localhost:5000/api/user/${userId}/details`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("User updated successfully:", response.data);
     } catch (err) {
       console.error("Error updating user:", err);
       alert("Failed to update user. Please try again.");

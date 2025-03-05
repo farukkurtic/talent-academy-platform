@@ -124,6 +124,24 @@ const getFilteredUsers = catchAsync(async (req, res) => {
   }
 });
 
+const updateUserDetails = catchAsync(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { links } = req.body;
+    const imageFile = req.file;
+
+    const updatedUser = await userService.updateUserDetails(
+      userId,
+      { links },
+      imageFile
+    );
+    res.status(200).json({ user: updatedUser });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ error: "Failed to update user details" });
+  }
+});
+
 module.exports = {
   getUsers,
   getUsersByName,
@@ -131,4 +149,5 @@ module.exports = {
   updateUser,
   getIsUserInitialized,
   getFilteredUsers,
+  updateUserDetails,
 };
