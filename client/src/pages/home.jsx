@@ -41,12 +41,16 @@ export default function Home() {
             </p>
           </div>
           <div className="pb-15">
-            <button className="w-3xs bg-black p-3 border-2 border-primary rounded-full lg:mr-3 cursor-pointer mb-5 lg:mb-0">
-              Registruj se!
-            </button>
-            <button className="w-3xs bg-primary text-white p-3 rounded-full cursor-pointer">
-              Prijavi se!
-            </button>
+            <a href="/registracija">
+              <button className="w-3xs bg-black p-3 border-2 border-primary rounded-full lg:mr-3 cursor-pointer mb-5 lg:mb-0">
+                Registruj se!
+              </button>
+            </a>
+            <a href="/prijava">
+              <button className="w-3xs bg-primary text-white p-3 rounded-full cursor-pointer">
+                Prijavi se!
+              </button>
+            </a>
           </div>
         </div>
       </div>

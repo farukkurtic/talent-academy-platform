@@ -44,7 +44,7 @@ export default function Register() {
       if (response.status === 201) {
         alert("Registracija je uspješna");
         localStorage.setItem("token", response.data.token);
-        navigate("/kontakt");
+        navigate("/profil-detalji", { state: { from: "registracija" } });
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -145,18 +145,20 @@ export default function Register() {
             >
               Nastavi
             </button>
-            <p className="text-center mt-5 tracking-wider">
-              {responseErr ? (
-                responseErr
-              ) : (
-                <>
-                  Već imaš račun?{" "}
-                  <span className="text-primary cursor-pointer">
-                    Prijavi se.
-                  </span>
-                </>
-              )}
-            </p>
+            <a href="/prijava">
+              <p className="text-center mt-5 tracking-wider">
+                {responseErr ? (
+                  responseErr
+                ) : (
+                  <>
+                    Već imaš račun?{" "}
+                    <span className="text-primary cursor-pointer">
+                      Prijavi se.
+                    </span>
+                  </>
+                )}
+              </p>
+            </a>
           </form>
         </div>
       </div>

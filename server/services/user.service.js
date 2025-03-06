@@ -195,9 +195,13 @@ const updateUserDetails = async (userId, data, imageFile) => {
       throw new ApiError(404, "User not found");
     }
 
-    // Update links
+    // Update links if provided
     if (data.links) {
-      user.links = data.links;
+      // Ensure links is an array of objects with platform and url properties
+      user.links = data.links.map((link) => ({
+        platform: link.platform,
+        url: link.url,
+      }));
     }
 
     // Update image if provided

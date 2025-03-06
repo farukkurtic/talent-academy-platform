@@ -130,11 +130,16 @@ const updateUserDetails = catchAsync(async (req, res) => {
     const { links } = req.body;
     const imageFile = req.file;
 
+    // Parse the links array if it's a JSON string
+    const parsedLinks = typeof links === "string" ? JSON.parse(links) : links;
+
+    // Update the user details
     const updatedUser = await userService.updateUserDetails(
       userId,
-      { links },
+      { links: parsedLinks }, // Pass the parsed links array
       imageFile
     );
+
     res.status(200).json({ user: updatedUser });
   } catch (err) {
     console.error("Error:", err);

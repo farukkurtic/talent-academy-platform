@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -33,7 +33,10 @@ const schema = yup.object().shape({
 export default function ProfileDetails() {
   const [userId, setUserId] = useState(null);
   const [bioLength, setBioLength] = useState(0); // State to track biography length
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromRegister = location.state?.from === "registracija";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -46,11 +49,20 @@ export default function ProfileDetails() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!fromRegister) {
+      if (userId) {
+        navigate("/feed");
+      } else {
+        navigate("/prijava");
+      }
+    }
+  }, [fromRegister, navigate, userId]);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     watch,
   } = useForm({
     resolver: yupResolver(schema),
@@ -78,9 +90,11 @@ export default function ProfileDetails() {
         newObj
       );
       if (response.status === 200) {
-        alert("Podaci spaseni");
+        navigate("/profil-detalji-dodatno", {
+          state: { from: "profil-detalji" },
+        });
       } else {
-        alert("Podaci nisu spaseni");
+        alert("Desila se greška. Molimo pokušajte ponovo");
       }
     } catch (err) {
       console.log(err);
@@ -233,10 +247,14 @@ export default function ProfileDetails() {
               <div className="mb-4 h-full">
                 <textarea
                   {...register("biography")}
-                  className="w-full p-4 border rounded rounded-3xl placeholder-white"
+                  className="w-full p-4 border rounded rounded-3xl placeholder-white overflow-hidden resize-none"
                   placeholder="Biografija:"
                   rows="6"
                   maxLength={500}
+                  onInput={(e) => {
+                    e.target.style.height = "auto"; // Reset height
+                    e.target.style.height = `${e.target.scrollHeight}px`; // Set height to scroll height
+                  }}
                 ></textarea>
                 <p className="text-sm text-gray-400 mt-2">
                   Preostalo karaktera: {500 - bioLength}

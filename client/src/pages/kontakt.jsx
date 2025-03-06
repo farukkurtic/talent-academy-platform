@@ -61,7 +61,7 @@ export default function Kontakt() {
       <div className="min-h-screen w-full flex flex-col items-center justify-center">
         <img src={logo} alt="hnta-logo" className="w-20 m-auto lg:m-0" />
         <h1 className="font-bold text-3xl lg:text-6xl tracking-wider mb-10 mt-6">
-          Imate dodatna pitanja?
+          Kontaktirajte nas
         </h1>
         <div>
           <form

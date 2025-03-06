@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { jwtDecode } from "jwt-decode";
@@ -22,9 +22,13 @@ const schema = yup.object().shape({
 export default function DetaljiFinalno() {
   const [userId, setUserId] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromRegister = location.state?.from === "profil-detalji";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -36,6 +40,16 @@ export default function DetaljiFinalno() {
       setUserId(decoded.id);
     }
   }, []);
+
+  useEffect(() => {
+    if (!fromRegister) {
+      if (userId) {
+        navigate("/feed");
+      } else {
+        navigate("/prijava");
+      }
+    }
+  }, [fromRegister, navigate, userId]);
 
   const {
     register,
@@ -66,16 +80,21 @@ export default function DetaljiFinalno() {
     try {
       const formData = new FormData();
 
+      // Create an array of link objects, each with a single platform and URL
       const linksArray = Object.entries(data).map(([key, value]) => ({
         platform: key,
         url: value,
       }));
+
+      // Append the links array to the form data
       formData.append("links", JSON.stringify(linksArray));
 
+      // Append the image file if it exists
       if (imageFile) {
         formData.append("image", imageFile);
       }
 
+      // Send the form data to the backend
       const response = await axios.put(
         `http://localhost:5000/api/user/${userId}/details`,
         formData,
@@ -86,10 +105,13 @@ export default function DetaljiFinalno() {
         }
       );
 
-      console.log("User updated successfully:", response.data);
+      if (response.status === 200) {
+        navigate("/feed");
+      } else {
+        alert("Desila se greška. Molimo pokušajte opet.");
+      }
     } catch (err) {
       console.error("Error updating user:", err);
-      alert("Failed to update user. Please try again.");
     }
   };
 
@@ -157,7 +179,7 @@ export default function DetaljiFinalno() {
                 </label>
               )}
             </div>
-            <div className="mt-6 w-4/5 flex flex-wrap justify-between gap-4">
+            <div className="mt-6 w-4/5 lg:w-3/5 grid grid-cols-1 lg:grid-cols-2 gap-4">
               {[
                 {
                   name: "instagram",
@@ -168,8 +190,8 @@ export default function DetaljiFinalno() {
                 { name: "twitter", Icon: Twitter, placeholder: "X" },
                 { name: "web", Icon: Globe, placeholder: "Web" },
                 { name: "linkedin", Icon: Linkedin, placeholder: "LinkedIn" },
-              ].map(({ name, Icon, placeholder }, index) => (
-                <div key={name} className="relative w-full sm:w-[48%] mb-5">
+              ].map(({ name, Icon, placeholder }) => (
+                <div key={name} className="relative w-full">
                   <div className="relative">
                     <Icon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                     <input
@@ -186,14 +208,15 @@ export default function DetaljiFinalno() {
                   )}
                 </div>
               ))}
-            </div>
 
-            <button
-              type="submit"
-              className="w-full lg:w-3/4 bg-primary text-white p-2 rounded-full font-semibold tracking-wider cursor-pointer mt-6"
-            >
-              Završi
-            </button>
+              {/* Button takes full width but aligns properly with inputs */}
+              <button
+                type="submit"
+                className="w-full bg-primary text-white p-3 rounded-full font-semibold tracking-wider cursor-pointer"
+              >
+                Završi
+              </button>
+            </div>
           </form>
         </div>
       </div>

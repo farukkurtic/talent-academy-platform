@@ -96,7 +96,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
   };
 
   return (
-    <div className="p-4 border rounded-3xl shadow-md w-md">
+    <div className="p-4 border rounded-3xl shadow-md w-xs lg:w-md">
       <form onSubmit={handleSubmit(onSubmit)}>
         <textarea
           {...register("text")}
