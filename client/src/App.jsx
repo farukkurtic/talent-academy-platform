@@ -11,6 +11,7 @@ import Login from "./pages/login.jsx";
 import Profile from "./pages/korisnik-profil.jsx";
 import MyProfile from "./pages/mojProfil.jsx";
 import Filters from "./pages/filteri.jsx";
+import Chat from "./pages/chat.jsx";
 
 import ProtectedRoute from "./pages/protectedRoute.jsx";
 
@@ -77,6 +78,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Filters />
+              </ProtectedRoute>
+            }
+          />
+
+<Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <Chat />
               </ProtectedRoute>
             }
           />

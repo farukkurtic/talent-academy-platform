@@ -2,6 +2,7 @@ const express = require('express');
 const authRoutes = require('./auth.route')
 const userRoutes = require('./user.route')
 const feedRoutes = require('./feed.route')
+const chatRoutes = require('./chat.route')
 
 const router = express.Router();
 
@@ -17,7 +18,11 @@ const defaultRoutes = [
     {
       path: '/api/posts',
       route: feedRoutes,
-  },
+    },
+    {
+      path: '/api/chat',
+      route: chatRoutes,
+    },
   ];
 
 defaultRoutes.forEach((route) => {
