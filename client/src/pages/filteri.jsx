@@ -164,7 +164,11 @@ export default function Filters() {
                       }}
                     >
                       <img
-                        src={user.image || defaultPic}
+                        src={
+                          user?.image
+                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            : defaultPic
+                        }
                         alt={`${user.firstName} ${user.lastName}`}
                         className="w-10 h-10 rounded-full"
                       />
@@ -322,7 +326,7 @@ export default function Filters() {
       </div>
 
       {/* Users List */}
-      <div className="flex-1 p-6 overflow-y-auto max-h-screen relative">
+      <div className="flex-1 p-6 overflow-y-auto max-h-screen relative w-full">
         <img
           src={line1}
           className="fixed -bottom-20 -right-10 rotate-250 hidden lg:block w-2xs"
@@ -331,16 +335,20 @@ export default function Filters() {
           src={line2}
           className="fixed top-0 right-0 rotate-100 hidden lg:block w-xs"
         />
-        <div className="flex flex-col items-start justify-start mt-30 lg:mt-0">
+        <div className="flex flex-col items-center justify-center lg:items-start lg:justify-start mt-20 lg:mt-0 w-full">
           {filteredUsers?.map((user) => (
             <a
               key={user._id}
               href={user._id === userId ? "/moj-profil" : `/profil/${user._id}`}
               className="cursor-pointer"
             >
-              <div className="p-4 border border-gray-700 rounded-3xl mb-10 lg:w-120">
+              <div className="p-4 border border-gray-700 rounded-3xl mb-10 w-90 lg:w-120">
                 <img
-                  src={user.image || defaultPic}
+                  src={
+                    user?.image
+                      ? `http://localhost:5000/api/posts/image/${user?.image}`
+                      : defaultPic
+                  }
                   alt={`${user.firstName} ${user.lastName}`}
                   className="w-20 h-20 rounded-full mb-4"
                 />
@@ -364,7 +372,11 @@ export default function Filters() {
                   })()}
                 </div>
 
-                <p>{user.biography}</p>
+                <p>
+                  {user?.biography.length > 250
+                    ? user.biography.slice(0, 250) + "..."
+                    : user?.biography}
+                </p>
               </div>
             </a>
           ))}
@@ -402,7 +414,11 @@ export default function Filters() {
                         }}
                       >
                         <img
-                          src={user.image || defaultPic}
+                          src={
+                            user?.image
+                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              : defaultPic
+                          }
                           alt={`${user.firstName} ${user.lastName}`}
                           className="w-10 h-10 rounded-full"
                         />

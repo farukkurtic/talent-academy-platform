@@ -6,8 +6,6 @@ import { useNavigate } from "react-router-dom";
 import hntaLogo from "../assets/hnta-logo.png";
 import textLogo from "../assets/textLogo.svg";
 import defaultPic from "../assets/default-image.png";
-import defaultBadge from "../assets/default-badge.png";
-import randomPic from "../assets/lecture-1.jpg";
 
 import line1 from "../assets/lines/s1.svg";
 import line2 from "../assets/lines/s2.svg";
@@ -146,26 +144,29 @@ export default function Feed() {
     fetchPosts();
   }, []);
 
-  useEffect(() => {
-    console.log(allPosts);
-  }, [allPosts]);
-
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State for hamburger menu
 
   return (
     <div className="text-white h-screen relative flex items-center justify-center">
-      <img src={line1} className="fixed -top-40 right-0 rotate-180" />
-
-      <img src={line3} className="fixed top-0 right-80" />
-      <img src={line5} className="fixed bottom-0 -right-63" />
+      <img
+        src={line1}
+        className="fixed -top-40 right-0 rotate-180 hidden lg:block"
+      />
+      <img src={line5} className="fixed -bottom-30 -right-63 hidden lg:block" />
 
       {/* Header (Mobile Only) */}
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
         {/* Logo Section */}
-        <div className="flex items-center">
-          <img src={hntaLogo} alt="hnta-logo" className="w-10" />
-          <img src={textLogo} alt="hnta-text-logo" className="w-32 h-10 ml-2" />
-        </div>
+        <a href="/feed" className="cursor-pointer">
+          <div className="flex items-center">
+            <img src={hntaLogo} alt="hnta-logo" className="w-10" />
+            <img
+              src={textLogo}
+              alt="hnta-text-logo"
+              className="w-32 h-10 ml-2"
+            />
+          </div>
+        </a>
 
         {/* Hamburger Menu */}
         <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -176,10 +177,16 @@ export default function Feed() {
       {/* Sidebar (Desktop Only) */}
       <div className="hidden lg:block fixed w-85 top-0 bottom-0 left-0 border-r border-gray-700 bg-black p-6">
         {/* Logo Section */}
-        <div className="logo-container flex items-center justify-center">
-          <img src={hntaLogo} alt="hnta-logo" className="w-20" />
-          <img src={textLogo} alt="hnta-text-logo" className="w-40 h-40 ml-2" />
-        </div>
+        <a href="/feed" className="cursor-pointer">
+          <div className="logo-container flex items-center justify-center">
+            <img src={hntaLogo} alt="hnta-logo" className="w-20" />
+            <img
+              src={textLogo}
+              alt="hnta-text-logo"
+              className="w-40 h-40 ml-2"
+            />
+          </div>
+        </a>
 
         {/* Search Bar */}
         <div className="text-center my-6">
@@ -202,14 +209,18 @@ export default function Feed() {
                       className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
                       onClick={() => {
                         if (userId === user?._id) {
-                          navigate(`/moj-profil`);
+                          navigate("/moj-profil");
                         } else {
                           navigate(`/profil/${user._id}`);
                         }
                       }}
                     >
                       <img
-                        src={user.image || defaultPic}
+                        src={
+                          user?.image
+                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            : defaultPic
+                        }
                         alt={`${user.firstName} ${user.lastName}`}
                         className="w-10 h-10 rounded-full"
                       />
@@ -238,7 +249,7 @@ export default function Feed() {
               )}
 
               <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                <a href="/filteri">Prikaži sve korisnike</a>
+                <a href="/svi-korisnici">Prikaži sve korisnike</a>
               </button>
             </div>
           )}
@@ -369,14 +380,14 @@ export default function Feed() {
         </div>
       )}
       <div className="flex flex-col items-center gap-4 absolute top-10">
-        <div>
+        <div className="mt-25 lg:mt-0">
           <CreatePost userId={userId} refreshFeed={fetchPosts} />
         </div>
         <div>
           {allPosts.map((post) => (
             <Post
               key={post._id}
-              profilePic={post.user?.image || defaultPic}
+              profilePic={post.user?.image}
               firstName={post.user.firstName}
               lastName={post.user.lastName}
               content={post.content}

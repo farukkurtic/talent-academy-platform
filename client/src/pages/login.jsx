@@ -154,9 +154,11 @@ export default function Login() {
               </p>
             )}
 
-            <p className="text-center mt-5 tracking-wider cursor-pointer">
-              Zaboravili ste šifru?
-            </p>
+            <a href="/kontakt">
+              <p className="text-center mt-5 tracking-wider cursor-pointer">
+                Zaboravili ste šifru?
+              </p>
+            </a>
           </form>
         </div>
       </div>

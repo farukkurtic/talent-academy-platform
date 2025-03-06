@@ -182,7 +182,7 @@ export default function Post({
   };
 
   return (
-    <div className="text-white w-md border rounded-3xl p-5 mb-10 relative">
+    <div className="text-white w-xs lg:w-md border rounded-3xl p-5 mb-10 relative">
       {/* User Info */}
       <div className="w-full flex items-center mb-3">
         {profilePic && (
@@ -194,7 +194,11 @@ export default function Post({
             }
           >
             <img
-              src={profilePic}
+              src={
+                profilePic
+                  ? `http://localhost:5000/api/posts/image/${profilePic}`
+                  : defaultPic
+              }
               className="mr-5 w-12 h-12 rounded-full cursor-pointer"
               alt="Profile"
             />
@@ -350,8 +354,12 @@ export default function Post({
               >
                 <div className="flex items-center mb-3">
                   <img
-                    src={user.image ? user.image : defaultPic}
-                    className="w-10 h-10 mr-3"
+                    src={
+                      user.image
+                        ? `http://localhost:5000/api/posts/image/${user?.image}`
+                        : defaultPic
+                    }
+                    className="w-10 h-10 mr-3 rounded-full"
                   />
                   <p className="text-gray-800">
                     {user.firstName} {user.lastName}
@@ -400,7 +408,11 @@ export default function Post({
             >
               <div className="flex items-center justify-start mb-3">
                 <img
-                  src={cmt.user?.image ? cmt.user?.image : defaultPic}
+                  src={
+                    cmt.user?.image
+                      ? `http://localhost:5000/api/posts/image/${cmt.user?.image}`
+                      : defaultPic
+                  }
                   className="w-10 h-10 rounded-full mr-3"
                 />
                 <p className="tracking-wider font-bold">

@@ -15,7 +15,12 @@ const UserSchema = new mongoose.Schema(
     biography: { type: String, default: "" },
     purposeOfPlatform: { type: Array, default: [] },
     image: { type: String, default: "" },
-    links: { type: Array, default: [] },
+    links: [
+      {
+        platform: { type: String },
+        url: { type: String },
+      },
+    ],
     courseID: { type: String, default: "" },
     isInitialized: { type: Boolean, default: false },
   },

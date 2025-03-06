@@ -1,6 +1,8 @@
 const { Auth, User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcrypt");
+const { getGfsBucket } = require("../config/db");
+const stream = require("stream");
 
 const getUsers = async (filter, options) => {
   try {
@@ -157,6 +159,65 @@ const getFilteredUsers = async (filter) => {
   return await User.find(query);
 };
 
+const uploadImageToGridFS = async (file, userId) => {
+  const gfsBucket = getGfsBucket();
+
+  // Create a readable stream from the file buffer
+  const readableStream = new stream.Readable();
+  readableStream.push(file.buffer); // Push the file buffer into the stream
+  readableStream.push(null); // Signal the end of the stream
+
+  // Create an upload stream to GridFS
+  const uploadStream = gfsBucket.openUploadStream(file.originalname, {
+    contentType: file.mimetype,
+    metadata: { userId }, // Link the file to the user
+  });
+
+  // Pipe the readable stream to the upload stream
+  readableStream.pipe(uploadStream);
+
+  return new Promise((resolve, reject) => {
+    uploadStream.on("finish", () => {
+      resolve(uploadStream.id); // Return the file ID
+    });
+
+    uploadStream.on("error", (err) => {
+      console.error("Error uploading file:", err);
+      reject(err);
+    });
+  });
+};
+
+const updateUserDetails = async (userId, data, imageFile) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    // Update links if provided
+    if (data.links) {
+      // Ensure links is an array of objects with platform and url properties
+      user.links = data.links.map((link) => ({
+        platform: link.platform,
+        url: link.url,
+      }));
+    }
+
+    // Update image if provided
+    if (imageFile) {
+      const imageId = await uploadImageToGridFS(imageFile, userId);
+      user.image = imageId;
+    }
+
+    await user.save();
+    return user;
+  } catch (err) {
+    console.error("Error in updateUserDetails:", err);
+    throw new ApiError(500, "Server error");
+  }
+};
+
 module.exports = {
   getUsers,
   getUsersByName,
@@ -165,4 +226,5 @@ module.exports = {
   updateUser,
   getIsUserInitialized,
   getFilteredUsers,
+  updateUserDetails,
 };
