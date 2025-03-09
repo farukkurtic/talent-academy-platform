@@ -44,7 +44,7 @@ const getAllUserWorkshops = catchAsync(async (req, res) => {
 
 const createWorkshop = catchAsync(async (req, res) => {
   try {
-    const workshop = await workshopService.createWorkshop(req.body.workshop);
+    const workshop = await workshopService.createWorkshop(req.body.workshop, req.file);
     res.status(status.CREATED).json({ workshop });
   } catch (err) {
     console.log("Error", err);
@@ -56,7 +56,7 @@ const createWorkshop = catchAsync(async (req, res) => {
 
 const updateWorkshop = catchAsync(async (req, res) => {
   try {
-    const workshop = await workshopService.updateWorkshop(req.body.workshop);
+    const workshop = await workshopService.updateWorkshop(req.body.workshop, req.file);
     res.status(status.OK).json({ workshop });
   } catch (err) {
     console.log("Error", err);

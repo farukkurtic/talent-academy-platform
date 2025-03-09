@@ -19,6 +19,8 @@ const defaultRoutes = [
   {
     path: '/api/workshop',
     route: workshopRoutes,
+  },
+  {
     path: '/api/posts',
     route: feedRoutes,
   },

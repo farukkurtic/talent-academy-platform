@@ -1,11 +1,46 @@
 const { Workshop, User } = require("../models");
 const ApiError = require("../utils/ApiError");
+const { getGfsBucket } = require("../config/db");
+const stream = require("stream");
 
-const createWorkshop = async (workshopBody) => {
+
+const uploadImageToGridFS = async (file, workshopId) => {
+  const gfsBucket = getGfsBucket();
+
+  const readableStream = new stream.Readable();
+  readableStream.push(file.buffer);
+  readableStream.push(null);
+
+  const uploadStream = gfsBucket.openUploadStream(file.originalname, {
+    contentType: file.mimetype,
+    metadata: { workshopId },
+  });
+
+  readableStream.pipe(uploadStream);
+
+  return new Promise((resolve, reject) => {
+    uploadStream.on("finish", () => {
+      resolve(uploadStream.id);
+    });
+
+    uploadStream.on("error", (err) => {
+      console.error("Error uploading file:", err);
+      reject(err);
+    });
+  });
+};
+
+const createWorkshop = async (workshopBody, coverImage) => {
   try {
     console.log("workshopBody", workshopBody);
     const newWorkshop = new Workshop(workshopBody);
     await newWorkshop.save();
+
+    if (coverImage) {
+      const imageId = await uploadImageToGridFS(coverImage, newWorkshop._id);
+      newWorkshop.coverImage = imageId;
+      await newWorkshop.save();
+    }
 
     return newWorkshop;
   } catch (err) {
@@ -16,7 +51,7 @@ const createWorkshop = async (workshopBody) => {
   }
 };
 
-const updateWorkshop = async (updatedWorkshop) => {
+const updateWorkshop = async (updatedWorkshop, coverImage) => {
   const workshop = await Workshop.findByIdAndUpdate(
     updatedWorkshop._id,
     updatedWorkshop,
@@ -27,6 +62,13 @@ const updateWorkshop = async (updatedWorkshop) => {
   if (!workshop) {
     throw new ApiError(400, "No workshop found with the given ID.");
   }
+
+  if (coverImage) {
+    const imageId = await uploadImageToGridFS(coverImage, workshop._id);
+    workshop.coverImage = imageId;
+    await workshop.save();
+  }
+
   return workshop;
 };
 

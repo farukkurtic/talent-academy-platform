@@ -36,8 +36,8 @@ const WorkshopSchema = new mongoose.Schema({
         required: true
     },
     coverImage: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "fs.files",
     },
     details: {
         type: String,
