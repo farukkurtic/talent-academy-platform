@@ -4,26 +4,28 @@ import { Image, SearchIcon, ImagePlay, X } from "lucide-react";
 import Modal from "react-modal";
 import { Grid } from "@giphy/react-components";
 import { GiphyFetch } from "@giphy/js-fetch-api";
+import axios from "axios";
 
 const gf = new GiphyFetch("czM41rghaxLbQ1BT2TP9HOHpk8AfzxfW");
 
-const CreatePost = () => {
-  const { register, handleSubmit, reset, setValue } = useForm();
+// eslint-disable-next-line react/prop-types
+const CreatePost = ({ userId, refreshFeed }) => {
+  const { register, handleSubmit, setValue, reset } = useForm();
+  const [postContent, setPostContent] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [selectedGif, setSelectedGif] = useState(null);
   const [isGifModalOpen, setIsGifModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const textareaRef = useRef(null);
-
-  const fileInputRef = useRef(null); // Reference to the file input
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
-  }, [selectedImage, selectedGif, searchQuery]);
+  }, [postContent, selectedImage, selectedGif, searchQuery]);
 
   const openGifModal = () => setIsGifModalOpen(true);
   const closeGifModal = () => {
@@ -41,40 +43,70 @@ const CreatePost = () => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
       setImageFile(file);
-      setSelectedImage(URL.createObjectURL(file)); // Preview image
+      setSelectedImage(URL.createObjectURL(file));
     } else {
       alert("Please select a valid image file.");
-      e.target.value = ""; // Reset the input value
+      e.target.value = "";
     }
   };
 
   const handleRemoveImage = () => {
     setSelectedImage(null);
     setImageFile(null);
-    fileInputRef.current.value = ""; // Reset the file input value
+    fileInputRef.current.value = "";
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const formData = new FormData();
+
     formData.append("text", data.text);
     if (imageFile) formData.append("image", imageFile);
     if (selectedGif) formData.append("gif", selectedGif);
+    formData.append("userId", userId);
 
-    // Log FormData contents
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/posts",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Post created:", response.data);
+
+      // Reset form states
+      setSelectedImage(null);
+      setImageFile(null);
+      setSelectedGif(null);
+      reset({ text: "" }); // Explicitly reset the text field
+      if (textareaRef.current) {
+        textareaRef.current.value = ""; // Manually clear the textarea
+      }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Clear the file input
+      }
+
+      // Refresh the feed after creating a new post
+      refreshFeed();
+    } catch (err) {
+      console.log("Error creating post:", err);
     }
   };
 
   return (
-    <div className="p-4 border rounded-3xl shadow-md w-md">
+    <div className="p-4 border rounded-3xl shadow-md w-xs lg:w-md">
       <form onSubmit={handleSubmit(onSubmit)}>
         <textarea
           {...register("text")}
           ref={textareaRef}
           placeholder="O čemu razmišljate?"
           className="w-full p-2 resize-none overflow-hidden focus:outline-none focus:ring-0 focus:border-transparent"
-          onChange={(e) => setValue("text", e.target.value)}
+          onChange={(e) => {
+            setValue("text", e.target.value);
+            setPostContent(e.target.value.trim()); // Trim to remove extra spaces
+          }}
         />
 
         <div
@@ -91,7 +123,7 @@ const CreatePost = () => {
               />
               <button
                 type="button"
-                onClick={handleRemoveImage} // Use the remove handler
+                onClick={handleRemoveImage}
                 className="absolute top-2 right-2 bg-gray-700 text-white rounded-full p-1 hover:bg-gray-800"
               >
                 <X size={18} />
@@ -121,7 +153,7 @@ const CreatePost = () => {
           <label className="cursor-pointer">
             <Image size={24} />
             <input
-              ref={fileInputRef} // Attach the ref to the file input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               className="hidden"
@@ -135,7 +167,8 @@ const CreatePost = () => {
 
           <button
             type="submit"
-            className="bg-primary text-black p-2 rounded-full ml-auto w-20 cursor-pointer"
+            className="bg-primary text-black p-2 rounded-full ml-auto w-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!postContent}
           >
             Objavi
           </button>

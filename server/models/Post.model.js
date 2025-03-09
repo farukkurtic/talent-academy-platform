@@ -1,44 +1,36 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
 
-const PostSchema = new mongoose.Schema({
+const PostSchema = new mongoose.Schema(
+  {
     userId: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
-    reactions: {
-        type: Array,
-        required: true,
+    likes: {
+      type: Array,
+      default: [],
     },
-    comments: {
-        type: Array,
-        required: true,
-    },
+    comments: [
+      {
+        userId: { type: String, required: true },
+        text: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     content: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
-    attachments: {
-        type: Array,
-        required: true
-    }
-}, { timestamps: true });
+    image: {
+      type: mongoose.Schema.Types.ObjectId, // Reference to GridFS file
+      ref: "fs.files", // GridFS collection
+    },
+    gif: {
+      type: String,
+      default: "",
+    },
+  },
+  { timestamps: true }
+);
 
-UserSchema.statics.isEmailTaken = async function (email, excludeUserId) {
-    const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
-    return !!user;
-  };
-
-UserSchema.methods.isPasswordMatch = async function (password) {
-  const user = this;
-  return bcrypt.compare(password, user.password);
-};
-
-// Hash password before saving to DB
-UserSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-});
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("Post", PostSchema);
