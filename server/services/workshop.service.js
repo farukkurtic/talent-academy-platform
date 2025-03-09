@@ -3,6 +3,7 @@ const ApiError = require("../utils/ApiError");
 
 const createWorkshop = async (workshopBody) => {
   try {
+    console.log("workshopBody", workshopBody);
     const newWorkshop = new Workshop(workshopBody);
     await newWorkshop.save();
 
@@ -54,8 +55,25 @@ const getAllUserWorkshops = async (userId) => {
 };
 
 const deleteWorkshop = async (workshopId) => {
-  await Workshop.findByIdAndDelete( workshopId )
+  await Workshop.findByIdAndDelete(workshopId)
 };
+
+const addWorkshopAttendee = async (workshopId, userId) => {
+  const workshop = await Workshop.findById(workshopId);
+  if (!workshop) {
+    throw new ApiError(404, "Workshop not found");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  workshop.attendes.push(userId);
+  await workshop.save();
+
+  return workshop;
+}
 
 module.exports = {
   getWorkshopById,
@@ -63,5 +81,6 @@ module.exports = {
   getAllWorkshops,
   getAllUserWorkshops,
   updateWorkshop,
-  deleteWorkshop
+  deleteWorkshop,
+  addWorkshopAttendee
 };

@@ -78,6 +78,23 @@ const deleteWorkshop = catchAsync(async (req, res) => {
   }
 });
 
+const attendWorkshop = catchAsync(async (req, res) => {
+  console.log("req.params", req.params);
+  console.log("req.body", req.body);
+  try {
+    const updatedWorkshop = await workshopService.addWorkshopAttendee(
+      req.params.workshopId,
+      req.body.userId
+    );
+    res.status(status.OK).json({ updatedWorkshop });
+  } catch (err) {
+    console.log("Error", err);
+    res
+      .status(status.INTERNAL_SERVER_ERROR)
+      .send("Failed to get Workshop", err);
+  }
+});
+
 module.exports = {
   getWorkshop,
   createWorkshop,
@@ -85,4 +102,5 @@ module.exports = {
   deleteWorkshop,
   getAllWorkshops,
   getAllUserWorkshops,
+  attendWorkshop
 };
