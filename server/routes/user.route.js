@@ -18,5 +18,10 @@ router.put(
   upload.single("image"),
   userController.updateUserDetails
 );
+router.put(
+  "/:userId/currentUser",
+  upload.single("image"),
+  userController.updateCurrentUser
+);
 
 module.exports = router;
