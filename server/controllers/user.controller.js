@@ -3,6 +3,9 @@ const catchAsync = require("../utils/catchAsync");
 const { userService } = require("../services");
 const pick = require("../utils/pick");
 const ApiError = require("../utils/ApiError");
+const { User } = require("../models");
+const { getGfsBucket } = require("../config/db");
+const stream = require("stream");
 
 const getUsers = catchAsync(async (req, res) => {
   try {
@@ -147,6 +150,89 @@ const updateUserDetails = catchAsync(async (req, res) => {
   }
 });
 
+const uploadImageToGridFS = async (file, userId) => {
+  const gfsBucket = getGfsBucket();
+
+  // Create a readable stream from the file buffer
+  const readableStream = new stream.Readable();
+  readableStream.push(file.buffer); // Push the file buffer into the stream
+  readableStream.push(null); // Signal the end of the stream
+
+  // Create an upload stream to GridFS
+  const uploadStream = gfsBucket.openUploadStream(file.originalname, {
+    contentType: file.mimetype,
+    metadata: { userId }, // Link the file to the user
+  });
+
+  // Pipe the readable stream to the upload stream
+  readableStream.pipe(uploadStream);
+
+  return new Promise((resolve, reject) => {
+    uploadStream.on("finish", () => {
+      resolve(uploadStream.id); // Return the file ID
+    });
+
+    uploadStream.on("error", (err) => {
+      console.error("Error uploading file:", err);
+      reject(err);
+    });
+  });
+};
+
+const updateCurrentUser = catchAsync(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      major,
+      yearOfAttend,
+      profession,
+      biography,
+      links,
+      purposeOfPlatform,
+    } = req.body;
+    const imageFile = req.file;
+
+    // Parse the links array if it's a JSON string
+    const parsedLinks = typeof links === "string" ? JSON.parse(links) : links;
+
+    // Parse the purposeOfPlatform array if it's a JSON string
+    const parsedPurposeOfPlatform =
+      typeof purposeOfPlatform === "string"
+        ? JSON.parse(purposeOfPlatform)
+        : purposeOfPlatform;
+
+    // Prepare the update data
+    const updateData = {
+      purposeOfPlatform: parsedPurposeOfPlatform, // Use the parsed array
+      major,
+      yearOfAttend,
+      profession,
+      biography,
+      links: parsedLinks,
+    };
+
+    // If an image is provided, upload it to GridFS
+    if (imageFile) {
+      const imageId = await uploadImageToGridFS(imageFile, userId);
+      updateData.image = imageId;
+    }
+
+    // Update the user in the database
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      throw new ApiError(404, "User not found");
+    }
+
+    res.status(200).json({ user: updatedUser });
+  } catch (err) {
+    console.error("Error updating current user:", err);
+    res.status(500).json({ error: "Failed to update current user" });
+  }
+});
+
 module.exports = {
   getUsers,
   getUsersByName,
@@ -155,4 +241,5 @@ module.exports = {
   getIsUserInitialized,
   getFilteredUsers,
   updateUserDetails,
+  updateCurrentUser,
 };
