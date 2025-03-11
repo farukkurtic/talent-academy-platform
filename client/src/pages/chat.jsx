@@ -28,8 +28,12 @@ const Chat = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { unreadMessages, setUnreadMessages } = useUnreadMessages();
-  const [lastMessageTimestamps, setLastMessageTimestamps] = useState({});
+  const {
+    unreadMessages,
+    setUnreadMessages,
+    lastMessageTimestamps,
+    setLastMessageTimestamps,
+  } = useUnreadMessages();
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
@@ -58,7 +62,7 @@ const Chat = () => {
     const decoded = jwtDecode(token);
     setCurrentUser(decoded.id);
     socket.emit("joinChat", decoded.id);
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -69,38 +73,39 @@ const Chat = () => {
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
 
-    // Fetch all messages for the current user
-    axios
-      .get(`http://localhost:5000/api/chat/messages/${currentUser}`)
-      .then((res) => {
-        const messages = res.data;
+    // Fetch unread messages
+    const fetchUnreadMessages = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/chat/unread-messages/${currentUser}`
+        );
+        const unreadMessagesData = response.data;
 
-        // Initialize unreadMessages and lastMessageTimestamps
-        const newUnreadMessages = {};
-        const newLastMessageTimestamps = {};
+        const newUnreadMessages = { ...unreadMessages };
+        const newLastMessageTimestamps = { ...lastMessageTimestamps };
 
-        messages.forEach((message) => {
-          if (message.receiver === currentUser) {
-            // Update unread messages
-            newUnreadMessages[message.sender] =
-              (newUnreadMessages[message.sender] || 0) + 1;
-          }
+        unreadMessagesData.forEach((message) => {
+          newUnreadMessages[message.sender._id] =
+            (newUnreadMessages[message.sender._id] || 0) + 1;
 
-          // Update last message timestamps
           if (
-            !newLastMessageTimestamps[message.sender] ||
+            !newLastMessageTimestamps[message.sender._id] ||
             new Date(message.createdAt) >
-              new Date(newLastMessageTimestamps[message.sender])
+              new Date(newLastMessageTimestamps[message.sender._id])
           ) {
-            newLastMessageTimestamps[message.sender] = message.createdAt;
+            newLastMessageTimestamps[message.sender._id] = message.createdAt;
           }
         });
 
         setUnreadMessages(newUnreadMessages);
         setLastMessageTimestamps(newLastMessageTimestamps);
-      })
-      .catch((err) => console.error(err));
-  }, [currentUser, setUnreadMessages]);
+      } catch (err) {
+        console.error("Error fetching unread messages:", err);
+      }
+    };
+
+    fetchUnreadMessages();
+  }, [currentUser, setUnreadMessages, setLastMessageTimestamps]);
 
   useEffect(() => {
     if (!currentUser || !selectedUser) return;
@@ -117,22 +122,7 @@ const Chat = () => {
   useEffect(() => {
     if (!currentUser) return;
 
-    // Handle real-time incoming messages
     const handleMessage = (message) => {
-      if (message.receiver === currentUser) {
-        // Update unread messages
-        setUnreadMessages((prev) => ({
-          ...prev,
-          [message.sender]: (prev[message.sender] || 0) + 1,
-        }));
-
-        // Update last message timestamps
-        setLastMessageTimestamps((prev) => ({
-          ...prev,
-          [message.sender]: message.createdAt,
-        }));
-      }
-
       // If the message is for the currently selected user, add it to the messages list
       if (
         selectedUser &&
@@ -148,23 +138,31 @@ const Chat = () => {
     return () => {
       socket.off("receiveMessage", handleMessage);
     };
-  }, [currentUser, selectedUser, setUnreadMessages]);
+  }, [currentUser, selectedUser]);
 
   // Reset unread messages for the selected user
   useEffect(() => {
     if (selectedUser) {
       setUnreadMessages((prev) => ({
         ...prev,
-        [selectedUser._id]: 0,
+        [selectedUser._id]: 0, // Reset unread messages for this user
       }));
+
+      // Mark messages as read on the server
+      axios
+        .post(`http://localhost:5000/api/chat/mark-as-read`, {
+          sender: selectedUser._id,
+          receiver: currentUser,
+        })
+        .catch((err) => console.error("Error marking messages as read:", err));
     }
-  }, [selectedUser, setUnreadMessages]);
+  }, [selectedUser, setUnreadMessages, currentUser]);
 
   // Sort users by last message timestamp
   const sortedUsers = users.sort((a, b) => {
-    const timestampA = lastMessageTimestamps[a._id] || 0; // Default to 0 if no timestamp exists
-    const timestampB = lastMessageTimestamps[b._id] || 0; // Default to 0 if no timestamp exists
-    return new Date(timestampB) - new Date(timestampA); // Sort by most recent message
+    const timestampA = lastMessageTimestamps[a._id] || 0;
+    const timestampB = lastMessageTimestamps[b._id] || 0;
+    return new Date(timestampB) - new Date(timestampA);
   });
 
   const sendMessage = () => {
@@ -173,8 +171,13 @@ const Chat = () => {
         sender: currentUser,
         receiver: selectedUser._id,
         text: newMessage,
+        createdAt: new Date(), // Add a timestamp for the message
       };
 
+      // Update local state immediately
+      setMessages((prev) => [...prev, messageData]);
+
+      // Emit the message via the socket
       socket.emit("sendMessage", messageData, (response) => {
         if (response?.error) {
           console.error("Message failed:", response.error);
