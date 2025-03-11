@@ -482,7 +482,12 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          <button className="text-white rounded-full bg-primary p-3 w-full lg:w-2/8 cursor-pointer font-bold tracking-wider mt-10">
+          <button
+            className="text-white rounded-full bg-primary p-3 w-full lg:w-2/8 cursor-pointer font-bold tracking-wider mt-10"
+            onClick={() => {
+              navigate("/chat", { state: { selectedUser: userData } });
+            }}
+          >
             Javi se!
           </button>
         </div>

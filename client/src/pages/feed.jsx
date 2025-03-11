@@ -3,14 +3,13 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
+import { useUnreadMessages } from "../../contexts/UnreadMessagesContext";
+
 import hntaLogo from "../assets/hnta-logo.png";
 import textLogo from "../assets/textLogo.svg";
 import defaultPic from "../assets/default-image.png";
 
 import line1 from "../assets/lines/s1.svg";
-import line2 from "../assets/lines/s2.svg";
-import line3 from "../assets/lines/s3.svg";
-import line4 from "../assets/lines/s4.svg";
 import line5 from "../assets/lines/s5.svg";
 
 // badges
