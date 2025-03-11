@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; // Add useLocation
 import io from "socket.io-client";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
 import { useUnreadMessages } from "../../contexts/UnreadMessagesContext";
 
 import hntaLogo from "../assets/hnta-logo.png";
@@ -22,7 +22,7 @@ const socket = io("http://localhost:5000", { transports: ["websocket"] });
 const Chat = () => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null); // This will be set from the passed state
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,6 +34,9 @@ const Chat = () => {
     lastMessageTimestamps,
     setLastMessageTimestamps,
   } = useUnreadMessages();
+
+  const navigate = useNavigate();
+  const location = useLocation(); // Use useLocation to access the passed state
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
@@ -53,7 +56,12 @@ const Chat = () => {
     }
   };
 
-  const navigate = useNavigate();
+  // Set the selectedUser from the passed state when the component mounts
+  useEffect(() => {
+    if (location.state?.selectedUser) {
+      setSelectedUser(location.state.selectedUser);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -81,8 +89,9 @@ const Chat = () => {
         );
         const unreadMessagesData = response.data;
 
-        const newUnreadMessages = { ...unreadMessages };
-        const newLastMessageTimestamps = { ...lastMessageTimestamps };
+        // Initialize unreadMessages and lastMessageTimestamps
+        const newUnreadMessages = {};
+        const newLastMessageTimestamps = {};
 
         unreadMessagesData.forEach((message) => {
           newUnreadMessages[message.sender._id] =
@@ -97,8 +106,12 @@ const Chat = () => {
           }
         });
 
-        setUnreadMessages(newUnreadMessages);
-        setLastMessageTimestamps(newLastMessageTimestamps);
+        // Update the state directly without incrementing existing values
+        setUnreadMessages((prev) => ({ ...prev, ...newUnreadMessages }));
+        setLastMessageTimestamps((prev) => ({
+          ...prev,
+          ...newLastMessageTimestamps,
+        }));
       } catch (err) {
         console.error("Error fetching unread messages:", err);
       }
@@ -115,7 +128,15 @@ const Chat = () => {
       .get(
         `http://localhost:5000/api/chat/messages/${currentUser}/${selectedUser._id}`
       )
-      .then((res) => setMessages(res.data))
+      .then((res) => {
+        // Ensure the response data is an array and filter out undefined/null messages
+        const validMessages = Array.isArray(res.data)
+          ? res.data.filter(
+              (msg) => msg && msg.sender && msg.receiver && msg.text
+            )
+          : [];
+        setMessages(validMessages);
+      })
       .catch((err) => console.error(err));
   }, [selectedUser, currentUser]);
 
@@ -123,8 +144,15 @@ const Chat = () => {
     if (!currentUser) return;
 
     const handleMessage = (message) => {
-      // If the message is for the currently selected user, add it to the messages list
+      // Ensure the message is valid before adding it to the state
+      if (!message || !message.sender || !message.receiver || !message.text) {
+        console.error("Received invalid message:", message);
+        return;
+      }
+
+      // Only add the message if it's not already in the messages list
       if (
+        !messages.some((msg) => msg._id === message._id) &&
         selectedUser &&
         (message.sender === selectedUser._id ||
           message.receiver === selectedUser._id)
@@ -154,7 +182,13 @@ const Chat = () => {
     return () => {
       socket.off("receiveMessage", handleMessage);
     };
-  }, [currentUser, selectedUser, setUnreadMessages, setLastMessageTimestamps]);
+  }, [
+    currentUser,
+    selectedUser,
+    setUnreadMessages,
+    setLastMessageTimestamps,
+    messages,
+  ]);
 
   // Reset unread messages for the selected user
   useEffect(() => {
@@ -190,13 +224,24 @@ const Chat = () => {
         createdAt: new Date(), // Add a timestamp for the message
       };
 
-      // Update local state immediately
-      setMessages((prev) => [...prev, messageData]);
-
       // Emit the message via the socket
       socket.emit("sendMessage", messageData, (response) => {
         if (response?.error) {
           console.error("Message failed:", response.error);
+        } else if (response?.message) {
+          // Ensure the response message is valid before adding it to the state
+          if (
+            response.message.sender &&
+            response.message.receiver &&
+            response.message.text
+          ) {
+            setMessages((prev) => [...prev, response.message]);
+          } else {
+            console.error(
+              "Received invalid message from server:",
+              response.message
+            );
+          }
         }
       });
 
@@ -206,8 +251,125 @@ const Chat = () => {
 
   return (
     <div className="text-white h-screen flex">
+      <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
+        {/* Logo Section */}
+        <a href="/feed" className="cursor-pointer">
+          <div className="flex items-center">
+            <img src={hntaLogo} alt="hnta-logo" className="w-10" />
+            <img
+              src={textLogo}
+              alt="hnta-text-logo"
+              className="w-32 h-10 ml-2"
+            />
+          </div>
+        </a>
+
+        {/* Hamburger Menu */}
+        <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <Menu size={32} className="text-primary" />
+        </button>
+      </div>
+
+      {/* Hamburger Menu (Mobile Only) */}
+      {isMenuOpen && (
+        <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
+          {/* Search Bar */}
+          <div className="text-center my-4">
+            <input
+              type="text"
+              placeholder="Pretraži korisnike..."
+              className="border p-3 rounded-full w-full text-white px-4"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+            {searchQuery !== "" && (
+              <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
+                {searchResults.length === 0 ? (
+                  <div>Korisnik nije pronađen</div>
+                ) : (
+                  <div>
+                    {searchResults.map((user) => (
+                      <div
+                        key={user._id}
+                        className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
+                        onClick={() => {
+                          if (userId === user?._id) {
+                            navigate(`/moj-profil`);
+                          } else {
+                            navigate(`/profil/${user._id}`);
+                          }
+                        }}
+                      >
+                        <img
+                          src={user.image || defaultPic}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <span>
+                          {user.firstName} {user.lastName}
+                        </span>
+                        <span>
+                          {(() => {
+                            switch (user.major) {
+                              case "Muzička produkcija":
+                                return <img src={muzika} className="w-4" />; // You can return whatever you want for this case
+                              case "Odgovorno kodiranje":
+                                return <img src={kodiranje} className="w-4" />; // Default case, in case no match
+                              case "Novinarstvo":
+                                return (
+                                  <img src={novinarstvo} className="w-4" />
+                                ); // Default case, in case no match
+                              case "Kreativno pisanje":
+                                return <img src={pisanje} className="w-4" />; // Default case, in case no match
+                              case "Grafički dizajn":
+                                return <img src={graficki} className="w-4" />; // Default case, in case no match
+                            }
+                          })()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
+                  Prikaži sve korisnike
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex flex-col items-center justify-center h-full relative">
+            <div className="absolute bottom-35">
+              <ul className="text-2xl">
+                <li className="flex items-center gap-x-4 py-2">
+                  <MessageSquare className="text-primary" size={32} />
+                  <span className="hover:text-primary cursor-pointer">
+                    Chat
+                  </span>
+                </li>
+                <li className="flex items-center gap-x-4 py-2">
+                  <GraduationCap className="text-primary" size={32} />
+                  <span className="hover:text-primary cursor-pointer">
+                    Radionice
+                  </span>
+                </li>
+                <li className="flex items-center gap-x-4 py-2">
+                  <UserPen className="text-primary" size={32} />
+                  <span className="hover:text-primary cursor-pointer">
+                    Moj profil
+                  </span>
+                </li>
+              </ul>
+              <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
+                Odjavi se
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Sidebar (Desktop Only) */}
-      <div className="hidden lg:block w-1/5 bg-black border-r border-gray-700 p-6">
+      <div className="hidden lg:block w-85 bg-black border-r border-gray-700 p-6">
         {/* Logo Section */}
         <a href="/feed" className="cursor-pointer">
           <div className="logo-container flex items-center justify-center">
@@ -225,12 +387,12 @@ const Chat = () => {
           <input
             type="text"
             placeholder="Pretraži korisnike..."
-            className="border p-3 rounded-full w-full text-white px-4 bg-gray-800"
+            className="border p-3 rounded-full w-full text-white px-4"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
           />
           {searchQuery !== "" && (
-            <div className="absolute w-5/6 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
+            <div className="absolute w-1/7 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
               {searchResults.length === 0 ? (
                 <div>Korisnik nije pronađen</div>
               ) : (
@@ -352,7 +514,7 @@ const Chat = () => {
       </div>
 
       {/* Chat Window */}
-      <div className="flex-1 bg-gray-700 flex flex-col">
+      <div className="flex-1 bg-gray-700 flex flex-col scrollbar-hide">
         {selectedUser ? (
           <>
             <div className="p-4 border-b border-gray-600">
@@ -361,24 +523,28 @@ const Chat = () => {
               </h2>
             </div>
             <div className="flex-1 p-4 overflow-y-auto">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    msg.sender === currentUser ? "justify-end" : "justify-start"
-                  } mb-4`}
-                >
+              {messages
+                .filter((msg) => msg && msg.sender && msg.receiver && msg.text) // Filter out invalid messages
+                .map((msg, index) => (
                   <div
-                    className={`max-w-2/3 p-3 rounded-lg ${
+                    key={index}
+                    className={`flex ${
                       msg.sender === currentUser
-                        ? "bg-primary text-white"
-                        : "bg-gray-600 text-white"
-                    }`}
+                        ? "justify-end"
+                        : "justify-start"
+                    } mb-4`}
                   >
-                    <p>{msg.text}</p>
+                    <div
+                      className={`max-w-2/3 p-3 rounded-lg ${
+                        msg.sender === currentUser
+                          ? "bg-primary text-white"
+                          : "bg-gray-600 text-white"
+                      }`}
+                    >
+                      <p>{msg.text}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
             <div className="p-4 border-t border-gray-600">
               <div className="flex gap-2">
@@ -406,7 +572,9 @@ const Chat = () => {
           </>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-400">Select a user to start chatting</p>
+            <p className="text-gray-400">
+              Odaberite korisnika i započnite razgovor
+            </p>
           </div>
         )}
       </div>

@@ -25,8 +25,6 @@ import CreatePost from "../components/createPost";
 import Post from "../components/post";
 
 export default function Feed() {
-  const { hasUnreadMessages } = useUnreadMessages();
-
   const [allPosts, setAllPosts] = useState([]);
   const [userId, setUserId] = useState(null);
 
@@ -262,9 +260,6 @@ export default function Feed() {
             <li className="flex items-center gap-x-4 py-2">
               <MessageSquare className="text-primary" size={32} />
               <span className="hover:text-primary cursor-pointer">Chat</span>
-              {hasUnreadMessages && (
-                <span className="bg-red-500 w-2 h-2 rounded-full"></span>
-              )}
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
