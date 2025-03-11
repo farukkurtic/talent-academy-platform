@@ -27,11 +27,13 @@ export const UnreadMessagesProvider = ({ children }) => {
     // Handle real-time messages
     const handleMessage = (message) => {
       if (message.receiver === currentUser) {
+        // Only increment unread messages if the sender is not the currently selected user
         setUnreadMessages((prev) => ({
           ...prev,
           [message.sender]: (prev[message.sender] || 0) + 1,
         }));
 
+        // Update the last message timestamp
         setLastMessageTimestamps((prev) => ({
           ...prev,
           [message.sender]: message.createdAt,

@@ -131,6 +131,22 @@ const Chat = () => {
       ) {
         setMessages((prev) => [...prev, message]);
       }
+
+      // Update unread messages if the message is not from the selected user
+      if (
+        message.receiver === currentUser &&
+        message.sender !== selectedUser?._id
+      ) {
+        setUnreadMessages((prev) => ({
+          ...prev,
+          [message.sender]: (prev[message.sender] || 0) + 1,
+        }));
+
+        setLastMessageTimestamps((prev) => ({
+          ...prev,
+          [message.sender]: message.createdAt,
+        }));
+      }
     };
 
     socket.on("receiveMessage", handleMessage);
@@ -138,7 +154,7 @@ const Chat = () => {
     return () => {
       socket.off("receiveMessage", handleMessage);
     };
-  }, [currentUser, selectedUser]);
+  }, [currentUser, selectedUser, setUnreadMessages, setLastMessageTimestamps]);
 
   // Reset unread messages for the selected user
   useEffect(() => {
