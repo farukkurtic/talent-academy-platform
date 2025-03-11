@@ -39,7 +39,6 @@ export default function Login() {
       console.log(response);
 
       if (response.status === 201) {
-        alert("Prijava je uspješna");
         localStorage.setItem("token", response.data.token);
         navigate("/feed");
       }

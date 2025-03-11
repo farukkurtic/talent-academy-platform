@@ -1,0 +1,23 @@
+{
+  "name": "Node.js Dev Container",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  "appPort": [5000],
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [5000],
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/usr/src/app,type=bind,consistency=cached"
+  ],
+  "remoteUser": "node"
+}

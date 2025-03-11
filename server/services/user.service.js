@@ -218,6 +218,50 @@ const updateUserDetails = async (userId, data, imageFile) => {
   }
 };
 
+const updateCurrentUser = async (userId, data, imageFile) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    if (data.links) {
+      // Ensure links is an array of objects with platform and url properties
+      user.links = data.links.map((link) => ({
+        platform: link.platform,
+        url: link.url,
+      }));
+    }
+
+    if (data.biography) {
+      user.biography = biography;
+    }
+
+    if (data.profession) {
+      user.profession = profession;
+    }
+
+    if (data.yearOfAttend) {
+      user.yearOfAttend = yearOfAttend;
+    }
+
+    if (data.major) {
+      user.major = major;
+    }
+
+    if (imageFile) {
+      const imageId = await uploadImageToGridFS(imageFile, userId);
+      user.image = imageId;
+    }
+
+    await user.save();
+    return user;
+  } catch (err) {
+    console.error("Error in updateCurrentUser:", err);
+    throw new ApiError(500, "Server error");
+  }
+};
+
 module.exports = {
   getUsers,
   getUsersByName,
@@ -227,4 +271,5 @@ module.exports = {
   getIsUserInitialized,
   getFilteredUsers,
   updateUserDetails,
+  updateCurrentUser,
 };

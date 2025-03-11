@@ -1,5 +1,9 @@
 require("dotenv").config();
 const express = require("express");
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const cookieParser = require("cookie-parser");
+const compression = require('compression');
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const routes = require("./routes");
@@ -11,9 +15,17 @@ const http = require("http");
 const server = http.createServer(app);
 
 const startServer = async () => {
+  app.use(helmet());
+
+  app.use(cookieParser()); 
+
+  app.use(xss());
   // Use CORS middleware
   app.use(cors());
+
   app.use(express.json());
+
+  app.use(compression());
   // Connect to DB
   await connectDB();
   console.log("MongoDB connected. Starting server...");

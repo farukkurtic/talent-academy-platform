@@ -147,6 +147,7 @@ export default function ProfileDetails() {
                     {...register("firstName")}
                     className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full placeholder-white"
                     placeholder="Ime"
+                    autoComplete="off"
                   />
                   {errors.firstName && (
                     <p className="text-red-500 text-sm mb-5">
@@ -159,6 +160,7 @@ export default function ProfileDetails() {
                     {...register("lastName")}
                     className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full placeholder-white"
                     placeholder="Prezime"
+                    autoComplete="off"
                   />
                   {errors.lastName && (
                     <p className="text-red-500 text-sm mb-5">
@@ -169,12 +171,36 @@ export default function ProfileDetails() {
               </div>
 
               {/* Major */}
-              <div className="w-full">
-                <input
+              <div className="w-full relative flex items-center justify-center">
+                <select
                   {...register("major")}
-                  className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full placeholder-white"
-                  placeholder="Smjer"
-                />
+                  className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full bg-transparent text-white appearance-none"
+                >
+                  <option
+                    value=""
+                    disabled
+                    selected
+                    className="bg-gray-800 text-white"
+                  >
+                    Odaberite smjer
+                  </option>
+                  <option value="Kreativno pisanje" className="bg-gray-800">
+                    Kreativno pisanje
+                  </option>
+                  <option value="Grafički dizajn" className="bg-gray-800">
+                    Grafički dizajn
+                  </option>
+                  <option value="Novinarstvo" className="bg-gray-800">
+                    Novinarstvo
+                  </option>
+                  <option value="Muzička produkcija" className="bg-gray-800">
+                    Muzička produkcija
+                  </option>
+                  <option value="Odgovorno kodiranje" className="bg-gray-800">
+                    Odgovorno kodiranje
+                  </option>
+                </select>
+
                 {errors.major && (
                   <p className="text-red-500 text-sm mb-5">
                     {errors.major.message}
@@ -188,6 +214,7 @@ export default function ProfileDetails() {
                   {...register("profession")}
                   className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full placeholder-white"
                   placeholder="Profesija"
+                  autoComplete="off"
                 />
                 {errors.profession && (
                   <p className="text-red-500 text-sm mb-5">
@@ -198,12 +225,20 @@ export default function ProfileDetails() {
 
               {/* Year of Attendance */}
               <div className="w-full">
-                <input
+                <select
                   {...register("yearOfAttend")}
-                  type="number"
-                  className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full placeholder-white"
-                  placeholder="Godina prisustva"
-                />
+                  className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full bg-transparent text-white appearance-none"
+                >
+                  <option value="" disabled selected className="bg-gray-800">
+                    Odaberite godinu
+                  </option>
+                  <option value={2024} className="bg-gray-800">
+                    2024
+                  </option>
+                  <option value={2025} className="bg-gray-800">
+                    2025
+                  </option>
+                </select>
                 {errors.yearOfAttend && (
                   <p className="text-red-500 text-sm mb-5">
                     {errors.yearOfAttend.message}

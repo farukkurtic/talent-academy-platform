@@ -1,12 +1,15 @@
 const express = require('express');
 const authRoutes = require('./auth.route')
 const userRoutes = require('./user.route')
+const workshopRoutes = require('./workshop.route')
+
 const feedRoutes = require('./feed.route')
 const chatRoutes = require('./chat.route')
 
 const router = express.Router();
 
 const defaultRoutes = [
+
     {
       path: '/api/auth',
       route: authRoutes,
@@ -23,6 +26,10 @@ const defaultRoutes = [
       path: '/api/chat',
       route: chatRoutes,
     },
+  {
+    path: '/api/workshop',
+    route: workshopRoutes,
+  },
   ];
 
 defaultRoutes.forEach((route) => {
