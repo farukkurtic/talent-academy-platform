@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import { useUnreadMessages } from "../contexts/UnreadMessagesContext";
+import { useUnreadMessages } from "../../contexts/UnreadMessagesContext";
 
 import hntaLogo from "../assets/hnta-logo.png";
 import textLogo from "../assets/textLogo.svg";
@@ -27,9 +27,9 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State for hamburger menu
-  const [lastMessageTimestamps, setLastMessageTimestamps] = useState({}); // Track last message timestamps
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { unreadMessages, setUnreadMessages } = useUnreadMessages();
+  const [lastMessageTimestamps, setLastMessageTimestamps] = useState({});
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
@@ -62,61 +62,85 @@ const Chat = () => {
 
   useEffect(() => {
     if (!currentUser) return;
+
+    // Fetch all users
     axios
       .get(`http://localhost:5000/api/chat/${currentUser}`)
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
-  }, [currentUser]);
+
+    // Fetch all messages for the current user
+    axios
+      .get(`http://localhost:5000/api/chat/messages/${currentUser}`)
+      .then((res) => {
+        const messages = res.data;
+
+        // Initialize unreadMessages and lastMessageTimestamps
+        const newUnreadMessages = {};
+        const newLastMessageTimestamps = {};
+
+        messages.forEach((message) => {
+          if (message.receiver === currentUser) {
+            // Update unread messages
+            newUnreadMessages[message.sender] =
+              (newUnreadMessages[message.sender] || 0) + 1;
+          }
+
+          // Update last message timestamps
+          if (
+            !newLastMessageTimestamps[message.sender] ||
+            new Date(message.createdAt) >
+              new Date(newLastMessageTimestamps[message.sender])
+          ) {
+            newLastMessageTimestamps[message.sender] = message.createdAt;
+          }
+        });
+
+        setUnreadMessages(newUnreadMessages);
+        setLastMessageTimestamps(newLastMessageTimestamps);
+      })
+      .catch((err) => console.error(err));
+  }, [currentUser, setUnreadMessages]);
 
   useEffect(() => {
     if (!currentUser || !selectedUser) return;
 
-    // Fetch past messages
+    // Fetch past messages for the selected user
     axios
       .get(
         `http://localhost:5000/api/chat/messages/${currentUser}/${selectedUser._id}`
       )
-      .then((res) => {
-        setMessages(res.data);
-
-        // Update last message timestamps
-        const lastMessage = res.data[res.data.length - 1];
-        if (lastMessage) {
-          setLastMessageTimestamps((prev) => ({
-            ...prev,
-            [lastMessage.sender]: lastMessage.createdAt, // Use `createdAt` from the message
-          }));
-        }
-      })
+      .then((res) => setMessages(res.data))
       .catch((err) => console.error(err));
+  }, [selectedUser, currentUser]);
+
+  useEffect(() => {
+    if (!currentUser) return;
 
     // Handle real-time incoming messages
     const handleMessage = (message) => {
-      if (
-        (message.sender === currentUser &&
-          message.receiver === selectedUser._id) ||
-        (message.sender === selectedUser._id &&
-          message.receiver === currentUser)
-      ) {
-        setMessages((prev) => [...prev, message]);
-      }
-
-      // Update unread messages in the global context
-      if (
-        message.sender !== selectedUser?._id &&
-        message.receiver === currentUser
-      ) {
+      if (message.receiver === currentUser) {
+        // Update unread messages
         setUnreadMessages((prev) => ({
           ...prev,
           [message.sender]: (prev[message.sender] || 0) + 1,
         }));
+
+        // Update last message timestamps
+        setLastMessageTimestamps((prev) => ({
+          ...prev,
+          [message.sender]: message.createdAt,
+        }));
       }
 
-      // Update last message timestamps
-      setLastMessageTimestamps((prev) => ({
-        ...prev,
-        [message.sender]: message.createdAt, // Use `createdAt` from the message
-      }));
+      // If the message is for the currently selected user, add it to the messages list
+      if (
+        selectedUser &&
+        (message.sender === selectedUser._id ||
+          message.receiver === selectedUser._id)
+      ) {
+        setMessages((prev) => [...prev, message]);
+      }
     };
 
     socket.on("receiveMessage", handleMessage);
@@ -124,8 +148,9 @@ const Chat = () => {
     return () => {
       socket.off("receiveMessage", handleMessage);
     };
-  }, [selectedUser, currentUser, setUnreadMessages]);
+  }, [currentUser, selectedUser, setUnreadMessages]);
 
+  // Reset unread messages for the selected user
   useEffect(() => {
     if (selectedUser) {
       setUnreadMessages((prev) => ({
@@ -134,6 +159,13 @@ const Chat = () => {
       }));
     }
   }, [selectedUser, setUnreadMessages]);
+
+  // Sort users by last message timestamp
+  const sortedUsers = users.sort((a, b) => {
+    const timestampA = lastMessageTimestamps[a._id] || 0; // Default to 0 if no timestamp exists
+    const timestampB = lastMessageTimestamps[b._id] || 0; // Default to 0 if no timestamp exists
+    return new Date(timestampB) - new Date(timestampA); // Sort by most recent message
+  });
 
   const sendMessage = () => {
     if (newMessage.trim() && selectedUser) {
@@ -147,18 +179,11 @@ const Chat = () => {
         if (response?.error) {
           console.error("Message failed:", response.error);
         }
-        // Do NOT update messages here, let the socket listener handle it
       });
 
       setNewMessage("");
     }
   };
-
-  const sortedUsers = users.sort((a, b) => {
-    const timestampA = lastMessageTimestamps[a._id] || 0; // Default to 0 if no timestamp exists
-    const timestampB = lastMessageTimestamps[b._id] || 0; // Default to 0 if no timestamp exists
-    return new Date(timestampB) - new Date(timestampA); // Sort by most recent message
-  });
 
   return (
     <div className="text-white h-screen flex">
