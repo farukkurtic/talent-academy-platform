@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { UnreadMessagesProvider } from "../contexts/UnreadMessagesContext.jsx";
 
 import Home from "./pages/home.jsx";
 import Register from "./pages/register.jsx";
@@ -22,17 +23,19 @@ Modal.setAppElement("#root");
 
 function App() {
   return (
-    <>
+    <UnreadMessagesProvider>
+      {" "}
+      {/* Wrap the app with the provider */}
       <Router>
         <Routes>
-          {/* Public routes (no token required) */}
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/registracija" element={<Register />} />
           <Route path="/prijava" element={<Login />} />
           <Route path="/uslovi-koristenja" element={<UsloviKoristenja />} />
           <Route path="/kontakt" element={<Kontakt />} />
 
-          {/* Protected routes (require valid token) */}
+          {/* Protected routes */}
           <Route
             path="/feed"
             element={
@@ -81,8 +84,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-<Route
+          <Route
             path="/chat"
             element={
               <ProtectedRoute>
@@ -92,7 +94,7 @@ function App() {
           />
         </Routes>
       </Router>
-    </>
+    </UnreadMessagesProvider>
   );
 }
 

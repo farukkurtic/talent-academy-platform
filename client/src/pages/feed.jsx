@@ -3,14 +3,13 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
+import { useUnreadMessages } from "../../contexts/UnreadMessagesContext";
+
 import hntaLogo from "../assets/hnta-logo.png";
 import textLogo from "../assets/textLogo.svg";
 import defaultPic from "../assets/default-image.png";
 
 import line1 from "../assets/lines/s1.svg";
-import line2 from "../assets/lines/s2.svg";
-import line3 from "../assets/lines/s3.svg";
-import line4 from "../assets/lines/s4.svg";
 import line5 from "../assets/lines/s5.svg";
 
 // badges
@@ -26,6 +25,8 @@ import CreatePost from "../components/createPost";
 import Post from "../components/post";
 
 export default function Feed() {
+  const { hasUnreadMessages } = useUnreadMessages();
+
   const [allPosts, setAllPosts] = useState([]);
   const [userId, setUserId] = useState(null);
 
@@ -261,6 +262,9 @@ export default function Feed() {
             <li className="flex items-center gap-x-4 py-2">
               <MessageSquare className="text-primary" size={32} />
               <span className="hover:text-primary cursor-pointer">Chat</span>
+              {hasUnreadMessages && (
+                <span className="bg-red-500 w-2 h-2 rounded-full"></span>
+              )}
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
