@@ -80,6 +80,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
       setSelectedImage(null);
       setImageFile(null);
       setSelectedGif(null);
+      setPostContent(""); // Reset postContent state
       reset({ text: "" }); // Explicitly reset the text field
       if (textareaRef.current) {
         textareaRef.current.value = ""; // Manually clear the textarea
@@ -168,7 +169,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
           <button
             type="submit"
             className="bg-primary text-black p-2 rounded-full ml-auto w-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!postContent}
+            disabled={!postContent} // Disable if postContent is empty
           >
             Objavi
           </button>
