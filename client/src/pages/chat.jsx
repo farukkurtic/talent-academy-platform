@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Add useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import io from "socket.io-client";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -22,7 +22,7 @@ const socket = io("http://localhost:5000", { transports: ["websocket"] });
 const Chat = () => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null); // This will be set from the passed state
+  const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,7 +36,7 @@ const Chat = () => {
   } = useUnreadMessages();
 
   const navigate = useNavigate();
-  const location = useLocation(); // Use useLocation to access the passed state
+  const location = useLocation();
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
@@ -250,7 +250,8 @@ const Chat = () => {
   };
 
   return (
-    <div className="text-white h-screen flex">
+    <div className="text-white h-screen flex flex-col lg:flex-row">
+      {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
         {/* Logo Section */}
         <a href="/feed" className="cursor-pointer">
@@ -270,104 +271,6 @@ const Chat = () => {
         </button>
       </div>
 
-      {/* Hamburger Menu (Mobile Only) */}
-      {isMenuOpen && (
-        <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
-          {/* Search Bar */}
-          <div className="text-center my-4">
-            <input
-              type="text"
-              placeholder="Pretraži korisnike..."
-              className="border p-3 rounded-full w-full text-white px-4"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
-            {searchQuery !== "" && (
-              <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
-                {searchResults.length === 0 ? (
-                  <div>Korisnik nije pronađen</div>
-                ) : (
-                  <div>
-                    {searchResults.map((user) => (
-                      <div
-                        key={user._id}
-                        className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
-                        onClick={() => {
-                          if (userId === user?._id) {
-                            navigate(`/moj-profil`);
-                          } else {
-                            navigate(`/profil/${user._id}`);
-                          }
-                        }}
-                      >
-                        <img
-                          src={user.image || defaultPic}
-                          alt={`${user.firstName} ${user.lastName}`}
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <span>
-                          {user.firstName} {user.lastName}
-                        </span>
-                        <span>
-                          {(() => {
-                            switch (user.major) {
-                              case "Muzička produkcija":
-                                return <img src={muzika} className="w-4" />; // You can return whatever you want for this case
-                              case "Odgovorno kodiranje":
-                                return <img src={kodiranje} className="w-4" />; // Default case, in case no match
-                              case "Novinarstvo":
-                                return (
-                                  <img src={novinarstvo} className="w-4" />
-                                ); // Default case, in case no match
-                              case "Kreativno pisanje":
-                                return <img src={pisanje} className="w-4" />; // Default case, in case no match
-                              case "Grafički dizajn":
-                                return <img src={graficki} className="w-4" />; // Default case, in case no match
-                            }
-                          })()}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                  Prikaži sve korisnike
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Navigation Links */}
-          <div className="flex flex-col items-center justify-center h-full relative">
-            <div className="absolute bottom-35">
-              <ul className="text-2xl">
-                <li className="flex items-center gap-x-4 py-2">
-                  <MessageSquare className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Chat
-                  </span>
-                </li>
-                <li className="flex items-center gap-x-4 py-2">
-                  <GraduationCap className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Radionice
-                  </span>
-                </li>
-                <li className="flex items-center gap-x-4 py-2">
-                  <UserPen className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Moj profil
-                  </span>
-                </li>
-              </ul>
-              <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
-                Odjavi se
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Sidebar (Desktop Only) */}
       <div className="hidden lg:block w-85 bg-black border-r border-gray-700 p-6">
         {/* Logo Section */}
@@ -475,108 +378,260 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* List of Users */}
-      <div className="w-1/5 bg-gray-800 p-4 overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4 tracking-wider">Svi korisnici</h2>
-        {sortedUsers.map((user) => (
-          <div
-            key={user._id}
-            className={`flex items-center gap-3 p-2 hover:bg-gray-700 cursor-pointer rounded-lg ${
-              selectedUser?._id === user._id ? "bg-gray-600" : ""
-            }`}
-            onClick={() => {
-              setSelectedUser(user);
-              setUnreadMessages((prev) => ({
-                ...prev,
-                [user._id]: 0, // Reset unread messages for this user
-              }));
-            }}
-          >
-            <img
-              src={
-                user?.image
-                  ? `http://localhost:5000/api/posts/image/${user?.image}`
-                  : defaultPic
-              }
-              alt={`${user.firstName} ${user.lastName}`}
-              className="w-10 h-10 rounded-full"
+      {isMenuOpen && (
+        <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
+          {/* Search Bar */}
+          <div className="text-center my-4">
+            <input
+              type="text"
+              placeholder="Pretraži korisnike..."
+              className="border p-3 rounded-full w-full text-white px-4"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
             />
-            <span>
-              {user.firstName} {user.lastName}
-            </span>
-            {unreadMessages[user._id] > 0 && (
-              <span className="bg-primary text-white text-xs rounded-full px-2 py-1">
-                {unreadMessages[user._id]}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Chat Window */}
-      <div className="flex-1 bg-gray-700 flex flex-col scrollbar-hide">
-        {selectedUser ? (
-          <>
-            <div className="p-4 border-b border-gray-600">
-              <h2 className="text-xl font-bold tracking-wider">
-                {selectedUser.firstName} {selectedUser.lastName}
-              </h2>
-            </div>
-            <div className="flex-1 p-4 overflow-y-auto">
-              {messages
-                .filter((msg) => msg && msg.sender && msg.receiver && msg.text) // Filter out invalid messages
-                .map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${
-                      msg.sender === currentUser
-                        ? "justify-end"
-                        : "justify-start"
-                    } mb-4`}
-                  >
-                    <div
-                      className={`max-w-2/3 p-3 rounded-lg ${
-                        msg.sender === currentUser
-                          ? "bg-primary text-white"
-                          : "bg-gray-600 text-white"
-                      }`}
-                    >
-                      <p>{msg.text}</p>
-                    </div>
+            {searchQuery !== "" && (
+              <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
+                {searchResults.length === 0 ? (
+                  <div>Korisnik nije pronađen</div>
+                ) : (
+                  <div>
+                    {searchResults.map((user) => (
+                      <div
+                        key={user._id}
+                        className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
+                        onClick={() => {
+                          if (userId === user?._id) {
+                            navigate(`/moj-profil`);
+                          } else {
+                            navigate(`/profil/${user._id}`);
+                          }
+                        }}
+                      >
+                        <img
+                          src={user.image || defaultPic}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <span>
+                          {user.firstName} {user.lastName}
+                        </span>
+                        <span>
+                          {(() => {
+                            switch (user.major) {
+                              case "Muzička produkcija":
+                                return <img src={muzika} className="w-4" />; // You can return whatever you want for this case
+                              case "Odgovorno kodiranje":
+                                return <img src={kodiranje} className="w-4" />; // Default case, in case no match
+                              case "Novinarstvo":
+                                return (
+                                  <img src={novinarstvo} className="w-4" />
+                                ); // Default case, in case no match
+                              case "Kreativno pisanje":
+                                return <img src={pisanje} className="w-4" />; // Default case, in case no match
+                              case "Grafički dizajn":
+                                return <img src={graficki} className="w-4" />; // Default case, in case no match
+                            }
+                          })()}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-            </div>
-            <div className="p-4 border-t border-gray-600">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault(); // Prevent default behavior (e.g., new line)
-                      sendMessage();
-                    }
-                  }}
-                  placeholder="Type a message..."
-                  className="flex-1 p-2 rounded-lg bg-gray-800 text-white"
-                />
-                <button
-                  onClick={sendMessage}
-                  className="bg-primary text-white p-2 rounded-lg"
-                >
-                  Send
+                )}
+
+                <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
+                  Prikaži sve korisnike
                 </button>
               </div>
+            )}
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex flex-col items-center justify-center h-full relative">
+            <div className="absolute bottom-35">
+              <ul className="text-2xl">
+                <li className="flex items-center gap-x-4 py-2">
+                  <MessageSquare className="text-primary" size={32} />
+                  <span className="hover:text-primary cursor-pointer">
+                    Chat
+                  </span>
+                </li>
+                <li className="flex items-center gap-x-4 py-2">
+                  <GraduationCap className="text-primary" size={32} />
+                  <span className="hover:text-primary cursor-pointer">
+                    Radionice
+                  </span>
+                </li>
+                <li className="flex items-center gap-x-4 py-2">
+                  <UserPen className="text-primary" size={32} />
+                  <span className="hover:text-primary cursor-pointer">
+                    Moj profil
+                  </span>
+                </li>
+              </ul>
+              <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
+                Odjavi se
+              </button>
             </div>
-          </>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col lg:flex-row mt-16 lg:mt-0">
+        {/* List of Users (Mobile Only) */}
+        {!selectedUser ? (
+          <div className="w-full h-screen lg:w-1/4 bg-gray-800 p-4 overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 tracking-wider">
+              Svi korisnici
+            </h2>
+            {sortedUsers.map((user) => (
+              <div
+                key={user._id}
+                className={`flex items-center gap-3 p-2 hover:bg-gray-700 cursor-pointer rounded-lg ${
+                  selectedUser?._id === user._id ? "bg-gray-600" : ""
+                }`}
+                onClick={() => {
+                  setSelectedUser(user);
+                  setUnreadMessages((prev) => ({
+                    ...prev,
+                    [user._id]: 0, // Reset unread messages for this user
+                  }));
+                }}
+              >
+                <img
+                  src={
+                    user?.image
+                      ? `http://localhost:5000/api/posts/image/${user?.image}`
+                      : defaultPic
+                  }
+                  alt={`${user.firstName} ${user.lastName}`}
+                  className="w-10 h-10 rounded-full"
+                />
+                <span>
+                  {user.firstName} {user.lastName}
+                </span>
+                {unreadMessages[user._id] > 0 && (
+                  <span className="bg-primary text-white text-xs rounded-full px-2 py-1">
+                    {unreadMessages[user._id]}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-400">
-              Odaberite korisnika i započnite razgovor
-            </p>
+          <div className="w-full lg:w-1/4 hidden lg:block bg-gray-800 p-4 overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 tracking-wider">
+              Svi korisnici
+            </h2>
+            {sortedUsers.map((user) => (
+              <div
+                key={user._id}
+                className={`flex items-center gap-3 p-2 hover:bg-gray-700 cursor-pointer rounded-lg ${
+                  selectedUser?._id === user._id ? "bg-gray-600" : ""
+                }`}
+                onClick={() => {
+                  setSelectedUser(user);
+                  setUnreadMessages((prev) => ({
+                    ...prev,
+                    [user._id]: 0, // Reset unread messages for this user
+                  }));
+                }}
+              >
+                <img
+                  src={
+                    user?.image
+                      ? `http://localhost:5000/api/posts/image/${user?.image}`
+                      : defaultPic
+                  }
+                  alt={`${user.firstName} ${user.lastName}`}
+                  className="w-10 h-10 rounded-full"
+                />
+                <span>
+                  {user.firstName} {user.lastName}
+                </span>
+                {unreadMessages[user._id] > 0 && (
+                  <span className="bg-primary text-white text-xs rounded-full px-2 py-1">
+                    {unreadMessages[user._id]}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
         )}
+
+        {/* Chat Window */}
+        <div className="flex-1 bg-gray-700 flex flex-col scrollbar-hide relative">
+          {selectedUser ? (
+            <>
+              <div className="p-4 border-b border-gray-600 flex justify-between items-center sticky bg-gray-700 top-17 lg:top-0">
+                <h2 className="text-xl font-bold tracking-wider">
+                  {selectedUser.firstName} {selectedUser.lastName}
+                </h2>
+                <button
+                  onClick={() => setSelectedUser(null)}
+                  className="lg:hidden bg-primary text-white p-2 rounded-lg"
+                >
+                  Svi korisnici
+                </button>
+              </div>
+              <div className="flex-1 p-4 overflow-y-auto">
+                {messages
+                  .filter(
+                    (msg) => msg && msg.sender && msg.receiver && msg.text
+                  ) // Filter out invalid messages
+                  .map((msg, index) => (
+                    <div
+                      key={index}
+                      className={`flex ${
+                        msg.sender === currentUser
+                          ? "justify-end"
+                          : "justify-start"
+                      } mb-4`}
+                    >
+                      <div
+                        className={`max-w-2/3 p-3 rounded-lg ${
+                          msg.sender === currentUser
+                            ? "bg-primary text-white"
+                            : "bg-gray-600 text-white"
+                        }`}
+                      >
+                        <p>{msg.text}</p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              <div className="sticky bottom-0 p-4 border-t border-gray-600 bg-gray-700">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault(); // Prevent default behavior (e.g., new line)
+                        sendMessage();
+                      }
+                    }}
+                    placeholder="Type a message..."
+                    className="flex-1 p-2 rounded-lg bg-gray-800 text-white"
+                  />
+                  <button
+                    onClick={sendMessage}
+                    className="bg-primary text-white p-2 rounded-lg"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="hidden lg:block flex items-center justify-center h-full">
+              <p className="text-gray-400">
+                Odaberite korisnika i započnite razgovor
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

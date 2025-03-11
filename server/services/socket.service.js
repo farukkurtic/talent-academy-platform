@@ -13,12 +13,9 @@ function initializeSocket(server) {
   });
 
   io.on("connection", (socket) => {
-    console.log(`New client connected: ${socket.id}`);
-
     // Join user to a chat room based on userId
     socket.on("joinChat", (userId) => {
       socket.join(userId);
-      console.log(`User ${userId} joined chat`);
     });
 
     // Handle sending messages
