@@ -295,7 +295,7 @@ const Chat = () => {
             onChange={(e) => handleSearch(e.target.value)}
           />
           {searchQuery !== "" && (
-            <div className="absolute w-1/7 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
+            <div className="absolute w-70 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
               {searchResults.length === 0 ? (
                 <div>Korisnik nije pronađen</div>
               ) : (
@@ -313,6 +313,7 @@ const Chat = () => {
                       }}
                     >
                       <img
+                        crossOrigin="anonymous"
                         src={
                           user?.image
                             ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -357,7 +358,9 @@ const Chat = () => {
           <ul className="text-2xl w-full">
             <li className="flex items-center gap-x-4 py-2">
               <MessageSquare className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">Chat</span>
+              <a href="/chat">
+                <span className="hover:text-primary cursor-pointer">Chat</span>
+              </a>
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
@@ -367,9 +370,11 @@ const Chat = () => {
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <UserPen className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">
-                Moj profil
-              </span>
+              <a href="/moj-profil">
+                <span className="hover:text-primary cursor-pointer">
+                  Moj profil
+                </span>
+              </a>
             </li>
           </ul>
           <button className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer">
@@ -408,7 +413,12 @@ const Chat = () => {
                         }}
                       >
                         <img
-                          src={user.image || defaultPic}
+                          crossOrigin="anonymous"
+                          src={
+                            user?.image
+                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              : defaultPic
+                          }
                           alt={`${user.firstName} ${user.lastName}`}
                           className="w-10 h-10 rounded-full"
                         />
@@ -451,9 +461,11 @@ const Chat = () => {
               <ul className="text-2xl">
                 <li className="flex items-center gap-x-4 py-2">
                   <MessageSquare className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Chat
-                  </span>
+                  <a href="/chat">
+                    <span className="hover:text-primary cursor-pointer">
+                      Chat
+                    </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <GraduationCap className="text-primary" size={32} />
@@ -463,9 +475,11 @@ const Chat = () => {
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <UserPen className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Moj profil
-                  </span>
+                  <a href="/moj-profil">
+                    <span className="hover:text-primary cursor-pointer">
+                      Moj profil
+                    </span>
+                  </a>
                 </li>
               </ul>
               <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
@@ -499,6 +513,7 @@ const Chat = () => {
                 }}
               >
                 <img
+                  crossOrigin="anonymous"
                   src={
                     user?.image
                       ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -538,6 +553,7 @@ const Chat = () => {
                 }}
               >
                 <img
+                  crossOrigin="anonymous"
                   src={
                     user?.image
                       ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -625,7 +641,7 @@ const Chat = () => {
               </div>
             </>
           ) : (
-            <div className="hidden lg:block flex items-center justify-center h-full">
+            <div className="hidden lg:block lg:flex lg:items-center lg:justify-center h-full">
               <p className="text-gray-400">
                 Odaberite korisnika i započnite razgovor
               </p>

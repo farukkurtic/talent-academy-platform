@@ -208,7 +208,9 @@ export default function Filters() {
           <ul className="text-2xl w-full">
             <li className="flex items-center gap-x-4 py-2">
               <MessageSquare className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">Chat</span>
+              <a href="/chat">
+                <span className="hover:text-primary cursor-pointer">Chat</span>
+              </a>
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
@@ -218,9 +220,11 @@ export default function Filters() {
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <UserPen className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">
-                Moj profil
-              </span>
+              <a href="/moj-profil">
+                <span className="hover:text-primary cursor-pointer">
+                  Moj profil
+                </span>
+              </a>
             </li>
           </ul>
           <button className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer">
@@ -344,6 +348,7 @@ export default function Filters() {
             >
               <div className="p-4 border border-gray-700 rounded-3xl mb-10 w-90 lg:w-120">
                 <img
+                  crossOrigin="anonymous"
                   src={
                     user?.image
                       ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -414,6 +419,7 @@ export default function Filters() {
                         }}
                       >
                         <img
+                          crossOrigin="anonymous"
                           src={
                             user?.image
                               ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -542,9 +548,11 @@ export default function Filters() {
               <ul className="text-2xl">
                 <li className="flex items-center gap-x-4 py-2">
                   <MessageSquare className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Chat
-                  </span>
+                  <a href="/chat">
+                    <span className="hover:text-primary cursor-pointer">
+                      Chat
+                    </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <GraduationCap className="text-primary" size={32} />
@@ -554,9 +562,11 @@ export default function Filters() {
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <UserPen className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Moj profil
-                  </span>
+                  <a href="/moj-profil">
+                    <span className="hover:text-primary cursor-pointer">
+                      Moj profil
+                    </span>
+                  </a>
                 </li>
                 <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
                   Odjavi se

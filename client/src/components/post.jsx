@@ -194,6 +194,7 @@ export default function Post({
             }
           >
             <img
+              crossOrigin="anonymous"
               src={
                 profilePic
                   ? `http://localhost:5000/api/posts/image/${profilePic}`
@@ -232,6 +233,7 @@ export default function Post({
         >
           {picture && (
             <img
+              crossOrigin="anonymous"
               src={picture}
               className={gif ? "w-1/2 rounded-lg" : "w-full rounded-lg"}
               alt="Uploaded Image"
@@ -287,6 +289,7 @@ export default function Post({
           </button>
           {selectedImage && (
             <img
+              crossOrigin="anonymous"
               src={selectedImage}
               alt="Expanded"
               className="max-w-full max-h-[90vh] rounded-lg"
@@ -408,6 +411,7 @@ export default function Post({
             >
               <div className="flex items-center justify-start mb-3">
                 <img
+                  crossOrigin="anonymous"
                   src={
                     cmt.user?.image
                       ? `http://localhost:5000/api/posts/image/${cmt.user?.image}`

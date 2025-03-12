@@ -1,9 +1,9 @@
 require("dotenv").config();
 const express = require("express");
-const helmet = require('helmet');
-const xss = require('xss-clean');
+const helmet = require("helmet");
+const xss = require("xss-clean");
 const cookieParser = require("cookie-parser");
-const compression = require('compression');
+const compression = require("compression");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const routes = require("./routes");
@@ -16,8 +16,11 @@ const server = http.createServer(app);
 
 const startServer = async () => {
   app.use(helmet());
+  helmet({
+    crossOriginResourcePolicy: false,
+  });
 
-  app.use(cookieParser()); 
+  app.use(cookieParser());
 
   app.use(xss());
   // Use CORS middleware

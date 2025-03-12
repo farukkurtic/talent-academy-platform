@@ -328,7 +328,7 @@ export default function MyProfile() {
                       key={user._id}
                       className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
                       onClick={() => {
-                        if (userId === user?._id) {
+                        if (currentUserId === user?._id) {
                           navigate("/moj-profil");
                         } else {
                           navigate(`/profil/${user._id}`);
@@ -336,6 +336,7 @@ export default function MyProfile() {
                       }}
                     >
                       <img
+                        crossOrigin="anonymous"
                         src={
                           user?.image
                             ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -380,7 +381,9 @@ export default function MyProfile() {
           <ul className="text-2xl w-full">
             <li className="flex items-center gap-x-4 py-2">
               <MessageSquare className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">Chat</span>
+              <a href="/chat">
+                <span className="hover:text-primary cursor-pointer">Chat</span>
+              </a>
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
@@ -390,9 +393,11 @@ export default function MyProfile() {
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <UserPen className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">
-                Moj profil
-              </span>
+              <a href="/moj-profil">
+                <span className="hover:text-primary cursor-pointer">
+                  Moj profil
+                </span>
+              </a>
             </li>
           </ul>
           <button className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer">
@@ -415,6 +420,7 @@ export default function MyProfile() {
             <X size={24} className="text-gray-700" />
           </button>
           <img
+            crossOrigin="anonymous"
             src={
               userData?.image
                 ? `http://localhost:5000/api/posts/image/${userData?.image}`
@@ -449,7 +455,7 @@ export default function MyProfile() {
                         key={user._id}
                         className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
                         onClick={() => {
-                          if (userId === user?._id) {
+                          if (currentUserId === user?._id) {
                             navigate(`/moj-profil`);
                           } else {
                             navigate(`/profil/${user._id}`);
@@ -457,6 +463,7 @@ export default function MyProfile() {
                         }}
                       >
                         <img
+                          crossOrigin="anonymous"
                           src={user.image || defaultPic}
                           alt={`${user.firstName} ${user.lastName}`}
                           className="w-10 h-10 rounded-full"
@@ -500,9 +507,11 @@ export default function MyProfile() {
               <ul className="text-2xl">
                 <li className="flex items-center gap-x-4 py-2">
                   <MessageSquare className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Chat
-                  </span>
+                  <a href="/chat">
+                    <span className="hover:text-primary cursor-pointer">
+                      Chat
+                    </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <GraduationCap className="text-primary" size={32} />
@@ -512,9 +521,11 @@ export default function MyProfile() {
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <UserPen className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Moj profil
-                  </span>
+                  <a href="/moj-profil">
+                    <span className="hover:text-primary cursor-pointer">
+                      Moj profil
+                    </span>
+                  </a>
                 </li>
               </ul>
               <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
@@ -539,6 +550,7 @@ export default function MyProfile() {
         <div className="flex flex-col items-center justify-center lg:items-start lg:ml-40">
           <div className="relative">
             <img
+              crossOrigin="anonymous"
               src={
                 imagePreviewUrl || // Use the preview URL if it exists
                 (userData?.image
