@@ -151,6 +151,7 @@ export default function DetaljiFinalno() {
               {selectedImage ? (
                 <div className="relative">
                   <img
+                    crossOrigin="anonymous"
                     src={selectedImage}
                     alt="Selected"
                     className="w-45 h-45 rounded-full object-cover"

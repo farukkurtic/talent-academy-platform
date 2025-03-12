@@ -48,6 +48,8 @@ router.get("/image/:fileId", async (req, res) => {
     console.log("File found in GridFS:", files[0]);
 
     // Set proper headers before streaming the file
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins
+    res.setHeader("Access-Control-Allow-Methods", "GET"); // Allow only GET requests
     res.setHeader("Content-Type", files[0].contentType);
     res.setHeader("Content-Length", files[0].length);
 
