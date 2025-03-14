@@ -1,8 +1,10 @@
-import utility from "../assets/utility-drawing.png";
-import logo from "../assets/hnta-logo.png";
-import { Facebook, Globe, Instagram, Linkedin, Youtube } from "lucide-react";
-import ambasadaLogo from "../assets/ambasada.png";
-import hnLogo from "../assets/hnLogo.svg";
+import { Link } from "react-router-dom";
+import utility from "../assets/visuals/utility-drawing.png";
+import logo from "../assets/logos/hnta-logo.png";
+import ambasadaLogo from "../assets/misc/ambasada.png";
+import hnLogo from "../assets/logos/hnLogo.svg";
+
+import { Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 
 export default function UsloviKoristenja() {
   return (
@@ -16,7 +18,6 @@ export default function UsloviKoristenja() {
               className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg p-5"
             />
           </div>
-
           <div className="w-full lg:w-1/2 p-5 lg:text-left tracking-wider">
             <a href="/">
               <img
@@ -61,7 +62,7 @@ export default function UsloviKoristenja() {
               </ul>
               <p className="mt-5 text-lg">
                 Ukoliko ne prihvatate ove uslove korištenja, molimo vas da
-                prestanete sa korištenjem ove web stranice.
+                prestanete sa korištenjem web stranice.
               </p>
             </div>
           </div>
@@ -71,7 +72,7 @@ export default function UsloviKoristenja() {
         <div className="lg:pr-20 pb-20 lg:pb-0">
           <ul className="text-lg">
             <li className="mb-2 cursor-pointer">Kontakt</li>
-            <li className="mb-2 cursor-pointer">Privatnost</li>
+
             <li className="mb-2 cursor-pointer">
               <a href="/uslovi-koristenja">Uslovi korištenja</a>
             </li>
@@ -79,25 +80,32 @@ export default function UsloviKoristenja() {
         </div>
         <div className="pb-20 lg:pb-0">
           <ul className="flex">
-            <li className="pr-2 cursor-pointer">
-              <Instagram size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Facebook size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Youtube size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Linkedin size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Globe size={25} strokeWidth={1} />
-            </li>
+            <Link to="https://www.instagram.com/talentakademija/">
+              <li className="pr-2 cursor-pointer">
+                <Instagram size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.facebook.com/profile.php?id=61559380710858&locale=nb_NO">
+              <li className="pr-2 cursor-pointer">
+                <Facebook size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.youtube.com/@talentakademija">
+              <li className="pr-2 cursor-pointer">
+                <Youtube size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.linkedin.com/company/helem-nejse-talent-akademija/">
+              <li className="pr-2 cursor-pointer">
+                <Linkedin size={25} strokeWidth={1} />
+              </li>
+            </Link>
           </ul>
-          <button className="p-3 border-2 border-primary rounded-full text-sm tracking-wider w-full text-primary mt-5 cursor-pointer">
-            Talent Akademija
-          </button>
+          <Link to="https://talentakademija.ba/">
+            <button className="p-3 border-2 border-primary rounded-full text-sm tracking-wider w-full text-primary mt-5 cursor-pointer">
+              Talent Akademija
+            </button>
+          </Link>
         </div>
         <div className="ml-20 ml-auto">
           <div>

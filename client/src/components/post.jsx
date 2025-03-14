@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Modal from "react-modal";
 import axios from "axios";
 
-import defaultPic from "../assets/defaultPic.svg";
+import defaultPic from "../assets/defaults/defaultPic.svg";
+
 import { Heart, MessageSquare, X, MoreVertical, Trash } from "lucide-react";
 
 export default function Post({
@@ -15,7 +16,7 @@ export default function Post({
   content,
   picture,
   gif,
-  likes: initialLikes, // Rename to avoid conflict with state
+  likes: initialLikes,
   comments: initialComments,
   deletePost,
   postId,
@@ -25,25 +26,22 @@ export default function Post({
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [likes, setLikes] = useState(initialLikes || []); // Store likes in state
+  const [likes, setLikes] = useState(initialLikes || []);
   const [isLiked, setIsLiked] = useState(likes.includes(currentUserId));
   const [likeCount, setLikeCount] = useState(likes.length);
-  const [likedUsers, setLikedUsers] = useState([]); // Track users who liked the post
-  const [isLikesModalOpen, setIsLikesModalOpen] = useState(false); // Track likes modal state
+  const [likedUsers, setLikedUsers] = useState([]);
+  const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
   const [comments, setComments] = useState(initialComments || []);
   const [seeComments, setSeeComments] = useState(false);
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const textareaRef = useRef(null);
   const commentValue = watch("comment", "");
 
-  // Check if the current user has liked the post
-
   useEffect(() => {
     setIsLiked(likes.includes(currentUserId));
     setLikeCount(likes.length);
   }, [likes, currentUserId]);
 
-  // Fetch user details for users who liked the post
   const fetchLikedUsers = async () => {
     try {
       const users = await Promise.all(
@@ -60,7 +58,6 @@ export default function Post({
     }
   };
 
-  // Open likes modal and fetch liked users
   const openLikesModal = async () => {
     setIsLikesModalOpen(true);
     await fetchLikedUsers();
@@ -70,7 +67,6 @@ export default function Post({
     setIsLikesModalOpen(false);
   };
 
-  // Handle like/unlike
   const handleLike = async () => {
     try {
       if (isLiked) {
@@ -83,8 +79,6 @@ export default function Post({
             },
           }
         );
-
-        // Update likes state
         setLikes((prev) => prev.filter((id) => id !== currentUserId));
       } else {
         await axios.post(
@@ -96,8 +90,6 @@ export default function Post({
             },
           }
         );
-
-        // Fetch the current user's data and add it to likes
         const response = await axios.get(
           `http://localhost:5000/api/user/id/${currentUserId}`
         );
@@ -126,7 +118,6 @@ export default function Post({
 
   const handleAddComment = async (commentText) => {
     if (commentText.trim() === "") return;
-
     try {
       const response = await axios.post(
         `http://localhost:5000/api/posts/${postId}/comment`,
@@ -140,13 +131,10 @@ export default function Post({
           },
         }
       );
-
-      // Update comments list with the new comment (including user details)
       setComments([...comments, response.data]);
-
-      reset(); // Clear form
-      setValue("comment", ""); // Reset input field
-      textareaRef.current.style.height = "auto"; // Reset textarea height
+      reset();
+      setValue("comment", "");
+      textareaRef.current.style.height = "auto";
       setSeeComments(true);
     } catch (err) {
       console.error("Error posting comment:", err);
@@ -183,7 +171,6 @@ export default function Post({
 
   return (
     <div className="text-white w-xs lg:w-md border rounded-3xl p-5 mb-10 relative">
-      {/* User Info */}
       <div className="w-full flex items-center mb-3">
         {profilePic && (
           <a
@@ -195,11 +182,7 @@ export default function Post({
           >
             <img
               crossOrigin="anonymous"
-              src={
-                profilePic
-                  ? `http://localhost:5000/api/posts/image/${profilePic}`
-                  : defaultPic
-              }
+              src={profilePic ? profilePic : defaultPic}
               className="mr-5 w-12 h-12 rounded-full cursor-pointer"
               alt="Profile"
             />
@@ -218,13 +201,9 @@ export default function Post({
         </h1>
         {badge && <img src={badge} alt="Badge" className="w-6 h-6" />}
       </div>
-
-      {/* Post Content */}
       <div className="w-full mb-3">
         <p className="text-sm tracking-wider">{content}</p>
       </div>
-
-      {/* Image/GIF Section */}
       {(picture || gif) && (
         <div
           className={`w-full flex gap-2 ${
@@ -252,8 +231,6 @@ export default function Post({
           )}
         </div>
       )}
-
-      {/* Three-Dot Menu */}
       {postUserId === currentUserId && (
         <div className="absolute top-8 right-10">
           <button onClick={() => setMenuOpen(!menuOpen)}>
@@ -272,8 +249,6 @@ export default function Post({
           )}
         </div>
       )}
-
-      {/* Modal for Image/GIF */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
@@ -297,9 +272,6 @@ export default function Post({
           )}
         </div>
       </Modal>
-
-      {/* Like and Comment Buttons */}
-      {/* Like and Comment Buttons */}
       <div className="w-3/5 flex items-center justify-between m-auto mt-3">
         <div className="flex items-center">
           <button onClick={handleLike}>
@@ -316,7 +288,6 @@ export default function Post({
           </button>
         </div>
         <div className="flex items-center">
-          {/* Restored Comment Icon */}
           <MessageSquare
             size={32}
             strokeWidth={1}
@@ -329,8 +300,6 @@ export default function Post({
           <p>{comments?.length || 0}</p>
         </div>
       </div>
-
-      {/* Modal for Liked Users */}
       <Modal
         isOpen={isLikesModalOpen}
         onRequestClose={closeLikesModal}
@@ -357,6 +326,7 @@ export default function Post({
               >
                 <div className="flex items-center mb-3">
                   <img
+                    crossOrigin="anonymous"
                     src={
                       user.image
                         ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -373,8 +343,6 @@ export default function Post({
           </div>
         </div>
       </Modal>
-
-      {/* Comment Input Section */}
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mt-4 border-t border-gray-700 pt-3"
@@ -384,8 +352,8 @@ export default function Post({
           ref={textareaRef}
           placeholder="Napiši komentar..."
           className="w-full p-2 bg-gray-800 text-white rounded-lg resize-none border border-gray-600 focus:outline-none"
-          style={{ height: "auto", overflowY: "hidden" }} // Added styles for auto height adjustment and hidden scrollbar
-          rows={1} // Keep it as 1 row to help with initial sizing but it will grow dynamically
+          style={{ height: "auto", overflowY: "hidden" }}
+          rows={1}
           onInput={handleInput}
           value={commentValue}
           onChange={(e) => setValue("comment", e.target.value)}
@@ -397,8 +365,6 @@ export default function Post({
           Objavi
         </button>
       </form>
-
-      {/* Display Comments */}
       <div className={seeComments ? "visible" : "hidden"}>
         {comments.map((cmt, index) => (
           <div key={index} className="bg-gray-800 p-2 rounded-lg mt-2 text-sm">
@@ -426,7 +392,14 @@ export default function Post({
             </a>
             <p className="break-words mb-3">{cmt.text}</p>{" "}
             <p className="text-gray-400 text-xs">
-              {new Date(cmt.createdAt).toLocaleString()}
+              {new Date(cmt.createdAt).toLocaleString("en-GB", {
+                hour12: false,
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </p>
           </div>
         ))}

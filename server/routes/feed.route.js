@@ -2,7 +2,7 @@ const express = require("express");
 const { feedController } = require("../controllers");
 const multer = require("multer");
 const { getGfsBucket } = require("../config/db");
-const mongoose = require("mongoose"); // Import mongoose
+const mongoose = require("mongoose");
 const { Post } = require("../models");
 const authMiddleware = require("../middlewares/authMiddleware");
 const axios = require("axios");
@@ -12,7 +12,6 @@ const upload = multer({ storage });
 
 const router = express.Router();
 
-// Create a post with optional image upload
 router.post(
   "/",
   upload.single("image"), // Handle file upload

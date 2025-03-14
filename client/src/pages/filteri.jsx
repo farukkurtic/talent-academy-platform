@@ -1,24 +1,21 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
-import hntaLogo from "../assets/hnta-logo.png";
-import textLogo from "../assets/textLogo.svg";
-import defaultPic from "../assets/default-image.png";
+import hntaLogo from "../assets/logos/hnta-logo.png";
+import textLogo from "../assets/logos/textLogo.svg";
+import defaultPic from "../assets/defaults/defaultPic.svg";
 
-// badges
-import kodiranje from "../assets/kodiranje.svg";
-import pisanje from "../assets/kreativnoPisanje.svg";
-import graficki from "../assets/grafickiDizajn.svg";
-import novinarstvo from "../assets/novinarstvo.svg";
-import muzika from "../assets/muzickaProdukcija.svg";
+import kodiranje from "../assets/badges/kodiranje.svg";
+import pisanje from "../assets/badges/kreativnoPisanje.svg";
+import graficki from "../assets/badges/grafickiDizajn.svg";
+import novinarstvo from "../assets/badges/novinarstvo.svg";
+import muzika from "../assets/badges/muzickaProdukcija.svg";
 
 import line1 from "../assets/lines/s1.svg";
 import line2 from "../assets/lines/s2.svg";
-import line3 from "../assets/lines/s3.svg";
-import line4 from "../assets/lines/s4.svg";
-import line5 from "../assets/lines/s5.svg";
 
 import { MessageSquare, GraduationCap, UserPen, Menu } from "lucide-react";
 
@@ -26,8 +23,10 @@ export default function Filters() {
   const [userId, setUserId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [allUsers, setAllUsers] = useState([]); // State to store all users
-  const [filteredUsers, setFilteredUsers] = useState([]); // State to store filtered users
+  const [allUsers, setAllUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [filters, setFilters] = useState({
     major: [],
     purposeOfPlatform: [],
@@ -38,7 +37,6 @@ export default function Filters() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/prijava");
     } else {
@@ -46,7 +44,6 @@ export default function Filters() {
       setUserId(decoded.id);
     }
 
-    // Fetch all users on load
     fetchAllUsers();
   }, []);
 
@@ -54,7 +51,7 @@ export default function Filters() {
     try {
       const response = await axios.get("http://localhost:5000/api/user/");
       setAllUsers(response.data.users);
-      setFilteredUsers(response.data.users.results); // Initially, show all users
+      setFilteredUsers(response.data.users.results);
     } catch (err) {
       console.error("Error fetching users:", err);
     }
@@ -62,7 +59,6 @@ export default function Filters() {
 
   const handleSearch = async (query) => {
     setSearchQuery(query);
-
     if (query.length > 1) {
       try {
         const response = await axios.get(
@@ -81,19 +77,17 @@ export default function Filters() {
   const handleFilterChange = (type, value) => {
     setFilters((prevFilters) => {
       const updatedFilters = { ...prevFilters };
-
       if (type === "yearOfAttend") {
         const isSelected = updatedFilters[type].includes(value);
         updatedFilters[type] = isSelected
-          ? updatedFilters[type].filter((item) => item !== value) // Remove year if already selected
-          : [...updatedFilters[type], value]; // Add year if not selected
+          ? updatedFilters[type].filter((item) => item !== value)
+          : [...updatedFilters[type], value];
       } else {
         const isSelected = updatedFilters[type].includes(value);
         updatedFilters[type] = isSelected
           ? updatedFilters[type].filter((item) => item !== value)
           : [...updatedFilters[type], value];
       }
-
       return updatedFilters;
     });
   };
@@ -101,7 +95,6 @@ export default function Filters() {
   const applyFilters = async () => {
     try {
       const queryParams = new URLSearchParams();
-
       if (filters.major.length > 0) {
         queryParams.append("major", filters.major.join(","));
       }
@@ -114,7 +107,6 @@ export default function Filters() {
       if (filters.yearOfAttend) {
         queryParams.append("yearOfAttend", filters.yearOfAttend);
       }
-
       const response = await axios.get(
         `http://localhost:5000/api/user/filter?${queryParams.toString()}`
       );
@@ -124,19 +116,24 @@ export default function Filters() {
     }
   };
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State for hamburger menu
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/prijava");
+  };
 
   return (
     <div className="text-white h-screen relative flex flex-col lg:flex-row">
-      {/* Sidebar (Desktop Only) */}
       <div className="hidden lg:block fixed w-85 top-0 bottom-0 left-0 border-r border-gray-700 bg-black p-6">
-        {/* Logo Section */}
-        <div className="logo-container flex items-center justify-center">
-          <img src={hntaLogo} alt="hnta-logo" className="w-20" />
-          <img src={textLogo} alt="hnta-text-logo" className="w-40 h-40 ml-2" />
-        </div>
-
-        {/* Search Bar */}
+        <a href="/feed">
+          <div className="logo-container flex items-center justify-center">
+            <img src={hntaLogo} alt="hnta-logo" className="w-20" />
+            <img
+              src={textLogo}
+              alt="hnta-text-logo"
+              className="w-40 h-40 ml-2"
+            />
+          </div>
+        </a>
         <div className="text-center my-6">
           <input
             type="text"
@@ -144,8 +141,10 @@ export default function Filters() {
             className="border p-3 rounded-full w-full text-white px-4"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
           />
-          {searchQuery !== "" && (
+          {(isSearchFocused || searchQuery !== "") && (
             <div className="absolute w-5/6 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
               {searchResults.length === 0 ? (
                 <div>Korisnik nije pronađen</div>
@@ -164,6 +163,7 @@ export default function Filters() {
                       }}
                     >
                       <img
+                        crossOrigin="anonymous"
                         src={
                           user?.image
                             ? `http://localhost:5000/api/posts/image/${user?.image}`
@@ -195,15 +195,12 @@ export default function Filters() {
                   ))}
                 </div>
               )}
-
               <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                <a href="/filteri">Prikaži sve korisnike</a>
+                <a href="/svi-korisnici">Prikaži sve korisnike</a>
               </button>
             </div>
           )}
         </div>
-
-        {/* Navigation Links and Logout Button at the Bottom */}
         <div className="absolute bottom-10 left-20 p-6">
           <ul className="text-2xl w-full">
             <li className="flex items-center gap-x-4 py-2">
@@ -227,29 +224,24 @@ export default function Filters() {
               </a>
             </li>
           </ul>
-          <button className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer">
+          <button
+            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer"
+            onClick={handleLogout}
+          >
             Odjavi se
           </button>
         </div>
       </div>
-
-      {/* Header (Mobile Only) */}
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
-        {/* Logo Section */}
         <div className="flex items-center">
           <img src={hntaLogo} alt="hnta-logo" className="w-10" />
           <img src={textLogo} alt="hnta-text-logo" className="w-32 h-10 ml-2" />
         </div>
-
-        {/* Hamburger Menu */}
         <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
           <Menu size={32} className="text-primary" />
         </button>
       </div>
-
-      {/* Filters Section */}
       <div className="w-85 lg:ml-100 lg:h-screen hidden lg:block lg:p-6 flex flex-col lg:flex-row border-r border-gray-700 overflow-y-auto scrollbar-hide">
-        {/* Smjerovi */}
         <div className="mb-6 w-full">
           <h3 className="text-xl font-semibold mb-5 tracking-wider">
             Smjerovi
@@ -275,8 +267,6 @@ export default function Filters() {
             </label>
           ))}
         </div>
-
-        {/* Dostupan za */}
         <div className="mb-6 w-full">
           <h3 className="text-xl font-semibold mb-5 tracking-wider">
             Dostupan za
@@ -298,8 +288,6 @@ export default function Filters() {
             </label>
           ))}
         </div>
-
-        {/* Generacija */}
         <div className="mb-6 w-full">
           <h3 className="text-xl font-semibold mb-5 tracking-wider">
             Generacija
@@ -319,8 +307,6 @@ export default function Filters() {
             </label>
           ))}
         </div>
-
-        {/* Filtriraj Button */}
         <button
           onClick={applyFilters}
           className="bg-primary p-2 rounded-full w-3/4 text-white cursor-pointer"
@@ -328,8 +314,6 @@ export default function Filters() {
           Filtriraj
         </button>
       </div>
-
-      {/* Users List */}
       <div className="flex-1 p-6 overflow-y-auto max-h-screen relative w-full">
         <img
           src={line1}
@@ -364,20 +348,19 @@ export default function Filters() {
                   {(() => {
                     switch (user.major) {
                       case "Muzička produkcija":
-                        return <img src={muzika} className="w-6" />; // You can return whatever you want for this case
+                        return <img src={muzika} className="w-6" />;
                       case "Odgovorno kodiranje":
-                        return <img src={kodiranje} className="w-6" />; // Default case, in case no match
+                        return <img src={kodiranje} className="w-6" />;
                       case "Novinarstvo":
-                        return <img src={novinarstvo} className="w-6" />; // Default case, in case no match
+                        return <img src={novinarstvo} className="w-6" />;
                       case "Kreativno pisanje":
-                        return <img src={pisanje} className="w-6" />; // Default case, in case no match
+                        return <img src={pisanje} className="w-6" />;
                       case "Grafički dizajn":
-                        return <img src={graficki} className="w-6" />; // Default case, in case no match
+                        return <img src={graficki} className="w-6" />;
                     }
                   })()}
                 </div>
-
-                <p>
+                <p className="break-words">
                   {user?.biography.length > 250
                     ? user.biography.slice(0, 250) + "..."
                     : user?.biography}
@@ -387,11 +370,8 @@ export default function Filters() {
           ))}
         </div>
       </div>
-
-      {/* Hamburger Menu (Mobile Only) */}
       {isMenuOpen && (
         <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black min-h-screen overflow-auto">
-          {/* Search Bar */}
           <div className="text-center my-4">
             <input
               type="text"
@@ -399,8 +379,10 @@ export default function Filters() {
               className="border p-3 rounded-full w-full text-white px-4"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
             />
-            {searchQuery !== "" && (
+            {(isSearchFocused || searchQuery !== "") && (
               <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
                 {searchResults.length === 0 ? (
                   <div>Korisnik nije pronađen</div>
@@ -453,16 +435,13 @@ export default function Filters() {
                     ))}
                   </div>
                 )}
-
                 <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                  Prikaži sve korisnike
+                  <a href="/svi-korisnici">Prikaži sve korisnike</a>
                 </button>
               </div>
             )}
           </div>
-
-          <div className=" p-6 flex flex-col items-center justify-center  w-full">
-            {/* Smjerovi */}
+          <div className=" p-6 flex flex-col items-center justify-center w-full">
             <div className="mb-6 w-full text-center flex flex-col items-center justify-center">
               <h3 className="text-xl font-semibold mb-5 tracking-wider">
                 Smjerovi
@@ -488,8 +467,6 @@ export default function Filters() {
                 </label>
               ))}
             </div>
-
-            {/* Dostupan za */}
             <div className="mb-6 w-full text-center flex flex-col items-center justify-center">
               <h3 className="text-xl font-semibold mb-5 tracking-wider">
                 Dostupan za
@@ -511,8 +488,6 @@ export default function Filters() {
                 </label>
               ))}
             </div>
-
-            {/* Generacija */}
             <div className="mb-6 w-full text-center flex flex-col items-center justify-center">
               <h3 className="text-xl font-semibold mb-5 tracking-wider">
                 Generacija
@@ -532,8 +507,6 @@ export default function Filters() {
                 </label>
               ))}
             </div>
-
-            {/* Filtriraj Button */}
             <button
               onClick={applyFilters}
               className="bg-primary p-2 rounded-full w-3/4 text-white cursor-pointer mb-20"
@@ -541,8 +514,6 @@ export default function Filters() {
               Filtriraj
             </button>
           </div>
-
-          {/* Navigation Links */}
           <div className="flex flex-col items-center justify-center relative h-1/2">
             <div className="absolute top-0">
               <ul className="text-2xl">
@@ -568,7 +539,10 @@ export default function Filters() {
                     </span>
                   </a>
                 </li>
-                <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
+                <button
+                  className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer"
+                  onClick={handleLogout}
+                >
                   Odjavi se
                 </button>
               </ul>

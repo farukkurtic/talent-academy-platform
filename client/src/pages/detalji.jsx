@@ -6,8 +6,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-import doorIcon from "../assets/door.svg";
-import logo from "../assets/hnta-logo.png";
+import doorIcon from "../assets/visuals/door.svg";
+import logo from "../assets/logos/hnta-logo.png";
 
 const schema = yup.object().shape({
   firstName: yup.string().required("Ovo polje je obavezno"),
@@ -32,15 +32,13 @@ const schema = yup.object().shape({
 
 export default function ProfileDetails() {
   const [userId, setUserId] = useState(null);
-  const [bioLength, setBioLength] = useState(0); // State to track biography length
-
+  const [bioLength, setBioLength] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const fromRegister = location.state?.from === "registracija";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/registracija");
     } else {
@@ -67,13 +65,12 @@ export default function ProfileDetails() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      purposeOfPlatform: ["Networking"], // Default selection
+      purposeOfPlatform: ["Networking"],
     },
   });
 
-  const biography = watch("biography", ""); // Watch the biography field for changes
+  const biography = watch("biography", "");
 
-  // Update bioLength whenever biography changes
   useEffect(() => {
     setBioLength(biography.length);
   }, [biography]);
@@ -84,7 +81,6 @@ export default function ProfileDetails() {
         ...data,
         _id: userId,
       };
-
       const response = await axios.put(
         "http://localhost:5000/api/user",
         newObj
@@ -94,7 +90,7 @@ export default function ProfileDetails() {
           state: { from: "profil-detalji" },
         });
       } else {
-        alert("Desila se greška. Molimo pokušajte ponovo");
+        alert("Desila se greška. Molimo pokušajte opet.");
       }
     } catch (err) {
       console.log(err);
@@ -103,7 +99,6 @@ export default function ProfileDetails() {
 
   return (
     <div className="text-white flex flex-col lg:flex-row min-h-screen">
-      {/* Left Box (Door Icon) - 50% on desktop, full width on mobile */}
       <div className="left-box w-full lg:w-1/2 flex items-center justify-center">
         <img
           src={doorIcon}
@@ -111,10 +106,7 @@ export default function ProfileDetails() {
           className="w-3xs h-3xs lg:w-5/6 lg:h-5/6"
         />
       </div>
-
-      {/* Right Box (Form) - 50% on desktop, full width on mobile */}
       <div className="right-box w-full lg:w-1/2 flex flex-col lg:items-start justify-center lg:overflow-y-auto">
-        {/* Header */}
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-start mt-10 lg:mt-60 xl:mt-10 mb-10 px-4">
           <img
             src={logo}
@@ -130,18 +122,14 @@ export default function ProfileDetails() {
             </p>
           </div>
         </div>
-
-        {/* Form Content */}
         <div className="flex lg:justify-start items-center justify-center w-full px-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="p-6 rounded-lg shadow-md w-full flex flex-col lg:flex-row gap-6"
             id="form-id"
           >
-            {/* Left Side (Fields) */}
             <div className="w-full lg:w-1/2 flex flex-col">
-              {/* First Name and Last Name */}
-              <div className="flex flex-col lg:flex-row gap-5">
+              <div className="flex flex-col lg:flex-row">
                 <div className="w-full lg:w-1/2">
                   <input
                     {...register("firstName")}
@@ -169,9 +157,7 @@ export default function ProfileDetails() {
                   )}
                 </div>
               </div>
-
-              {/* Major */}
-              <div className="w-full relative flex items-center justify-center">
+              <div className="w-full relative flex flex-col justify-center">
                 <select
                   {...register("major")}
                   className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full bg-transparent text-white appearance-none"
@@ -200,15 +186,12 @@ export default function ProfileDetails() {
                     Odgovorno kodiranje
                   </option>
                 </select>
-
                 {errors.major && (
                   <p className="text-red-500 text-sm mb-5">
                     {errors.major.message}
                   </p>
                 )}
               </div>
-
-              {/* Profession */}
               <div className="w-full">
                 <input
                   {...register("profession")}
@@ -222,8 +205,6 @@ export default function ProfileDetails() {
                   </p>
                 )}
               </div>
-
-              {/* Year of Attendance */}
               <div className="w-full">
                 <select
                   {...register("yearOfAttend")}
@@ -245,8 +226,6 @@ export default function ProfileDetails() {
                   </p>
                 )}
               </div>
-
-              {/* Purpose of Platform */}
               <div className="w-full">
                 <label className="block mb-3">
                   Kako planirate koristiti platformu?
@@ -276,8 +255,6 @@ export default function ProfileDetails() {
                 )}
               </div>
             </div>
-
-            {/* Right Side (Biography) */}
             <div className="w-full lg:w-1/2">
               <div className="mb-4 h-full">
                 <textarea
@@ -287,8 +264,8 @@ export default function ProfileDetails() {
                   rows="6"
                   maxLength={500}
                   onInput={(e) => {
-                    e.target.style.height = "auto"; // Reset height
-                    e.target.style.height = `${e.target.scrollHeight}px`; // Set height to scroll height
+                    e.target.style.height = "auto";
+                    e.target.style.height = `${e.target.scrollHeight}px`;
                   }}
                 ></textarea>
                 <p className="text-sm text-gray-400 mt-2">
@@ -303,11 +280,9 @@ export default function ProfileDetails() {
             </div>
           </form>
         </div>
-
-        {/* Submit Button */}
         <button
           type="submit"
-          className="w-1/2 bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-4 mb-4 cursor-pointer mx-auto lg:mx-0"
+          className="w-4/5 lg:w-1/2 bg-primary text-white p-3 rounded-full font-semibold tracking-wider mt-4 mb-4 cursor-pointer mx-auto lg:mx-0"
           form="form-id"
         >
           Nastavi

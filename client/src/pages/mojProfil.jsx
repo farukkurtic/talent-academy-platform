@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import Modal from "react-modal";
+import axios from "axios";
+
 import {
   MessageSquare,
   GraduationCap,
@@ -14,28 +17,21 @@ import {
   Twitter,
   Linkedin,
   Globe,
-  Calendar,
-  BriefcaseBusiness,
   X,
 } from "lucide-react";
-import Modal from "react-modal";
-import axios from "axios";
 
-import hntaLogo from "../assets/hnta-logo.png";
-import textLogo from "../assets/textLogo.svg";
-import defaultPic from "../assets/defaultPic.svg";
-import badge from "../assets/default-badge.png";
+import hntaLogo from "../assets/logos/hnta-logo.png";
+import textLogo from "../assets/logos/textLogo.svg";
+import defaultPic from "../assets/defaults/defaultPic.svg";
+
 import line1 from "../assets/lines/s1.svg";
-import line2 from "../assets/lines/s4.svg";
-import line3 from "../assets/lines/s2.svg";
-import line4 from "../assets/lines/s3.svg";
 import line5 from "../assets/lines/s5.svg";
 
-import kodiranje from "../assets/kodiranje.svg";
-import pisanje from "../assets/kreativnoPisanje.svg";
-import graficki from "../assets/grafickiDizajn.svg";
-import novinarstvo from "../assets/novinarstvo.svg";
-import muzika from "../assets/muzickaProdukcija.svg";
+import kodiranje from "../assets/badges/kodiranje.svg";
+import pisanje from "../assets/badges/kreativnoPisanje.svg";
+import graficki from "../assets/badges/grafickiDizajn.svg";
+import novinarstvo from "../assets/badges/novinarstvo.svg";
+import muzika from "../assets/badges/muzickaProdukcija.svg";
 
 const validationSchema = Yup.object().shape({
   major: Yup.string().required("Ovo polje je obavezno"),
@@ -60,19 +56,18 @@ export default function MyProfile() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
   const [currentUserId, setCurrentUserId] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
-  const [bioLength, setBioLength] = useState(0); // State to track biography length
+  const [bioLength, setBioLength] = useState(0);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const {
     register,
     handleSubmit,
-    control,
     setValue,
     watch,
     reset,
@@ -95,7 +90,7 @@ export default function MyProfile() {
     },
   });
 
-  const biography = watch("biography", ""); // Watch the biography field for changes
+  const biography = watch("biography", "");
   useEffect(() => {
     setBioLength(biography.length);
   }, [biography]);
@@ -154,7 +149,6 @@ export default function MyProfile() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/prijava");
     } else {
@@ -165,7 +159,6 @@ export default function MyProfile() {
 
   useEffect(() => {
     return () => {
-      // Revoke the object URL when the component unmounts
       if (imagePreviewUrl) {
         URL.revokeObjectURL(imagePreviewUrl);
       }
@@ -179,8 +172,6 @@ export default function MyProfile() {
           `http://localhost:5000/api/user/id/${currentUserId}`
         );
         const user = response.data.user;
-
-        // Set default values for the form
         reset({
           purposeOfPlatform: user.purposeOfPlatform || [],
           major: user.major,
@@ -189,7 +180,6 @@ export default function MyProfile() {
           biography: user.biography,
           links: user.links,
         });
-
         setUserData(user);
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -201,11 +191,6 @@ export default function MyProfile() {
     }
   }, [currentUserId, reset]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
   const handlePurposeChange = (value) => {
     const currentPurposes = watch("purposeOfPlatform");
     const updatedPurposes = currentPurposes.includes(value)
@@ -214,20 +199,12 @@ export default function MyProfile() {
     setValue("purposeOfPlatform", updatedPurposes);
   };
 
-  const handleLinkChange = (index, value) => {
-    const updatedLinks = [...formData.links];
-    updatedLinks[index].url = value;
-    setFormData({ ...formData, links: updatedLinks });
-  };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Revoke the previous object URL (if it exists)
       if (imagePreviewUrl) {
         URL.revokeObjectURL(imagePreviewUrl);
       }
-      // Create a new object URL for the selected file
       const newImagePreviewUrl = URL.createObjectURL(file);
       setImagePreviewUrl(newImagePreviewUrl);
       setProfileImage(file);
@@ -263,13 +240,6 @@ export default function MyProfile() {
           },
         }
       );
-
-      if (response.status === 200) {
-        alert("Podaci spaseni");
-      } else {
-        alert("Podaci nisu spaseni");
-      }
-
       setUserData(response.data.user);
       setIsEditing(false);
     } catch (error) {
@@ -278,11 +248,15 @@ export default function MyProfile() {
   };
 
   const userMajor = userData?.major;
-  const badgeImage = badges[userMajor] || badge;
+  const badgeImage = badges[userMajor];
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/prijava");
+  };
 
   return (
     <div className="text-white min-h-screen relative flex flex-col lg:flex-row lg:items-center lg:justify-center">
-      {/* Header (Mobile Only) */}
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
         <div className="flex items-center">
           <img src={hntaLogo} alt="hnta-logo" className="w-10" />
@@ -293,10 +267,7 @@ export default function MyProfile() {
           <Menu size={32} className="text-primary" />
         </button>
       </div>
-
-      {/* Sidebar (Desktop Only) */}
       <div className="hidden lg:block fixed w-85 top-0 bottom-0 left-0 border-r border-gray-700 bg-black p-6">
-        {/* Logo Section */}
         <a href="/feed" className="cursor-pointer">
           <div className="logo-container flex items-center justify-center">
             <img src={hntaLogo} alt="hnta-logo" className="w-20" />
@@ -307,8 +278,6 @@ export default function MyProfile() {
             />
           </div>
         </a>
-
-        {/* Search Bar */}
         <div className="text-center my-6">
           <input
             type="text"
@@ -316,8 +285,10 @@ export default function MyProfile() {
             className="border p-3 rounded-full w-full text-white px-4"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
           />
-          {searchQuery !== "" && (
+          {(isSearchFocused || searchQuery !== "") && (
             <div className="absolute w-5/6 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
               {searchResults.length === 0 ? (
                 <div>Korisnik nije pronađen</div>
@@ -352,15 +323,15 @@ export default function MyProfile() {
                         {(() => {
                           switch (user.major) {
                             case "Muzička produkcija":
-                              return <img src={muzika} className="w-4" />; // You can return whatever you want for this case
+                              return <img src={muzika} className="w-4" />;
                             case "Odgovorno kodiranje":
-                              return <img src={kodiranje} className="w-4" />; // Default case, in case no match
+                              return <img src={kodiranje} className="w-4" />;
                             case "Novinarstvo":
-                              return <img src={novinarstvo} className="w-4" />; // Default case, in case no match
+                              return <img src={novinarstvo} className="w-4" />;
                             case "Kreativno pisanje":
-                              return <img src={pisanje} className="w-4" />; // Default case, in case no match
+                              return <img src={pisanje} className="w-4" />;
                             case "Grafički dizajn":
-                              return <img src={graficki} className="w-4" />; // Default case, in case no match
+                              return <img src={graficki} className="w-4" />;
                           }
                         })()}
                       </span>
@@ -368,15 +339,12 @@ export default function MyProfile() {
                   ))}
                 </div>
               )}
-
               <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                <a href="/svi-korisnici">Prikaži sve korisnike</a>
+                <a href="/filteri">Prikaži sve korisnike</a>
               </button>
             </div>
           )}
         </div>
-
-        {/* Navigation Links and Logout Button at the Bottom */}
         <div className="absolute bottom-10 left-20 p-6">
           <ul className="text-2xl w-full">
             <li className="flex items-center gap-x-4 py-2">
@@ -400,12 +368,14 @@ export default function MyProfile() {
               </a>
             </li>
           </ul>
-          <button className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer">
+          <button
+            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer"
+            onClick={handleLogout}
+          >
             Odjavi se
           </button>
         </div>
       </div>
-
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
@@ -431,11 +401,8 @@ export default function MyProfile() {
           />
         </div>
       </Modal>
-
-      {/* Hamburger Menu (Mobile Only) */}
       {isMenuOpen && (
         <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
-          {/* Search Bar */}
           <div className="text-center my-4">
             <input
               type="text"
@@ -443,8 +410,10 @@ export default function MyProfile() {
               className="border p-3 rounded-full w-full text-white px-4"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
             />
-            {searchQuery !== "" && (
+            {(isSearchFocused || searchQuery !== "") && (
               <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
                 {searchResults.length === 0 ? (
                   <div>Korisnik nije pronađen</div>
@@ -456,7 +425,7 @@ export default function MyProfile() {
                         className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
                         onClick={() => {
                           if (currentUserId === user?._id) {
-                            navigate(`/moj-profil`);
+                            navigate("/moj-profil");
                           } else {
                             navigate(`/profil/${user._id}`);
                           }
@@ -464,7 +433,11 @@ export default function MyProfile() {
                       >
                         <img
                           crossOrigin="anonymous"
-                          src={user.image || defaultPic}
+                          src={
+                            user?.image
+                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              : defaultPic
+                          }
                           alt={`${user.firstName} ${user.lastName}`}
                           className="w-10 h-10 rounded-full"
                         />
@@ -475,17 +448,17 @@ export default function MyProfile() {
                           {(() => {
                             switch (user.major) {
                               case "Muzička produkcija":
-                                return <img src={muzika} className="w-4" />; // You can return whatever you want for this case
+                                return <img src={muzika} className="w-4" />;
                               case "Odgovorno kodiranje":
-                                return <img src={kodiranje} className="w-4" />; // Default case, in case no match
+                                return <img src={kodiranje} className="w-4" />;
                               case "Novinarstvo":
                                 return (
                                   <img src={novinarstvo} className="w-4" />
-                                ); // Default case, in case no match
+                                );
                               case "Kreativno pisanje":
-                                return <img src={pisanje} className="w-4" />; // Default case, in case no match
+                                return <img src={pisanje} className="w-4" />;
                               case "Grafički dizajn":
-                                return <img src={graficki} className="w-4" />; // Default case, in case no match
+                                return <img src={graficki} className="w-4" />;
                             }
                           })()}
                         </span>
@@ -493,15 +466,12 @@ export default function MyProfile() {
                     ))}
                   </div>
                 )}
-
                 <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
                   Prikaži sve korisnike
                 </button>
               </div>
             )}
           </div>
-
-          {/* Navigation Links */}
           <div className="flex flex-col items-center justify-center h-full relative">
             <div className="absolute bottom-35">
               <ul className="text-2xl">
@@ -528,15 +498,16 @@ export default function MyProfile() {
                   </a>
                 </li>
               </ul>
-              <button className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer">
+              <button
+                className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer"
+                onClick={handleLogout}
+              >
                 Odjavi se
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Profile Info */}
       <div className="flex-1 lg:ml-80 p-8 mt-30 lg:mt-0 mb-8 relative overflow-x-hidden">
         <img
           src={line1}
@@ -546,16 +517,15 @@ export default function MyProfile() {
           src={line5}
           className="hidden lg:block lg:absolute lg:bottom-0 lg:-right-65"
         />
-
         <div className="flex flex-col items-center justify-center lg:items-start lg:ml-40">
           <div className="relative">
             <img
               crossOrigin="anonymous"
               src={
-                imagePreviewUrl || // Use the preview URL if it exists
+                imagePreviewUrl ||
                 (userData?.image
-                  ? `http://localhost:5000/api/posts/image/${userData?.image}` // Show the old image
-                  : defaultPic) // Fallback to default image
+                  ? `http://localhost:5000/api/posts/image/${userData?.image}`
+                  : defaultPic)
               }
               className="w-40 h-40 mb-10 rounded-full cursor-pointer"
               alt="Profile"
@@ -594,7 +564,6 @@ export default function MyProfile() {
             </h1>
             <img src={badgeImage} className="w-9" alt="Badge" />
           </div>
-
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="w-full">
               <div className="mt-15 flex w-full items-center justify-center">
@@ -604,29 +573,75 @@ export default function MyProfile() {
                       <h1 className="text-3xl text-primary tracking-wider mb-10 text-center lg:text-left">
                         Informacije
                       </h1>
-                      <input
+                      <select
                         {...register("major")}
-                        className="border rounded-full p-3 w-full mb-5 bg-transparent text-white"
-                        placeholder="Smjer"
-                      />
+                        className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full bg-transparent text-white appearance-none"
+                      >
+                        <option
+                          value=""
+                          disabled
+                          selected
+                          className="bg-gray-800 text-white"
+                        >
+                          Odaberite smjer
+                        </option>
+                        <option
+                          value="Kreativno pisanje"
+                          className="bg-gray-800"
+                        >
+                          Kreativno pisanje
+                        </option>
+                        <option value="Grafički dizajn" className="bg-gray-800">
+                          Grafički dizajn
+                        </option>
+                        <option value="Novinarstvo" className="bg-gray-800">
+                          Novinarstvo
+                        </option>
+                        <option
+                          value="Muzička produkcija"
+                          className="bg-gray-800"
+                        >
+                          Muzička produkcija
+                        </option>
+                        <option
+                          value="Odgovorno kodiranje"
+                          className="bg-gray-800"
+                        >
+                          Odgovorno kodiranje
+                        </option>
+                      </select>
                       {errors.major && (
-                        <p className="text-red-500 my-3">
+                        <p className="text-red-500 text-sm mb-5">
                           {errors.major.message}
                         </p>
                       )}
-                      <input
+                      <select
                         {...register("yearOfAttend")}
-                        className="border rounded-full p-3 w-full mb-5 bg-transparent text-white"
-                        placeholder="Godina pohađanja"
-                      />
+                        className="w-full p-4 placeholder-white mb-5 mt-1 border rounded rounded-full bg-transparent text-white appearance-none"
+                      >
+                        <option
+                          value=""
+                          disabled
+                          selected
+                          className="bg-gray-800"
+                        >
+                          Odaberite godinu
+                        </option>
+                        <option value={2024} className="bg-gray-800">
+                          2024
+                        </option>
+                        <option value={2025} className="bg-gray-800">
+                          2025
+                        </option>
+                      </select>
                       {errors.yearOfAttend && (
-                        <p className="text-red-500 mr-2 mb-3">
+                        <p className="text-red-500 text-sm mb-5">
                           {errors.yearOfAttend.message}
                         </p>
                       )}
                       <input
                         {...register("profession")}
-                        className="border rounded-full p-3 w-full mb-5 bg-transparent text-white"
+                        className="border rounded-full p-4 w-full mb-5 bg-transparent text-white"
                         placeholder="Zanimanje"
                       />
                       {errors.profession && (
@@ -635,7 +650,6 @@ export default function MyProfile() {
                         </p>
                       )}
                     </div>
-
                     <div className="w-full lg:w-1/3 text-center lg:text-left">
                       <h1 className="text-3xl text-primary tracking-wider mb-10">
                         Linkovi
@@ -653,7 +667,6 @@ export default function MyProfile() {
                       </div>
                     </div>
                   </div>
-
                   <div className="w-full lg:w-1/2 lg:mr-15 mb-15">
                     <h1 className="text-3xl text-primary tracking-wider mb-10 text-center lg:text-left">
                       Dostupan za:
@@ -685,19 +698,18 @@ export default function MyProfile() {
                       </p>
                     )}
                   </div>
-
                   <div className="w-full lg:w-1/2 lg:mr-15 mb-15">
                     <h1 className="text-3xl text-primary tracking-wider mb-10 text-center lg:text-left">
                       Biografija
                     </h1>
                     <textarea
                       {...register("biography")}
-                      className="border rounded-xl p-4 w-full min-h-90 lg:min-h-55 bg-transparent text-white mb-3"
+                      className="border rounded-xl p-4 w-full min-h-90 lg:min-h-70 bg-transparent text-white mb-3"
                       placeholder="Biografija"
                       maxLength={500}
                       onChange={(e) => {
                         setValue("biography", e.target.value);
-                        setBioLength(e.target.value.length); // Update bioLength
+                        setBioLength(e.target.value.length);
                       }}
                     />
                     <p className="text-sm text-gray-400 mt-2">
@@ -707,7 +719,6 @@ export default function MyProfile() {
                       <p className="text-red-500">{errors.biography.message}</p>
                     )}
                   </div>
-
                   <button
                     type="submit"
                     className="text-white rounded-full bg-primary p-3 w-full lg:w-2/8 cursor-pointer font-bold tracking-wider mt-10"
@@ -735,7 +746,6 @@ export default function MyProfile() {
                       Zanimanje: {userData?.profession}
                     </div>
                   </div>
-
                   <div className="w-full lg:w-1/3 text-center lg:text-left">
                     {userData?.links &&
                       userData.links.some((link) => link.url !== "") && (
@@ -788,7 +798,6 @@ export default function MyProfile() {
                     </div>
                   </div>
                 </div>
-
                 <div className="w-full lg:w-1/2 lg:mr-15 mb-15">
                   <h1 className="text-3xl text-primary tracking-wider mb-10 text-center lg:text-left">
                     Dostupan za:
@@ -803,7 +812,6 @@ export default function MyProfile() {
                     })}
                   </div>
                 </div>
-
                 <div className="w-full lg:w-1/2 lg:mr-15 mb-15">
                   <h1 className="text-3xl text-primary tracking-wider mb-10 text-center lg:text-left">
                     Biografija
@@ -814,7 +822,6 @@ export default function MyProfile() {
                     </p>
                   </div>
                 </div>
-
                 <button
                   onClick={() => setIsEditing(true)}
                   className="text-white rounded-full bg-primary p-3 w-full lg:w-2/8 cursor-pointer font-bold tracking-wider mt-10"
