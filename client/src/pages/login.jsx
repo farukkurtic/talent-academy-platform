@@ -6,9 +6,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import { Eye, EyeOff } from "lucide-react";
-
-import logo from "../assets/hnta-logo.png";
-import pencilIcon from "../assets/pencil-alt.svg";
+import logo from "../assets/logos/hnta-logo.png";
+import pencilIcon from "../assets/visuals/pencil-alt.svg";
 
 const schema = yup.object().shape({
   email: yup.string().required("Ovo polje je obavezno"),
@@ -45,7 +44,6 @@ export default function Login() {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
-
         if (status === 400) {
           setResponseErr(<>Neispravni podaci za prijavu.</>);
         } else if (status === 404) {
@@ -91,13 +89,11 @@ export default function Login() {
             </p>
           </div>
         </div>
-
         <div className="flex lg:justify-start items-center justify-center">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="p-5 rounded-lg shadow-md w-96"
           >
-            {/* Email Field */}
             <div className="mb-4">
               <input
                 {...register("email")}
@@ -111,8 +107,6 @@ export default function Login() {
                 </p>
               )}
             </div>
-
-            {/* Password Field */}
             <div className="mb-4 relative flex justify-center items-center">
               <input
                 {...register("password")}
@@ -120,7 +114,6 @@ export default function Login() {
                 className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center mr-5"
                 placeholder="Password"
               />
-
               {showPassword ? (
                 <EyeOff size={30} onClick={togglePassword} />
               ) : (
@@ -132,16 +125,12 @@ export default function Login() {
                 {errors.password.message}
               </p>
             )}
-
-            {/* Submit Button */}
             <button
               type="submit"
               className="w-xs lg:w-full bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-10 cursor-pointer"
             >
               Nastavi
             </button>
-
-            {/* Display responseErr or "Nemate korisnički račun?" */}
             {responseErr ? (
               <p className="text-center mt-5 tracking-wider">{responseErr}</p>
             ) : (
@@ -152,7 +141,6 @@ export default function Login() {
                 </span>
               </p>
             )}
-
             <a href="/kontakt">
               <p className="text-center mt-5 tracking-wider cursor-pointer">
                 Zaboravili ste šifru?

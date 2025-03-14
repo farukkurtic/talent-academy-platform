@@ -1,18 +1,17 @@
-import logo from "../assets/hnta-logo.png";
-import ambasadaLogo from "../assets/ambasada.png";
-import ekipaLogo from "../assets/ekipa-logo.png";
-import hnLogo from "../assets/hnLogo.svg";
-import intlDev from "../assets/intl-development.png";
+import { Link } from "react-router-dom";
+
+import logo from "../assets/logos/hnta-logo.png";
+import ambasadaLogo from "../assets/misc/ambasada.png";
+import hnLogo from "../assets/logos/hnLogo.svg";
 
 import s1 from "../assets/lines/s1.svg";
 import s2 from "../assets/lines/s2.svg";
 import s3 from "../assets/lines/s3.svg";
 import s4 from "../assets/lines/s4.svg";
 import s5 from "../assets/lines/s5.svg";
+import pic from "../assets/pictures/lecture-1.jpg";
 
-import pic from "../assets/lecture-1.jpg";
-
-import { Instagram, Facebook, Youtube, Linkedin, Globe } from "lucide-react";
+import { Instagram, Facebook, Youtube, Linkedin } from "lucide-react";
 
 export default function Home() {
   return (
@@ -26,7 +25,6 @@ export default function Home() {
           className="absolute right-0 top-0 lg:right-auto lg:top-auto lg:left-0 lg:-bottom-50 rotate-180 lg:rotate-0 w-3xs lg:w-sm"
         />
         <img src={s5} className="absolute left-75 -bottom-35 w-sm " />
-
         <div className="h-screen flex flex-col justify-end lg:items-end lg:pr-25 text-center">
           <div className="flex flex-col lg:flex-row items-center">
             <img src={logo} alt="logo" className="w-35 h-35" />
@@ -54,7 +52,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
       <div className="text-white w-full flex flex-col lg:flex-row bg-secondary relative overflow-hidden">
         <img src={s5} className="absolute -right-50  w-sm " />
         <img src={s5} className="absolute -bottom-70 -left-50 rotate-240" />
@@ -112,8 +109,10 @@ export default function Home() {
       <footer className="text-white flex flex-col lg:flex-row items-center justify-center p-30">
         <div className="lg:pr-20 pb-20 lg:pb-0">
           <ul className="text-lg">
-            <li className="mb-2 cursor-pointer">Kontakt</li>
-            <li className="mb-2 cursor-pointer">Privatnost</li>
+            <a href="/kontakt">
+              <li className="mb-2 cursor-pointer">Kontakt</li>
+            </a>
+
             <li className="mb-2 cursor-pointer">
               <a href="/uslovi-koristenja">Uslovi korištenja</a>
             </li>
@@ -121,25 +120,34 @@ export default function Home() {
         </div>
         <div className="pb-20 lg:pb-0">
           <ul className="flex">
-            <li className="pr-2 cursor-pointer">
-              <Instagram size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Facebook size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Youtube size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Linkedin size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Globe size={25} strokeWidth={1} />
-            </li>
+            <Link to="https://www.instagram.com/talentakademija/">
+              <li className="pr-2 cursor-pointer">
+                <Instagram size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.facebook.com/profile.php?id=61559380710858&locale=nb_NO">
+              <li className="pr-2 cursor-pointer">
+                <Facebook size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.youtube.com/@talentakademija">
+              <li className="pr-2 cursor-pointer">
+                <Youtube size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.linkedin.com/company/helem-nejse-talent-akademija/">
+              <li className="pr-2 cursor-pointer">
+                <Linkedin size={25} strokeWidth={1} />
+              </li>
+            </Link>
           </ul>
-          <button className="p-3 border-2 border-primary rounded-full text-sm tracking-wider w-full text-primary mt-5 cursor-pointer">
-            Talent Akademija
-          </button>
+          <a>
+            <Link to="https://talentakademija.ba/">
+              <button className="p-3 border-2 border-primary rounded-full text-sm tracking-wider w-full text-primary mt-5 cursor-pointer">
+                Talent Akademija
+              </button>
+            </Link>
+          </a>
         </div>
         <div className="ml-20 ml-auto">
           <div>

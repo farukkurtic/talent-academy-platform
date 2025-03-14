@@ -45,7 +45,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
       setImageFile(file);
       setSelectedImage(URL.createObjectURL(file));
     } else {
-      alert("Please select a valid image file.");
+      alert("Molimo odaberite sliku.");
       e.target.value = "";
     }
   };
@@ -58,7 +58,6 @@ const CreatePost = ({ userId, refreshFeed }) => {
 
   const onSubmit = async (data) => {
     const formData = new FormData();
-
     formData.append("text", data.text);
     if (imageFile) formData.append("image", imageFile);
     if (selectedGif) formData.append("gif", selectedGif);
@@ -76,20 +75,17 @@ const CreatePost = ({ userId, refreshFeed }) => {
       );
       console.log("Post created:", response.data);
 
-      // Reset form states
       setSelectedImage(null);
       setImageFile(null);
       setSelectedGif(null);
-      setPostContent(""); // Reset postContent state
-      reset({ text: "" }); // Explicitly reset the text field
+      setPostContent("");
+      reset({ text: "" });
       if (textareaRef.current) {
-        textareaRef.current.value = ""; // Manually clear the textarea
+        textareaRef.current.value = "";
       }
       if (fileInputRef.current) {
-        fileInputRef.current.value = ""; // Clear the file input
+        fileInputRef.current.value = "";
       }
-
-      // Refresh the feed after creating a new post
       refreshFeed();
     } catch (err) {
       console.log("Error creating post:", err);
@@ -106,10 +102,9 @@ const CreatePost = ({ userId, refreshFeed }) => {
           className="w-full p-2 resize-none overflow-hidden focus:outline-none focus:ring-0 focus:border-transparent"
           onChange={(e) => {
             setValue("text", e.target.value);
-            setPostContent(e.target.value.trim()); // Trim to remove extra spaces
+            setPostContent(e.target.value.trim());
           }}
         />
-
         <div
           className={`mt-2 flex gap-3 ${
             selectedImage && selectedGif ? "flex-row" : "flex-col"
@@ -131,7 +126,6 @@ const CreatePost = ({ userId, refreshFeed }) => {
               </button>
             </div>
           )}
-
           {selectedGif && (
             <div className={`${selectedImage ? "w-1/2" : "w-full"} relative`}>
               <img
@@ -149,7 +143,6 @@ const CreatePost = ({ userId, refreshFeed }) => {
             </div>
           )}
         </div>
-
         <div className="flex items-center gap-3 mt-3">
           <label className="cursor-pointer">
             <Image size={24} />
@@ -161,30 +154,26 @@ const CreatePost = ({ userId, refreshFeed }) => {
               onChange={handleImageUpload}
             />
           </label>
-
           <button type="button" onClick={openGifModal}>
             <ImagePlay size={24} />
           </button>
-
           <button
             type="submit"
             className="bg-primary text-black p-2 rounded-full ml-auto w-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!postContent} // Disable if postContent is empty
+            disabled={!postContent}
           >
             Objavi
           </button>
         </div>
       </form>
-
       <Modal
         isOpen={isGifModalOpen}
         onRequestClose={closeGifModal}
         contentLabel="Select a GIF"
         ariaHideApp={false}
-        className="bg-white p-4 rounded-lg shadow-lg w-[90%] max-w-lg mx-auto max-h-[80vh] overflow-hidden"
+        className="bg-white p-4 rounded-lg shadow-lg w-[90%] max-w-lg mx-auto max-h-[80vh] overflow-hidden mt-20 lg:mt-10"
       >
         <h2 className="text-lg font-bold mb-2">Select a GIF</h2>
-
         <div className="flex items-center gap-2 mb-3 border p-2 rounded">
           <SearchIcon size={20} />
           <input
@@ -195,7 +184,6 @@ const CreatePost = ({ userId, refreshFeed }) => {
             className="flex-1 focus:outline-none"
           />
         </div>
-
         <div className="overflow-y-auto max-h-[60vh] flex justify-center">
           <Grid
             key={searchQuery}

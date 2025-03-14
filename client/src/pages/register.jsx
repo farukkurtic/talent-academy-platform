@@ -3,12 +3,12 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
-import doorIcon from "../assets/door.svg";
-import logo from "../assets/hnta-logo.png";
+import doorIcon from "../assets/visuals/door.svg";
+import logo from "../assets/logos/hnta-logo.png";
 
 const schema = yup.object().shape({
   email: yup
@@ -42,7 +42,6 @@ export default function Register() {
       console.log(response);
 
       if (response.status === 201) {
-        alert("Registracija je uspješna");
         localStorage.setItem("token", response.data.token);
         navigate("/profil-detalji", { state: { from: "registracija" } });
       }
@@ -102,7 +101,6 @@ export default function Register() {
             onSubmit={handleSubmit(onSubmit)}
             className="p-6 rounded-lg shadow-md w-96 "
           >
-            {/* Email Field */}
             <div className="mb-4">
               <input
                 {...register("email")}
@@ -116,8 +114,6 @@ export default function Register() {
                 </p>
               )}
             </div>
-
-            {/* Password Field */}
             <div className="mb-4 relative flex justify-center items-center">
               <input
                 {...register("password")}
@@ -125,7 +121,6 @@ export default function Register() {
                 className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center mr-5"
                 placeholder="Password"
               />
-
               {showPassword ? (
                 <EyeOff size={30} onClick={togglePassword} />
               ) : (
@@ -137,8 +132,6 @@ export default function Register() {
                 {errors.password.message}
               </p>
             )}
-
-            {/* Submit Button */}
             <button
               type="submit"
               className="w-xs lg:w-full bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-10 cursor-pointer"

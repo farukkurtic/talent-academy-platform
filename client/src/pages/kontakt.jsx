@@ -1,14 +1,15 @@
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import emailjs from "@emailjs/browser";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-import { Facebook, Globe, Instagram, Linkedin, Youtube } from "lucide-react";
+import logo from "../assets/logos/hnta-logo.png";
+import ambasadaLogo from "../assets/misc/ambasada.png";
+import hnLogo from "../assets/logos/hnLogo.svg";
 
-import logo from "../assets/hnta-logo.png";
-import ambasadaLogo from "../assets/ambasada.png";
-import hnLogo from "../assets/hnLogo.svg";
+import { Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 
 const schema = yup.object().shape({
   name: yup.string().required("Ovo polje je obavezno"),
@@ -30,8 +31,11 @@ export default function Kontakt() {
     resolver: yupResolver(schema),
   });
 
+  const navigate = useNavigate();
+
   const onSubmit = async (data) => {
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.post(
         "https://api.emailjs.com/api/v1.0/email/send",
         {
@@ -47,12 +51,11 @@ export default function Kontakt() {
           },
         }
       );
-
-      console.log("SUCCESS!", response.data);
       alert("Poruka je uspješno poslana!");
+      navigate("/kontakt");
     } catch (error) {
       console.error("FAILED...", error);
-      alert("Greška pri slanju poruke.");
+      alert("Greška pri slanju poruke. Molimo pokušajte opet.");
     }
   };
 
@@ -96,7 +99,6 @@ export default function Kontakt() {
                 )}
               </div>
             </div>
-
             <div className="mb-4 flex flex-col lg:flex-row gap-5">
               <div>
                 <input
@@ -125,7 +127,6 @@ export default function Kontakt() {
                 )}
               </div>
             </div>
-
             <div className="mb-4">
               <textarea
                 {...register("message")}
@@ -139,8 +140,6 @@ export default function Kontakt() {
                 </p>
               )}
             </div>
-
-            {/* Submit Button */}
             <button
               type="submit"
               className="w-xs lg:w-full bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-10 cursor-pointer"
@@ -150,12 +149,11 @@ export default function Kontakt() {
           </form>
         </div>
       </div>
-
       <footer className="text-white flex flex-col lg:flex-row items-center justify-center p-30">
         <div className="lg:pr-20 pb-20 lg:pb-0">
           <ul className="text-lg">
-            <li className="mb-2 cursor-pointer">Kontakt</li>
-            <li className="mb-2 cursor-pointer">Privatnost</li>
+            <a href="/kontakt">Kontakt</a>
+
             <li className="mb-2 cursor-pointer">
               <a href="/uslovi-koristenja">Uslovi korištenja</a>
             </li>
@@ -163,25 +161,32 @@ export default function Kontakt() {
         </div>
         <div className="pb-20 lg:pb-0">
           <ul className="flex">
-            <li className="pr-2 cursor-pointer">
-              <Instagram size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Facebook size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Youtube size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Linkedin size={25} strokeWidth={1} />
-            </li>
-            <li className="pr-2 cursor-pointer">
-              <Globe size={25} strokeWidth={1} />
-            </li>
+            <Link to="https://www.instagram.com/talentakademija/">
+              <li className="pr-2 cursor-pointer">
+                <Instagram size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.facebook.com/profile.php?id=61559380710858&locale=nb_NO">
+              <li className="pr-2 cursor-pointer">
+                <Facebook size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.youtube.com/@talentakademija">
+              <li className="pr-2 cursor-pointer">
+                <Youtube size={25} strokeWidth={1} />
+              </li>
+            </Link>
+            <Link to="https://www.linkedin.com/company/helem-nejse-talent-akademija/">
+              <li className="pr-2 cursor-pointer">
+                <Linkedin size={25} strokeWidth={1} />
+              </li>
+            </Link>
           </ul>
-          <button className="p-3 border-2 border-primary rounded-full text-sm tracking-wider w-full text-primary mt-5 cursor-pointer">
-            Talent Akademija
-          </button>
+          <Link to="https://talentakademija.ba/">
+            <button className="p-3 border-2 border-primary rounded-full text-sm tracking-wider w-full text-primary mt-5 cursor-pointer">
+              Talent Akademija
+            </button>
+          </Link>
         </div>
         <div className="ml-20 ml-auto">
           <div>

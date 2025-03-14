@@ -1,30 +1,26 @@
 /* eslint-disable react/prop-types */
 import { Navigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // Corrected import
+import { jwtDecode } from "jwt-decode";
 
 const ProtectedRoute = ({ children }) => {
-  // Function to check if the token is expired
   const isTokenExpired = (token) => {
-    if (!token) return true; // No token means it's "expired"
-
+    if (!token) return true;
     try {
-      const decoded = jwtDecode(token); // Use the named export
-      const currentTime = Date.now() / 1000; // Convert to seconds
-      return decoded.exp < currentTime; // Token is expired if `exp` is in the past
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decoded.exp < currentTime;
     } catch (error) {
       console.error("Error decoding token:", error);
-      return true; // If decoding fails, assume the token is expired
+      return true;
     }
   };
 
-  const token = localStorage.getItem("token"); // Retrieve the token from storage
+  const token = localStorage.getItem("token");
 
-  // Redirect to login if the token is missing or expired
   if (!token || isTokenExpired(token)) {
     return <Navigate to="/prijava" replace />;
   }
 
-  // Render the children (protected component) if the token is valid
   return children;
 };
 

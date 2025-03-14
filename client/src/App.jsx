@@ -13,6 +13,7 @@ import Profile from "./pages/korisnik-profil.jsx";
 import MyProfile from "./pages/mojProfil.jsx";
 import Filters from "./pages/filteri.jsx";
 import Chat from "./pages/chat.jsx";
+import NotFound from "./pages/not-found.jsx";
 
 import ProtectedRoute from "./pages/protectedRoute.jsx";
 
@@ -25,17 +26,13 @@ function App() {
   return (
     <UnreadMessagesProvider>
       {" "}
-      {/* Wrap the app with the provider */}
       <Router>
         <Routes>
-          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/registracija" element={<Register />} />
           <Route path="/prijava" element={<Login />} />
           <Route path="/uslovi-koristenja" element={<UsloviKoristenja />} />
           <Route path="/kontakt" element={<Kontakt />} />
-
-          {/* Protected routes */}
           <Route
             path="/feed"
             element={
@@ -92,6 +89,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </UnreadMessagesProvider>

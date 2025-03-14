@@ -6,9 +6,10 @@ import * as yup from "yup";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
-import doorIcon from "../assets/door.svg";
-import logo from "../assets/hnta-logo.png";
-import defaultPic from "../assets/defaultPic.svg";
+import doorIcon from "../assets/visuals/door.svg";
+import logo from "../assets/logos/hnta-logo.png";
+import defaultPic from "../assets/defaults/defaultPic.svg";
+
 import { X, Instagram, Facebook, Twitter, Linkedin, Globe } from "lucide-react";
 
 const schema = yup.object().shape({
@@ -22,17 +23,14 @@ const schema = yup.object().shape({
 export default function DetaljiFinalno() {
   const [userId, setUserId] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
-
   const navigate = useNavigate();
   const location = useLocation();
   const fromRegister = location.state?.from === "profil-detalji";
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/registracija");
     } else {
@@ -65,7 +63,7 @@ export default function DetaljiFinalno() {
       setImageFile(file);
       setSelectedImage(URL.createObjectURL(file));
     } else {
-      alert("Please select a valid image file.");
+      alert("Molimo odaberite sliku.");
       e.target.value = "";
     }
   };
@@ -79,22 +77,14 @@ export default function DetaljiFinalno() {
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-
-      // Create an array of link objects, each with a single platform and URL
       const linksArray = Object.entries(data).map(([key, value]) => ({
         platform: key,
         url: value,
       }));
-
-      // Append the links array to the form data
       formData.append("links", JSON.stringify(linksArray));
-
-      // Append the image file if it exists
       if (imageFile) {
         formData.append("image", imageFile);
       }
-
-      // Send the form data to the backend
       const response = await axios.put(
         `http://localhost:5000/api/user/${userId}/details`,
         formData,
@@ -104,7 +94,6 @@ export default function DetaljiFinalno() {
           },
         }
       );
-
       if (response.status === 200) {
         navigate("/feed");
       } else {
@@ -124,7 +113,6 @@ export default function DetaljiFinalno() {
           className="w-3xs h-3xs lg:w-5/6 lg:h-5/6"
         />
       </div>
-
       <div className="right-box w-full lg:w-1/2 flex flex-col lg:items-start justify-center lg:overflow-y-auto">
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-start mt-10 lg:mt-60 xl:mt-10 mb-10 px-4">
           <img
@@ -141,7 +129,6 @@ export default function DetaljiFinalno() {
             </p>
           </div>
         </div>
-
         <div className="w-full flex items-center justify-center p-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -196,6 +183,7 @@ export default function DetaljiFinalno() {
                   <div className="relative">
                     <Icon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                     <input
+                      autoComplete="off"
                       type="text"
                       placeholder={placeholder}
                       {...register(name)}
@@ -209,11 +197,9 @@ export default function DetaljiFinalno() {
                   )}
                 </div>
               ))}
-
-              {/* Button takes full width but aligns properly with inputs */}
               <button
                 type="submit"
-                className="w-full bg-primary text-white p-3 rounded-full font-semibold tracking-wider cursor-pointer"
+                className="w-full bg-primary text-white p-3 rounded-full font-semibold tracking-wider cursor-pointer mt-5"
               >
                 Završi
               </button>
