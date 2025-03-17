@@ -13,7 +13,7 @@ const chatSchema = new mongoose.Schema(
       required: true,
     },
     text: { type: String, required: true },
-    read: { type: Boolean, default: false }, // New field to track if the message has been read
+    read: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

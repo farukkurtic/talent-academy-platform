@@ -1,48 +1,39 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const WorkshopSchema = new mongoose.Schema({
+const WorkshopSchema = new mongoose.Schema(
+  {
     createdBy: {
-        type: String,
-        required: true,
+      type: String,
     },
     name: {
-        type: Array,
-        required: true,
+      type: String,
+      required: true,
     },
     dateOfStart: {
-        type: Date,
-        required: true,
-    },
-    dateOfEnd: {
-        type: Date,
-        required: true
+      type: Date,
+      required: true,
     },
     type: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     link: {
-        type: String,
+      type: String,
+      required: true,
     },
     attendes: {
-        type: Array,
-    },
-    hosts: {
-        type: Array,
-        required: true,
-    },
-    courseID: {
-        type: String,
-        required: true
+      type: Array,
     },
     coverImage: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "fs.files",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "fs.files",
     },
     details: {
-        type: String,
-        required: true
-    }
-}, { timestamps: true });
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Workshop', WorkshopSchema);
+module.exports = mongoose.model("Workshop", WorkshopSchema);

@@ -44,7 +44,7 @@ const getAllUserWorkshops = catchAsync(async (req, res) => {
 
 const createWorkshop = catchAsync(async (req, res) => {
   try {
-    const workshop = await workshopService.createWorkshop(req.body.workshop, req.file);
+    const workshop = await workshopService.createWorkshop(req.body, req.file);
     res.status(status.CREATED).json({ workshop });
   } catch (err) {
     console.log("Error", err);
@@ -56,7 +56,34 @@ const createWorkshop = catchAsync(async (req, res) => {
 
 const updateWorkshop = catchAsync(async (req, res) => {
   try {
-    const workshop = await workshopService.updateWorkshop(req.body.workshop, req.file);
+    const {
+      workshopId,
+      name,
+      dateOfStart,
+      type,
+      details,
+      link,
+      removeCoverImage,
+    } = req.body;
+
+    const updatedWorkshop = {
+      _id: workshopId,
+      name,
+      dateOfStart,
+      type,
+      details,
+      link,
+    };
+
+    if (removeCoverImage === "true") {
+      updatedWorkshop.coverImage = null;
+    }
+
+    const workshop = await workshopService.updateWorkshop(
+      updatedWorkshop,
+      req.file
+    );
+
     res.status(status.OK).json({ workshop });
   } catch (err) {
     console.log("Error", err);
@@ -69,18 +96,20 @@ const updateWorkshop = catchAsync(async (req, res) => {
 const deleteWorkshop = catchAsync(async (req, res) => {
   try {
     const resp = await workshopService.deleteWorkshop(req.params.workshopId);
-    res.status(status.OK).json("")
+    res.status(status.OK).json(resp);
   } catch (err) {
     console.log("Error", err);
-    res
-      .status(status.INTERNAL_SERVER_ERROR)
-      .send("Failed to get Workshop", err);
+    if (err.message === "Workshop not found") {
+      res.status(status.NOT_FOUND).json({ message: err.message });
+    } else {
+      res
+        .status(status.INTERNAL_SERVER_ERROR)
+        .json({ message: "Failed to delete workshop", error: err.message });
+    }
   }
 });
 
 const attendWorkshop = catchAsync(async (req, res) => {
-  console.log("req.params", req.params);
-  console.log("req.body", req.body);
   try {
     const updatedWorkshop = await workshopService.addWorkshopAttendee(
       req.params.workshopId,
@@ -102,5 +131,5 @@ module.exports = {
   deleteWorkshop,
   getAllWorkshops,
   getAllUserWorkshops,
-  attendWorkshop
+  attendWorkshop,
 };

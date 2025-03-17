@@ -35,7 +35,6 @@ export default function Login() {
         "http://localhost:5000/api/auth/prijava",
         data
       );
-      console.log(response);
 
       if (response.status === 201) {
         localStorage.setItem("token", response.data.token);

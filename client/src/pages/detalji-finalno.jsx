@@ -199,7 +199,7 @@ export default function DetaljiFinalno() {
               ))}
               <button
                 type="submit"
-                className="w-full bg-primary text-white p-3 rounded-full font-semibold tracking-wider cursor-pointer mt-5"
+                className="w-full bg-primary text-white p-3 rounded-full font-semibold tracking-wider cursor-pointer mt-5 lg:mt-0"
               >
                 Završi
               </button>

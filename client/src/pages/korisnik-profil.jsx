@@ -112,10 +112,16 @@ export default function Profile() {
   return (
     <div className="text-white min-h-screen relative flex flex-col lg:flex-row lg:items-center lg:justify-center">
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
-        <div className="flex items-center">
-          <img src={hntaLogo} alt="hnta-logo" className="w-10" />
-          <img src={textLogo} alt="hnta-text-logo" className="w-32 h-10 ml-2" />
-        </div>
+        <a href="/feed">
+          <div className="flex items-center">
+            <img src={hntaLogo} alt="hnta-logo" className="w-10" />
+            <img
+              src={textLogo}
+              alt="hnta-text-logo"
+              className="w-32 h-10 ml-2"
+            />
+          </div>
+        </a>
         <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
           <Menu size={32} className="text-primary" />
         </button>
@@ -193,7 +199,7 @@ export default function Profile() {
                 </div>
               )}
               <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                <a href="/filteri">Prikaži sve korisnike</a>
+                <a href="/svi-korisnici">Prikaži sve korisnike</a>
               </button>
             </div>
           )}
@@ -208,9 +214,11 @@ export default function Profile() {
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">
-                Radionice
-              </span>
+              <a href="/radionice">
+                <span className="hover:text-primary cursor-pointer">
+                  Radionice
+                </span>
+              </a>
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <UserPen className="text-primary" size={32} />
@@ -294,9 +302,11 @@ export default function Profile() {
                     ))}
                   </div>
                 )}
-                <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                  Prikaži sve korisnike
-                </button>
+                <a href="/svi-korisnici">
+                  <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
+                    Prikaži sve korisnike
+                  </button>
+                </a>
               </div>
             )}
           </div>
@@ -313,9 +323,11 @@ export default function Profile() {
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <GraduationCap className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Radionice
-                  </span>
+                  <a href="/radionice">
+                    <span className="hover:text-primary cursor-pointer">
+                      Radionice
+                    </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <UserPen className="text-primary" size={32} />
@@ -416,38 +428,48 @@ export default function Profile() {
                         switch (fullLink.platform) {
                           case "instagram":
                             return (
-                              <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start w-full">
-                                <Instagram className="mr-3 hover:text-primary" />
-                                Instagram
-                              </div>
+                              <a href={fullLink.url}>
+                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start w-full">
+                                  <Instagram className="mr-3 hover:text-primary" />
+                                  Instagram
+                                </div>
+                              </a>
                             );
                           case "facebook":
                             return (
-                              <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                <Facebook className="mr-3 hover:text-primary" />
-                                Facebook
-                              </div>
+                              <a href={fullLink.ur}>
+                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                  <Facebook className="mr-3 hover:text-primary" />
+                                  Facebook
+                                </div>
+                              </a>
                             );
                           case "twitter":
                             return (
-                              <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                <Twitter className="mr-3 hover:text-primary" />
-                                Twitter
-                              </div>
+                              <a href={fullLink.url}>
+                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                  <Twitter className="mr-3 hover:text-primary" />
+                                  Twitter
+                                </div>
+                              </a>
                             );
                           case "linkedin":
                             return (
-                              <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                <Linkedin className="mr-3 hover:text-primary" />
-                                LinkedIn
-                              </div>
+                              <a href={fullLink.url}>
+                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                  <Linkedin className="mr-3 hover:text-primary" />
+                                  LinkedIn
+                                </div>
+                              </a>
                             );
                           case "web":
                             return (
-                              <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                <Globe className="mr-3 hover:text-primary" />
-                                Web
-                              </div>
+                              <a href={fullLink.url}>
+                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                  <Globe className="mr-3 hover:text-primary" />
+                                  Web
+                                </div>
+                              </a>
                             );
                         }
                       }

@@ -3,7 +3,6 @@ const ApiError = require("../utils/ApiError");
 const { getGfsBucket } = require("../config/db");
 const stream = require("stream");
 
-
 const uploadImageToGridFS = async (file, workshopId) => {
   const gfsBucket = getGfsBucket();
 
@@ -32,7 +31,6 @@ const uploadImageToGridFS = async (file, workshopId) => {
 
 const createWorkshop = async (workshopBody, coverImage) => {
   try {
-    console.log("workshopBody", workshopBody);
     const newWorkshop = new Workshop(workshopBody);
     await newWorkshop.save();
 
@@ -52,24 +50,33 @@ const createWorkshop = async (workshopBody, coverImage) => {
 };
 
 const updateWorkshop = async (updatedWorkshop, coverImage) => {
-  const workshop = await Workshop.findByIdAndUpdate(
-    updatedWorkshop._id,
-    updatedWorkshop,
-    {
-      new: true,
+  try {
+    const workshop = await Workshop.findByIdAndUpdate(
+      updatedWorkshop._id,
+      updatedWorkshop,
+      { new: true }
+    );
+
+    if (!workshop) {
+      throw new ApiError(400, "No workshop found with the given ID.");
     }
-  );
-  if (!workshop) {
-    throw new ApiError(400, "No workshop found with the given ID.");
-  }
 
-  if (coverImage) {
-    const imageId = await uploadImageToGridFS(coverImage, workshop._id);
-    workshop.coverImage = imageId;
-    await workshop.save();
-  }
+    if (coverImage) {
+      const imageId = await uploadImageToGridFS(coverImage, workshop._id);
+      workshop.coverImage = imageId;
+      await workshop.save();
+    } else if (updatedWorkshop.coverImage === null) {
+      workshop.coverImage = null;
+      await workshop.save();
+    }
 
-  return workshop;
+    return workshop;
+  } catch (err) {
+    console.error("Greška u updateWorkshop:", err);
+    throw err instanceof ApiError
+      ? err
+      : new ApiError(500, "Došlo je do greške na serveru");
+  }
 };
 
 const getWorkshopById = async (workshopId) => {
@@ -97,7 +104,11 @@ const getAllUserWorkshops = async (userId) => {
 };
 
 const deleteWorkshop = async (workshopId) => {
-  await Workshop.findByIdAndDelete(workshopId)
+  const deletedWorkshop = await Workshop.findByIdAndDelete(workshopId);
+  if (!deletedWorkshop) {
+    throw new Error("Workshop not found");
+  }
+  return { message: "Workshop deleted successfully" };
 };
 
 const addWorkshopAttendee = async (workshopId, userId) => {
@@ -111,11 +122,17 @@ const addWorkshopAttendee = async (workshopId, userId) => {
     throw new ApiError(404, "User not found");
   }
 
-  workshop.attendes.push(userId);
-  await workshop.save();
+  const index = workshop.attendes.indexOf(userId);
 
+  if (index !== -1) {
+    workshop.attendes.splice(index, 1);
+  } else {
+    workshop.attendes.push(userId);
+  }
+
+  await workshop.save();
   return workshop;
-}
+};
 
 module.exports = {
   getWorkshopById,
@@ -124,5 +141,5 @@ module.exports = {
   getAllUserWorkshops,
   updateWorkshop,
   deleteWorkshop,
-  addWorkshopAttendee
+  addWorkshopAttendee,
 };

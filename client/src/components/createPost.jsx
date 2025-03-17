@@ -64,6 +64,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
     formData.append("userId", userId);
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.post(
         "http://localhost:5000/api/posts",
         formData,
@@ -73,7 +74,6 @@ const CreatePost = ({ userId, refreshFeed }) => {
           },
         }
       );
-      console.log("Post created:", response.data);
 
       setSelectedImage(null);
       setImageFile(null);

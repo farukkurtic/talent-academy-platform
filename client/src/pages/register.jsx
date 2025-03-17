@@ -39,7 +39,6 @@ export default function Register() {
         "http://localhost:5000/api/auth/registracija",
         data
       );
-      console.log(response);
 
       if (response.status === 201) {
         localStorage.setItem("token", response.data.token);
@@ -116,6 +115,7 @@ export default function Register() {
             </div>
             <div className="mb-4 relative flex justify-center items-center">
               <input
+                autoComplete="off"
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
                 className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center mr-5"
