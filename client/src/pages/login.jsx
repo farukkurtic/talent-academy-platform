@@ -91,7 +91,7 @@ export default function Login() {
         <div className="flex lg:justify-start items-center justify-center">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="p-5 rounded-lg shadow-md w-96"
+            className="p-5 rounded-lg shadow-md w-full lg:w-96"
           >
             <div className="mb-4">
               <input
@@ -110,7 +110,7 @@ export default function Login() {
               <input
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
-                className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center mr-5"
+                className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-1 pr-12 flex items-center justify-center mr-5"
                 placeholder="Password"
               />
               {showPassword ? (
