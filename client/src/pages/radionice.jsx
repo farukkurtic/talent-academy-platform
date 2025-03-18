@@ -1,11 +1,20 @@
-/* eslint-disable react/prop-types */
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { MessageSquare, GraduationCap, UserPen, Menu } from "lucide-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate, Link } from "react-router-dom";
 
 import hntaLogo from "../assets/logos/hnta-logo.png";
 import textLogo from "../assets/logos/textLogo.svg";
-import defaultPic from "../assets/defaults/defaultPic.svg";
+
+import {
+  MessageSquare,
+  GraduationCap,
+  UserPen,
+  Menu,
+  Plus,
+} from "lucide-react";
+
+import Workshop from "../components/workshop";
 
 import kodiranje from "../assets/badges/kodiranje.svg";
 import pisanje from "../assets/badges/kreativnoPisanje.svg";
@@ -13,16 +22,67 @@ import graficki from "../assets/badges/grafickiDizajn.svg";
 import novinarstvo from "../assets/badges/novinarstvo.svg";
 import muzika from "../assets/badges/muzickaProdukcija.svg";
 
-export default function Sidebar({
-  userId,
-  searchQuery,
-  handleSearch,
-  searchResults,
-  isMenuOpen,
-  setIsMenuOpen,
-}) {
-  const navigate = useNavigate();
+import defaultPic from "../assets/defaults/defaultPic.svg";
+
+export default function Radionice() {
+  const [userId, setUserId] = useState(null);
+  const [workshops, setWorkshops] = useState([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/prijava");
+    } else {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.id);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchWorkshops();
+    }
+  }, [userId]);
+
+  const fetchWorkshops = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/workshop");
+      setWorkshops(response.data.workshop);
+    } catch (err) {
+      console.error("Error fetching workshops:", err);
+    }
+  };
+
+  const myWorkshops = workshops.filter(
+    (workshop) => workshop.createdBy === userId
+  );
+  const attendingWorkshops = workshops.filter((workshop) =>
+    workshop.attendes.includes(userId)
+  );
+  const allWorkshops = workshops;
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (query.length > 1) {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/user/search?name=${query}`
+        );
+        setSearchResults(response.data.users);
+      } catch (err) {
+        console.error("Error searching users:", err);
+        setSearchResults([]);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -30,9 +90,9 @@ export default function Sidebar({
   };
 
   return (
-    <>
+    <div className="text-white min-h-screen relative flex">
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
-        <a href="/feed" className="cursor-pointer">
+        <a href="/feed">
           <div className="flex items-center">
             <img src={hntaLogo} alt="hnta-logo" className="w-10" />
             <img
@@ -47,7 +107,7 @@ export default function Sidebar({
         </button>
       </div>
       <div className="hidden lg:block fixed w-85 top-0 bottom-0 left-0 border-r border-gray-700 bg-black p-6">
-        <a href="/feed" className="cursor-pointer">
+        <a href="/feed">
           <div className="logo-container flex items-center justify-center">
             <img src={hntaLogo} alt="hnta-logo" className="w-20" />
             <img
@@ -119,7 +179,7 @@ export default function Sidebar({
                 </div>
               )}
               <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                <a href="/svi-korisnici">Prikaži sve korisnike</a>
+                <a href="/filteri">Prikaži sve korisnike</a>
               </button>
             </div>
           )}
@@ -181,7 +241,7 @@ export default function Sidebar({
                         className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
                         onClick={() => {
                           if (userId === user?._id) {
-                            navigate(`/moj-profil`);
+                            navigate("/moj-profil");
                           } else {
                             navigate(`/profil/${user._id}`);
                           }
@@ -222,7 +282,7 @@ export default function Sidebar({
                     ))}
                   </div>
                 )}
-                <a href="/svi-korisnici">
+                <a href="svi-korisnici">
                   <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
                     Prikaži sve korisnike
                   </button>
@@ -268,6 +328,81 @@ export default function Sidebar({
           </div>
         </div>
       )}
-    </>
+      <div className="flex-1 lg:ml-85 pt-16 lg:pt-0 overflow-y-auto">
+        <div className="flex justify-end p-6">
+          <Link
+            to="/kreiraj-radionicu"
+            className="bg-primary px-6 py-3 rounded-full flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Kreiraj radionicu
+          </Link>
+        </div>
+        <h1 className="text-2xl border-b border-t border-gray-700 font-bold p-4 mb-6 tracking-wider">
+          Moje radionice
+        </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 mx-auto">
+          {myWorkshops.length === 0 ? (
+            <p className="text-xl">Nemate kreiranih radionica</p>
+          ) : (
+            myWorkshops.map((workshop) => (
+              <Workshop
+                key={workshop._id}
+                imageId={workshop.coverImage}
+                title={workshop.name}
+                description={workshop.details}
+                date={new Date(workshop.dateOfStart).toLocaleString()}
+                createdBy={workshop.createdBy}
+                onClick={() => navigate(`/radionice/${workshop._id}`)}
+              />
+            ))
+          )}
+        </div>
+        <h1 className="text-2xl border-b border-gray-700 font-bold p-4 mb-6 tracking-wider">
+          Nadolazeće radionice
+        </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6  mx-auto">
+          {attendingWorkshops.length === 0 ? (
+            <p className="text-left mr-auto text-xl">
+              Nemate nadolazećih radionica
+            </p>
+          ) : (
+            attendingWorkshops.map((workshop) => (
+              <Workshop
+                key={workshop._id}
+                imageId={workshop.coverImage}
+                title={workshop.name}
+                description={workshop.details}
+                date={new Date(workshop.dateOfStart).toLocaleString()}
+                createdBy={workshop.createdBy}
+                onClick={() => navigate(`/radionice/${workshop._id}`)}
+              />
+            ))
+          )}
+        </div>
+        <h1 className="text-2xl border-b border-t border-gray-700 font-bold p-4 mb-6 tracking-wider">
+          Sve radionice
+        </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 mx-auto">
+          {allWorkshops.length === 0 ? (
+            <p className="text-left mr-auto text-xl">
+              Radionice nisu pronađene
+            </p>
+          ) : (
+            allWorkshops.map((workshop) => (
+              <Workshop
+                key={workshop._id}
+                imageId={workshop.coverImage}
+                title={workshop.name}
+                description={workshop.details}
+                date={new Date(workshop.dateOfStart).toLocaleString()}
+                createdBy={workshop.createdBy}
+                onClick={() => navigate(`/radionice/${workshop._id}`)}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

@@ -211,9 +211,11 @@ export default function Filters() {
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">
-                Radionice
-              </span>
+              <a href="/radionice">
+                <span className="hover:text-primary cursor-pointer">
+                  Radionice
+                </span>
+              </a>
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <UserPen className="text-primary" size={32} />
@@ -515,7 +517,7 @@ export default function Filters() {
             </button>
           </div>
           <div className="flex flex-col items-center justify-center relative h-1/2">
-            <div className="absolute top-0">
+            <div className="absolute bottom-20">
               <ul className="text-2xl">
                 <li className="flex items-center gap-x-4 py-2">
                   <MessageSquare className="text-primary" size={32} />
@@ -527,9 +529,11 @@ export default function Filters() {
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <GraduationCap className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Radionice
-                  </span>
+                  <a href="/radionice">
+                    <span className="hover:text-primary cursor-pointer">
+                      Radionice
+                    </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <UserPen className="text-primary" size={32} />

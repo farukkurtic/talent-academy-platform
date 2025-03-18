@@ -4,7 +4,6 @@ import { jwtDecode } from "jwt-decode";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import Modal from "react-modal";
 import axios from "axios";
 
 import {
@@ -17,7 +16,6 @@ import {
   Twitter,
   Linkedin,
   Globe,
-  X,
 } from "lucide-react";
 
 import hntaLogo from "../assets/logos/hnta-logo.png";
@@ -59,6 +57,7 @@ export default function MyProfile() {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
@@ -141,7 +140,6 @@ export default function MyProfile() {
   };
 
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   const [profileImage, setProfileImage] = useState(null);
 
@@ -211,10 +209,6 @@ export default function MyProfile() {
     }
   };
 
-  const handleUnselectImage = () => {
-    setProfileImage(null);
-  };
-
   const onSubmit = async (data) => {
     try {
       const formDataToSend = new FormData();
@@ -258,17 +252,22 @@ export default function MyProfile() {
   return (
     <div className="text-white min-h-screen relative flex flex-col lg:flex-row lg:items-center lg:justify-center">
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
-        <div className="flex items-center">
-          <img src={hntaLogo} alt="hnta-logo" className="w-10" />
-          <img src={textLogo} alt="hnta-text-logo" className="w-32 h-10 ml-2" />
-        </div>
-
+        <a href="/feed">
+          <div className="flex items-center">
+            <img src={hntaLogo} alt="hnta-logo" className="w-10" />
+            <img
+              src={textLogo}
+              alt="hnta-text-logo"
+              className="w-32 h-10 ml-2"
+            />
+          </div>
+        </a>
         <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
           <Menu size={32} className="text-primary" />
         </button>
       </div>
       <div className="hidden lg:block fixed w-85 top-0 bottom-0 left-0 border-r border-gray-700 bg-black p-6">
-        <a href="/feed" className="cursor-pointer">
+        <a href="/feed">
           <div className="logo-container flex items-center justify-center">
             <img src={hntaLogo} alt="hnta-logo" className="w-20" />
             <img
@@ -355,9 +354,11 @@ export default function MyProfile() {
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <GraduationCap className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">
-                Radionice
-              </span>
+              <a href="/radionice">
+                <span className="hover:text-primary cursor-pointer">
+                  Radionice
+                </span>
+              </a>
             </li>
             <li className="flex items-center gap-x-4 py-2">
               <UserPen className="text-primary" size={32} />
@@ -376,31 +377,6 @@ export default function MyProfile() {
           </button>
         </div>
       </div>
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center bg-black bg-transparent"
-        ariaHideApp={false}
-      >
-        <div className="bg-black p-4 rounded-lg relative">
-          <button
-            onClick={closeModal}
-            className="absolute top-5 right-5 p-1 rounded-full bg-gray-200 transition-colors"
-          >
-            <X size={24} className="text-gray-700" />
-          </button>
-          <img
-            crossOrigin="anonymous"
-            src={
-              userData?.image
-                ? `http://localhost:5000/api/posts/image/${userData?.image}`
-                : defaultPic
-            }
-            alt="Expanded Profile"
-            className="max-w-full max-h-[90vh] rounded-lg"
-          />
-        </div>
-      </Modal>
       {isMenuOpen && (
         <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
           <div className="text-center my-4">
@@ -466,9 +442,11 @@ export default function MyProfile() {
                     ))}
                   </div>
                 )}
-                <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                  Prikaži sve korisnike
-                </button>
+                <a href="/svi-korisnici">
+                  <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
+                    Prikaži sve korisnike
+                  </button>
+                </a>
               </div>
             )}
           </div>
@@ -485,9 +463,11 @@ export default function MyProfile() {
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <GraduationCap className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Radionice
-                  </span>
+                  <a href="/radionice">
+                    <span className="hover:text-primary cursor-pointer">
+                      Radionice
+                    </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <UserPen className="text-primary" size={32} />
@@ -545,14 +525,6 @@ export default function MyProfile() {
                   id="profile-image-input"
                   style={{ display: "none" }}
                 />
-                {profileImage && (
-                  <button
-                    onClick={handleUnselectImage}
-                    className="absolute top-0 right-2 bg-gray-700 p-1 rounded-full cursor-pointer"
-                  >
-                    <X size={20} className="text-white" />
-                  </button>
-                )}
               </>
             )}
           </div>
@@ -759,38 +731,48 @@ export default function MyProfile() {
                           switch (link.platform) {
                             case "instagram":
                               return (
-                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start w-full">
-                                  <Instagram className="mr-3 hover:text-primary" />
-                                  Instagram
-                                </div>
+                                <a href={link.url}>
+                                  <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start w-full">
+                                    <Instagram className="mr-3 hover:text-primary" />
+                                    Instagram
+                                  </div>
+                                </a>
                               );
                             case "facebook":
                               return (
-                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                  <Facebook className="mr-3 hover:text-primary" />
-                                  Facebook
-                                </div>
+                                <a href={link.url}>
+                                  <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                    <Facebook className="mr-3 hover:text-primary" />
+                                    Facebook
+                                  </div>
+                                </a>
                               );
                             case "twitter":
                               return (
-                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                  <Twitter className="mr-3 hover:text-primary" />
-                                  Twitter
-                                </div>
+                                <a href={link.url}>
+                                  <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                    <Twitter className="mr-3 hover:text-primary" />
+                                    Twitter
+                                  </div>
+                                </a>
                               );
                             case "linkedin":
                               return (
-                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                  <Linkedin className="mr-3 hover:text-primary" />
-                                  LinkedIn
-                                </div>
+                                <a href={link.url}>
+                                  <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                    <Linkedin className="mr-3 hover:text-primary" />
+                                    LinkedIn
+                                  </div>
+                                </a>
                               );
                             case "web":
                               return (
-                                <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
-                                  <Globe className="mr-3 hover:text-primary" />
-                                  Web
-                                </div>
+                                <a href={link.url}>
+                                  <div className="border rounded-full p-3 cursor-pointer flex items-center justify-center lg:justify-start">
+                                    <Globe className="mr-3 hover:text-primary" />
+                                    Web
+                                  </div>
+                                </a>
                               );
                           }
                         }

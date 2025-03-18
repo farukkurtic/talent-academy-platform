@@ -202,7 +202,7 @@ export default function Post({
         {badge && <img src={badge} alt="Badge" className="w-6 h-6" />}
       </div>
       <div className="w-full mb-3">
-        <p className="text-sm tracking-wider">{content}</p>
+        <p className="text-sm tracking-wider break-words">{content}</p>
       </div>
       {(picture || gif) && (
         <div

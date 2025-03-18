@@ -13,15 +13,11 @@ function initializeSocket(server) {
   });
 
   io.on("connection", (socket) => {
-    // Join user to a chat room based on userId
     socket.on("joinChat", (userId) => {
       socket.join(userId);
     });
 
-    // Handle sending messages
     socket.on("sendMessage", async (data, callback) => {
-      console.log("Received sendMessage event:", data);
-
       if (!data.sender || !data.receiver || !data.text) {
         console.error("Invalid message data:", data);
         return callback({ error: "Invalid message data" });
@@ -34,9 +30,7 @@ function initializeSocket(server) {
           text: data.text,
         });
         await newMessage.save();
-        console.log("Message saved to database:", newMessage);
 
-        // Emit message to the sender and receiver if they are connected
         io.to(data.sender).emit("receiveMessage", newMessage);
         io.to(data.receiver).emit("receiveMessage", newMessage);
 
@@ -47,9 +41,7 @@ function initializeSocket(server) {
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log(`Client disconnected: ${socket.id}`);
-    });
+    socket.on("disconnect", () => {});
   });
 
   return io;

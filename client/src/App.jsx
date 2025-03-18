@@ -14,12 +14,15 @@ import MyProfile from "./pages/mojProfil.jsx";
 import Filters from "./pages/filteri.jsx";
 import Chat from "./pages/chat.jsx";
 import NotFound from "./pages/not-found.jsx";
+import KreirajRadionicu from "./pages/kreiraj-radionicu.jsx";
 
 import ProtectedRoute from "./pages/protectedRoute.jsx";
 
 import "./App.css";
 
 import Modal from "react-modal";
+import Radionice from "./pages/radionice.jsx";
+import WorkshopDetails from "./pages/radionice-detalji.jsx";
 Modal.setAppElement("#root");
 
 function App() {
@@ -86,6 +89,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/radionice"
+            element={
+              <ProtectedRoute>
+                <Radionice />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/kreiraj-radionicu"
+            element={
+              <ProtectedRoute>
+                <KreirajRadionicu />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/radionice/:workshopId"
+            element={
+              <ProtectedRoute>
+                <WorkshopDetails />
               </ProtectedRoute>
             }
           />

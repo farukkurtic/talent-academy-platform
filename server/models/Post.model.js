@@ -22,8 +22,8 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     image: {
-      type: mongoose.Schema.Types.ObjectId, // Reference to GridFS file
-      ref: "fs.files", // GridFS collection
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "fs.files",
     },
     gif: {
       type: String,

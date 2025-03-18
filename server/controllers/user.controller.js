@@ -30,10 +30,7 @@ const getUsers = catchAsync(async (req, res) => {
 
 const getUsersByName = catchAsync(async (req, res) => {
   try {
-    console.log("Full request query:", req.query);
-
     const searchQuery = req.query.name || "";
-    console.log("Received search query:", searchQuery);
 
     if (!searchQuery) {
       return res.status(400).json({ error: "Search query is required" });
@@ -46,7 +43,6 @@ const getUsersByName = catchAsync(async (req, res) => {
     };
 
     const users = await userService.getUsersByName(searchQuery, options);
-    console.log("Found users:", users);
 
     res.status(200).json({ users });
   } catch (err) {
@@ -93,32 +89,25 @@ const getIsUserInitialized = catchAsync(async (req, res) => {
 
 const getFilteredUsers = catchAsync(async (req, res) => {
   try {
-    console.log("Received filter query:", req.query);
-
     let filter = pick(req.query, [
       "major",
       "purposeOfPlatform",
       "yearOfAttend",
     ]);
 
-    // Ensure major is treated as an array if multiple values are provided (max 5)
     if (filter.major) {
       filter.major = Array.isArray(filter.major)
-        ? filter.major.slice(0, 5) // Limit to 5
+        ? filter.major.slice(0, 5)
         : filter.major.split(",").slice(0, 5);
     }
 
-    // Ensure purposeOfPlatform is treated as an array if multiple values are provided (max 3)
     if (filter.purposeOfPlatform) {
       filter.purposeOfPlatform = Array.isArray(filter.purposeOfPlatform)
-        ? filter.purposeOfPlatform.slice(0, 3) // Limit to 3
+        ? filter.purposeOfPlatform.slice(0, 3)
         : filter.purposeOfPlatform.split(",").slice(0, 3);
     }
 
-    console.log("Picked filters:", filter);
-
     const users = await userService.getFilteredUsers(filter);
-    console.log("Filtered users:", users);
 
     res.status(200).json({ users });
   } catch (error) {
@@ -133,13 +122,11 @@ const updateUserDetails = catchAsync(async (req, res) => {
     const { links } = req.body;
     const imageFile = req.file;
 
-    // Parse the links array if it's a JSON string
     const parsedLinks = typeof links === "string" ? JSON.parse(links) : links;
 
-    // Update the user details
     const updatedUser = await userService.updateUserDetails(
       userId,
-      { links: parsedLinks }, // Pass the parsed links array
+      { links: parsedLinks },
       imageFile
     );
 
@@ -153,23 +140,20 @@ const updateUserDetails = catchAsync(async (req, res) => {
 const uploadImageToGridFS = async (file, userId) => {
   const gfsBucket = getGfsBucket();
 
-  // Create a readable stream from the file buffer
   const readableStream = new stream.Readable();
-  readableStream.push(file.buffer); // Push the file buffer into the stream
-  readableStream.push(null); // Signal the end of the stream
+  readableStream.push(file.buffer);
+  readableStream.push(null);
 
-  // Create an upload stream to GridFS
   const uploadStream = gfsBucket.openUploadStream(file.originalname, {
     contentType: file.mimetype,
-    metadata: { userId }, // Link the file to the user
+    metadata: { userId },
   });
 
-  // Pipe the readable stream to the upload stream
   readableStream.pipe(uploadStream);
 
   return new Promise((resolve, reject) => {
     uploadStream.on("finish", () => {
-      resolve(uploadStream.id); // Return the file ID
+      resolve(uploadStream.id);
     });
 
     uploadStream.on("error", (err) => {
@@ -192,18 +176,15 @@ const updateCurrentUser = catchAsync(async (req, res) => {
     } = req.body;
     const imageFile = req.file;
 
-    // Parse the links array if it's a JSON string
     const parsedLinks = typeof links === "string" ? JSON.parse(links) : links;
 
-    // Parse the purposeOfPlatform array if it's a JSON string
     const parsedPurposeOfPlatform =
       typeof purposeOfPlatform === "string"
         ? JSON.parse(purposeOfPlatform)
         : purposeOfPlatform;
 
-    // Prepare the update data
     const updateData = {
-      purposeOfPlatform: parsedPurposeOfPlatform, // Use the parsed array
+      purposeOfPlatform: parsedPurposeOfPlatform,
       major,
       yearOfAttend,
       profession,
@@ -211,13 +192,11 @@ const updateCurrentUser = catchAsync(async (req, res) => {
       links: parsedLinks,
     };
 
-    // If an image is provided, upload it to GridFS
     if (imageFile) {
       const imageId = await uploadImageToGridFS(imageFile, userId);
       updateData.image = imageId;
     }
 
-    // Update the user in the database
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
     });

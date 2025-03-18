@@ -16,19 +16,13 @@ const getUsers = async (filter, options) => {
 
 const getUsersByName = async (searchQuery, options) => {
   try {
-    console.log("Raw search query:", searchQuery);
-
     const normalizedQuery = searchQuery
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Remove accents
-      .trim(); // Remove extra spaces
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
 
-    console.log("Normalized search query:", normalizedQuery);
-
-    // Split the query into words (e.g. "Faruk Kurtic" → ["Faruk", "Kurtic"])
     const words = normalizedQuery.split(/\s+/);
 
-    // Create a regex pattern that matches all words in either firstName or lastName
     const regexPatterns = words.map((word) => ({
       $or: [
         { firstName: { $regex: word, $options: "i" } },
@@ -37,11 +31,7 @@ const getUsersByName = async (searchQuery, options) => {
     }));
 
     const filter = { $and: regexPatterns };
-
-    console.log("MongoDB filter:", JSON.stringify(filter, null, 2));
-
     const users = await User.find(filter);
-    console.log("Users found:", users);
 
     return users.length ? users : [];
   } catch (err) {
@@ -141,17 +131,14 @@ const getIsUserInitialized = async (userID) => {
 const getFilteredUsers = async (filter) => {
   let query = {};
 
-  // Filter by major (if provided, match any of the selected ones)
   if (filter.major) {
     query.major = { $in: filter.major };
   }
 
-  // Filter by purposeOfPlatform (if provided, match any of the selected ones)
   if (filter.purposeOfPlatform) {
     query.purposeOfPlatform = { $in: filter.purposeOfPlatform };
   }
 
-  // Filter by yearOfAttend (single value, exact match)
   if (filter.yearOfAttend) {
     query.yearOfAttend = filter.yearOfAttend;
   }
@@ -162,23 +149,20 @@ const getFilteredUsers = async (filter) => {
 const uploadImageToGridFS = async (file, userId) => {
   const gfsBucket = getGfsBucket();
 
-  // Create a readable stream from the file buffer
   const readableStream = new stream.Readable();
-  readableStream.push(file.buffer); // Push the file buffer into the stream
-  readableStream.push(null); // Signal the end of the stream
+  readableStream.push(file.buffer);
+  readableStream.push(null);
 
-  // Create an upload stream to GridFS
   const uploadStream = gfsBucket.openUploadStream(file.originalname, {
     contentType: file.mimetype,
-    metadata: { userId }, // Link the file to the user
+    metadata: { userId },
   });
 
-  // Pipe the readable stream to the upload stream
   readableStream.pipe(uploadStream);
 
   return new Promise((resolve, reject) => {
     uploadStream.on("finish", () => {
-      resolve(uploadStream.id); // Return the file ID
+      resolve(uploadStream.id);
     });
 
     uploadStream.on("error", (err) => {
@@ -195,16 +179,13 @@ const updateUserDetails = async (userId, data, imageFile) => {
       throw new ApiError(404, "User not found");
     }
 
-    // Update links if provided
     if (data.links) {
-      // Ensure links is an array of objects with platform and url properties
       user.links = data.links.map((link) => ({
         platform: link.platform,
         url: link.url,
       }));
     }
 
-    // Update image if provided
     if (imageFile) {
       const imageId = await uploadImageToGridFS(imageFile, userId);
       user.image = imageId;
@@ -226,7 +207,6 @@ const updateCurrentUser = async (userId, data, imageFile) => {
     }
 
     if (data.links) {
-      // Ensure links is an array of objects with platform and url properties
       user.links = data.links.map((link) => ({
         platform: link.platform,
         url: link.url,

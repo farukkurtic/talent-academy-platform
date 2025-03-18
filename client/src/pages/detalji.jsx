@@ -129,7 +129,7 @@ export default function ProfileDetails() {
             id="form-id"
           >
             <div className="w-full lg:w-1/2 flex flex-col">
-              <div className="flex flex-col lg:flex-row">
+              <div className="flex flex-col lg:flex-row gap-3">
                 <div className="w-full lg:w-1/2">
                   <input
                     {...register("firstName")}

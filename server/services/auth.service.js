@@ -18,7 +18,6 @@ const loginUsingCredentials = async ({ email, password }) => {
     throw new ApiError(400, "Pogrešni podaci za prijavu");
   }
 
-  // 🔥 Return the full user object instead of just a message
   return user;
 };
 

@@ -12,8 +12,8 @@ router.get("/unread-messages/:userId", async (req, res) => {
     const { userId } = req.params;
     const unreadMessages = await Chats.find({
       receiver: userId,
-      read: false, // Fetch only unread messages
-    }).populate("sender", "firstName lastName image"); // Populate sender details if needed
+      read: false,
+    }).populate("sender", "firstName lastName image");
 
     res.status(200).json(unreadMessages);
   } catch (err) {
@@ -25,7 +25,6 @@ router.post("/mark-as-read", async (req, res) => {
   try {
     const { sender, receiver } = req.body;
 
-    // Mark all unread messages from the sender to the receiver as read
     await Chats.updateMany(
       { sender, receiver, read: false },
       { $set: { read: true } }

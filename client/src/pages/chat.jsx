@@ -225,7 +225,7 @@ const Chat = () => {
   return (
     <div className="text-white h-screen flex flex-col lg:flex-row">
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
-        <a href="/feed" className="cursor-pointer">
+        <a href="/feed">
           <div className="flex items-center">
             <img src={hntaLogo} alt="hnta-logo" className="w-10" />
             <img
@@ -239,8 +239,8 @@ const Chat = () => {
           <Menu size={32} className="text-primary" />
         </button>
       </div>
-      <div className="hidden lg:block w-85 bg-black border-r border-gray-700 p-6">
-        <a href="/feed" className="cursor-pointer">
+      <div className="hidden lg:block fixed w-85 top-0 bottom-0 left-0 border-r border-gray-700 bg-black p-6">
+        <a href="/feed">
           <div className="logo-container flex items-center justify-center">
             <img src={hntaLogo} alt="hnta-logo" className="w-20" />
             <img
@@ -260,9 +260,110 @@ const Chat = () => {
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
           />
-          {isSearchFocused ||
-            (searchQuery !== "" && (
-              <div className="absolute w-5/6 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
+          {(isSearchFocused || searchQuery !== "") && (
+            <div className="absolute w-5/6 bg-gray-800 text-white rounded-2xl shadow-lg max-h-60 overflow-y-auto mt-5 z-50 p-3">
+              {searchResults.length === 0 ? (
+                <div>Korisnik nije pronađen</div>
+              ) : (
+                <div>
+                  {searchResults.map((user) => (
+                    <div
+                      key={user._id}
+                      className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
+                      onClick={() => {
+                        if (currentUser === user?._id) {
+                          navigate("/moj-profil");
+                        } else {
+                          navigate(`/profil/${user._id}`);
+                        }
+                      }}
+                    >
+                      <img
+                        crossOrigin="anonymous"
+                        src={
+                          user?.image
+                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            : defaultPic
+                        }
+                        alt={`${user.firstName} ${user.lastName}`}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <span>
+                        {user.firstName} {user.lastName}
+                      </span>
+                      <span>
+                        {(() => {
+                          switch (user.major) {
+                            case "Muzička produkcija":
+                              return <img src={muzika} className="w-4" />;
+                            case "Odgovorno kodiranje":
+                              return <img src={kodiranje} className="w-4" />;
+                            case "Novinarstvo":
+                              return <img src={novinarstvo} className="w-4" />;
+                            case "Kreativno pisanje":
+                              return <img src={pisanje} className="w-4" />;
+                            case "Grafički dizajn":
+                              return <img src={graficki} className="w-4" />;
+                          }
+                        })()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
+                <a href="/svi-korisnici">Prikaži sve korisnike</a>
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="absolute bottom-10 left-20 p-6">
+          <ul className="text-2xl w-full">
+            <li className="flex items-center gap-x-4 py-2">
+              <MessageSquare className="text-primary" size={32} />
+              <a href="/chat">
+                <span className="hover:text-primary cursor-pointer">Chat</span>
+              </a>
+            </li>
+            <li className="flex items-center gap-x-4 py-2">
+              <GraduationCap className="text-primary" size={32} />
+              <a href="/radionice">
+                <span className="hover:text-primary cursor-pointer">
+                  Radionice
+                </span>
+              </a>
+            </li>
+            <li className="flex items-center gap-x-4 py-2">
+              <UserPen className="text-primary" size={32} />
+              <a href="/moj-profil">
+                <span className="hover:text-primary cursor-pointer">
+                  Moj profil
+                </span>
+              </a>
+            </li>
+          </ul>
+          <button
+            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer"
+            onClick={handleLogout}
+          >
+            Odjavi se
+          </button>
+        </div>
+      </div>
+      {isMenuOpen && (
+        <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
+          <div className="text-center my-4">
+            <input
+              type="text"
+              placeholder="Pretraži korisnike..."
+              className="border p-3 rounded-full w-full text-white px-4"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+            />
+            {(isSearchFocused || searchQuery !== "") && (
+              <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
                 {searchResults.length === 0 ? (
                   <div>Korisnik nije pronađen</div>
                 ) : (
@@ -318,112 +419,7 @@ const Chat = () => {
                   <a href="/svi-korisnici">Prikaži sve korisnike</a>
                 </button>
               </div>
-            ))}
-        </div>
-        <div className="absolute bottom-10 left-20 p-6">
-          <ul className="text-2xl w-full">
-            <li className="flex items-center gap-x-4 py-2">
-              <MessageSquare className="text-primary" size={32} />
-              <a href="/chat">
-                <span className="hover:text-primary cursor-pointer">Chat</span>
-              </a>
-            </li>
-            <li className="flex items-center gap-x-4 py-2">
-              <GraduationCap className="text-primary" size={32} />
-              <span className="hover:text-primary cursor-pointer">
-                Radionice
-              </span>
-            </li>
-            <li className="flex items-center gap-x-4 py-2">
-              <UserPen className="text-primary" size={32} />
-              <a href="/moj-profil">
-                <span className="hover:text-primary cursor-pointer">
-                  Moj profil
-                </span>
-              </a>
-            </li>
-          </ul>
-          <button
-            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer"
-            onClick={handleLogout}
-          >
-            Odjavi se
-          </button>
-        </div>
-      </div>
-      {isMenuOpen && (
-        <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-40 p-4 bg-black">
-          <div className="text-center my-4">
-            <input
-              type="text"
-              placeholder="Pretraži korisnike..."
-              className="border p-3 rounded-full w-full text-white px-4"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-            />
-            {isSearchFocused ||
-              (searchQuery !== "" && (
-                <div className="absolute w-9/10 bg-gray-800 text-white rounded-lg shadow-2xl max-h-60 overflow-y-auto mt-5 z-50 p-3">
-                  {searchResults.length === 0 ? (
-                    <div>Korisnik nije pronađen</div>
-                  ) : (
-                    <div>
-                      {searchResults.map((user) => (
-                        <div
-                          key={user._id}
-                          className="p-2 hover:bg-gray-700 cursor-pointer flex items-center gap-2 mb-0 border-bottom border-gray-700"
-                          onClick={() => {
-                            if (currentUser === user?._id) {
-                              navigate(`/moj-profil`);
-                            } else {
-                              navigate(`/profil/${user._id}`);
-                            }
-                          }}
-                        >
-                          <img
-                            crossOrigin="anonymous"
-                            src={
-                              user?.image
-                                ? `http://localhost:5000/api/posts/image/${user?.image}`
-                                : defaultPic
-                            }
-                            alt={`${user.firstName} ${user.lastName}`}
-                            className="w-10 h-10 rounded-full"
-                          />
-                          <span>
-                            {user.firstName} {user.lastName}
-                          </span>
-                          <span>
-                            {(() => {
-                              switch (user.major) {
-                                case "Muzička produkcija":
-                                  return <img src={muzika} className="w-4" />;
-                                case "Odgovorno kodiranje":
-                                  return (
-                                    <img src={kodiranje} className="w-4" />
-                                  );
-                                case "Novinarstvo":
-                                  return (
-                                    <img src={novinarstvo} className="w-4" />
-                                  );
-                                case "Kreativno pisanje":
-                                  return <img src={pisanje} className="w-4" />;
-                                case "Grafički dizajn":
-                                  return <img src={graficki} className="w-4" />;
-                              }
-                            })()}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                    Prikaži sve korisnike
-                  </button>
-                </div>
-              ))}
+            )}
           </div>
           <div className="flex flex-col items-center justify-center h-full relative">
             <div className="absolute bottom-35">
@@ -438,9 +434,11 @@ const Chat = () => {
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <GraduationCap className="text-primary" size={32} />
-                  <span className="hover:text-primary cursor-pointer">
-                    Radionice
-                  </span>
+                  <a href="/radionice">
+                    <span className="hover:text-primary cursor-pointer">
+                      Radionice
+                    </span>
+                  </a>
                 </li>
                 <li className="flex items-center gap-x-4 py-2">
                   <UserPen className="text-primary" size={32} />
@@ -461,7 +459,8 @@ const Chat = () => {
           </div>
         </div>
       )}
-      <div className="flex-1 flex flex-col lg:flex-row mt-16 lg:mt-0">
+
+      <div className="flex-1 flex flex-col lg:flex-row mt-16 lg:mt-0 lg:ml-85">
         {!selectedUser ? (
           <div className="w-full h-screen lg:w-1/4 bg-gray-800 p-4 overflow-y-auto">
             <h2 className="text-xl font-bold mb-4 tracking-wider">
