@@ -51,4 +51,51 @@ const postUnreact = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { createPost, getPosts, postReact, postUnreact };
+const addComment = catchAsync(async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId, text } = req.body;
+
+    const comment = await feedService.addComment(postId, userId, text);
+    res.status(201).json({ comment });
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    res.status(500).json({ error: "Failed to add comment" });
+  }
+});
+
+const addReply = catchAsync(async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { userId, text } = req.body;
+
+    const reply = await feedService.addReply(commentId, userId, text);
+    res.status(201).json({ reply });
+  } catch (err) {
+    console.error("Error adding reply:", err);
+    res.status(500).json({ error: "Failed to add reply" });
+  }
+});
+
+const likeComment = catchAsync(async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { userId } = req.body;
+
+    const comment = await feedService.likeComment(commentId, userId);
+    res.status(200).json({ comment });
+  } catch (err) {
+    console.error("Error liking comment:", err);
+    res.status(500).json({ error: "Failed to like comment" });
+  }
+});
+
+module.exports = {
+  createPost,
+  getPosts,
+  postReact,
+  postUnreact,
+  addComment,
+  addReply,
+  likeComment,
+};

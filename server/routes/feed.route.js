@@ -12,6 +12,27 @@ const upload = multer({ storage });
 
 const router = express.Router();
 
+router.post("/:postId/comments", authMiddleware, async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId, text } = req.body;
+
+    // Call the addComment function
+    const comment = await feedService.addComment(postId, userId, text);
+
+    // Return the new comment
+    res.status(201).json({ comment });
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    res.status(500).json({ error: "Failed to add comment" });
+  }
+});
+router.post("/:commentId/replies", authMiddleware, feedController.addReply);
+router.post(
+  "/comments/:commentId/like",
+  authMiddleware,
+  feedController.likeComment
+);
 router.post("/", upload.single("image"), feedController.createPost);
 router.get("/", feedController.getPosts);
 router.post("/:postId/like", feedController.postReact);

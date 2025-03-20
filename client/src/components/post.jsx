@@ -36,6 +36,7 @@ export default function Post({
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const textareaRef = useRef(null);
   const commentValue = watch("comment", "");
+  const [replyingTo, setReplyingTo] = useState(null);
 
   useEffect(() => {
     setIsLiked(likes.includes(currentUserId));
@@ -167,6 +168,45 @@ export default function Post({
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedImage(null);
+  };
+
+  // --------------------------------------------------------------
+  const handleLikeComment = async (commentId) => {
+    try {
+      await axios.post(
+        `http://localhost:5000/api/posts/comments/${commentId}/like`,
+        { userId: currentUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      fetchComments(); // Refresh comments after liking
+    } catch (err) {
+      console.error("Error liking comment:", err);
+    }
+  };
+
+  const handleAddReply = async (commentId, replyText) => {
+    if (replyText.trim() === "") return;
+    try {
+      await axios.post(
+        `http://localhost:5000/api/posts/comments/${commentId}/replies`,
+        {
+          userId: currentUserId,
+          text: replyText,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      fetchComments(); // Refresh comments after adding reply
+    } catch (err) {
+      console.error("Error adding reply:", err);
+    }
   };
 
   return (
@@ -366,41 +406,99 @@ export default function Post({
         </button>
       </form>
       <div className={seeComments ? "visible" : "hidden"}>
-        {comments.map((cmt, index) => (
-          <div key={index} className="bg-gray-800 p-2 rounded-lg mt-2 text-sm">
-            <a
-              href={
-                currentUserId === cmt.user?._id
-                  ? "/moj-profil"
-                  : `/profil/${cmt.user?._id}`
-              }
-            >
+        {comments.map((cmt) => (
+          <div
+            key={cmt._id}
+            className="bg-gray-800 p-2 rounded-lg mt-2 text-sm"
+          >
+            <a href={`/profil/${cmt.userId}`}>
               <div className="flex items-center justify-start mb-3">
                 <img
-                  crossOrigin="anonymous"
-                  src={
-                    cmt.user?.image
-                      ? `http://localhost:5000/api/posts/image/${cmt.user?.image}`
-                      : defaultPic
-                  }
+                  src={cmt.user?.image || defaultPic}
                   className="w-10 h-10 rounded-full mr-3"
+                  alt="Profile"
                 />
                 <p className="tracking-wider font-bold">
                   {cmt.user?.firstName} {cmt.user?.lastName}
                 </p>
               </div>
             </a>
-            <p className="break-words mb-3">{cmt.text}</p>{" "}
-            <p className="text-gray-400 text-xs">
-              {new Date(cmt.createdAt).toLocaleString("en-GB", {
-                hour12: false,
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+            <p className="break-words mb-3">{cmt.text}</p>
+            <div className="flex items-center gap-2">
+              <button onClick={() => handleLikeComment(cmt._id)}>
+                <Heart
+                  size={20}
+                  strokeWidth={1}
+                  className={`hover:text-primary cursor-pointer ${
+                    cmt.likes.includes(currentUserId)
+                      ? "fill-primary text-primary"
+                      : ""
+                  }`}
+                />
+              </button>
+              <span>{cmt.likes.length}</span>
+              <button onClick={() => setReplyingTo(cmt._id)}>
+                <MessageSquare
+                  size={20}
+                  strokeWidth={1}
+                  className="hover:text-primary cursor-pointer"
+                />
+              </button>
+            </div>
+            {replyingTo === cmt._id && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddReply(cmt._id, e.target.reply.value);
+                  setReplyingTo(null);
+                }}
+                className="mt-2"
+              >
+                <textarea
+                  name="reply"
+                  placeholder="Napiši odgovor..."
+                  className="w-full p-2 bg-gray-700 text-white rounded-lg resize-none border border-gray-600 focus:outline-none"
+                  rows={1}
+                />
+                <button
+                  type="submit"
+                  className="bg-primary mt-2 px-4 py-1 rounded-lg text-white hover:bg-opacity-80"
+                >
+                  Pošalji
+                </button>
+              </form>
+            )}
+            {cmt.replies.map((reply) => (
+              <div key={reply._id} className="ml-4 mt-2">
+                <a href={`/profil/${reply.userId}`}>
+                  <div className="flex items-center justify-start mb-2">
+                    <img
+                      src={reply.user?.image || defaultPic}
+                      className="w-8 h-8 rounded-full mr-2"
+                      alt="Profile"
+                    />
+                    <p className="tracking-wider font-bold">
+                      {reply.user?.firstName} {reply.user?.lastName}
+                    </p>
+                  </div>
+                </a>
+                <p className="break-words mb-2">{reply.text}</p>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => handleLikeComment(reply._id)}>
+                    <Heart
+                      size={16}
+                      strokeWidth={1}
+                      className={`hover:text-primary cursor-pointer ${
+                        reply.likes.includes(currentUserId)
+                          ? "fill-primary text-primary"
+                          : ""
+                      }`}
+                    />
+                  </button>
+                  <span>{reply.likes.length}</span>
+                </div>
+              </div>
+            ))}
           </div>
         ))}
       </div>
