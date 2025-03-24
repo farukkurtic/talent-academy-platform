@@ -14,6 +14,8 @@ import {
   UserPen,
   X,
   MoreVertical,
+  Trash,
+  SquarePen,
 } from "lucide-react";
 import hntaLogo from "../assets/logos/hnta-logo.png";
 import textLogo from "../assets/logos/textLogo.svg";
@@ -340,7 +342,7 @@ export default function WorkshopDetails() {
                 </div>
               )}
               <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                <a href="/filteri">Prikaži sve korisnike</a>
+                <a href="/svi-korisnici">Prikaži sve korisnike</a>
               </button>
             </div>
           )}
@@ -515,7 +517,9 @@ export default function WorkshopDetails() {
                       }}
                       className="w-full flex items-center gap-2 p-3 hover:bg-gray-700 rounded-t-lg"
                     >
-                      <span>Uredi radionicu</span>
+                      <span className="text-primary flex items-center justify-center">
+                        <SquarePen size={15} className="mr-2" /> Uredi
+                      </span>
                     </button>
                     <button
                       onClick={() => {
@@ -524,7 +528,10 @@ export default function WorkshopDetails() {
                       }}
                       className="w-full flex items-center gap-2 p-3 hover:bg-gray-700 rounded-b-lg"
                     >
-                      <span>Izbriši radionicu</span>
+                      <span className="text-primary flex items-center justify-center">
+                        <Trash size={15} className="mr-2" />
+                        Obriši
+                      </span>
                     </button>
                   </div>
                 )}

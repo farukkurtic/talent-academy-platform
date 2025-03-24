@@ -1,8 +1,57 @@
 const { status } = require("http-status");
-const { Post } = require("../models");
+const { Post, Comment } = require("../models");
 const ApiError = require("../utils/ApiError");
 const { getGfsBucket } = require("../config/db");
 const stream = require("stream");
+
+const addComment = async (postId, userId, text) => {
+  const post = await Post.findById(postId);
+  if (!post) throw new ApiError(404, "Post not found");
+
+  const newComment = new Comment({
+    userId,
+    text,
+    postId,
+  });
+
+  await newComment.save();
+  post.comments.push(newComment._id);
+  await post.save();
+
+  return newComment;
+};
+
+const addReply = async (commentId, userId, text) => {
+  const parentComment = await Comment.findById(commentId);
+  if (!parentComment) throw new ApiError(404, "Parent comment not found");
+
+  const newReply = new Comment({
+    userId,
+    text,
+    postId: parentComment.postId,
+    parentCommentId: commentId,
+  });
+
+  await newReply.save();
+  parentComment.replies.push(newReply._id);
+  await parentComment.save();
+
+  return newReply;
+};
+
+const likeComment = async (commentId, userId) => {
+  const comment = await Comment.findById(commentId);
+  if (!comment) throw new ApiError(404, "Comment not found");
+
+  if (comment.likes.includes(userId)) {
+    comment.likes = comment.likes.filter((id) => id !== userId);
+  } else {
+    comment.likes.push(userId);
+  }
+
+  await comment.save();
+  return comment;
+};
 
 const createPost = async (postBody) => {
   const { text, gif, image, userId } = postBody;
@@ -36,31 +85,17 @@ const createPost = async (postBody) => {
 
 const getPosts = async () => {
   try {
-    const posts = await Post.aggregate([
-      {
-        $lookup: {
-          from: "fs.files",
-          localField: "image",
-          foreignField: "_id",
-          as: "imageData",
+    const posts = await Post.find()
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+          select: "firstName lastName image",
         },
-      },
-      { $sort: { createdAt: -1 } },
-    ]);
+      })
+      .sort({ createdAt: -1 });
 
-    const postsWithImages = posts.map((post) => {
-      const imageUrl =
-        post.imageData.length > 0
-          ? `/api/image/${post.imageData[0]._id}`
-          : null;
-
-      return {
-        ...post,
-        imageUrl,
-      };
-    });
-
-    return postsWithImages;
+    return posts;
   } catch (err) {
     console.error("Error in getPosts:", err);
     throw new ApiError(500, "Failed to fetch posts");
@@ -122,4 +157,12 @@ const uploadImageToGridFS = async (file, postId) => {
   });
 };
 
-module.exports = { createPost, getPosts, postReact, postUnreact };
+module.exports = {
+  createPost,
+  getPosts,
+  postReact,
+  postUnreact,
+  addComment,
+  addReply,
+  likeComment,
+};

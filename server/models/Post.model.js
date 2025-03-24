@@ -7,14 +7,13 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     likes: {
-      type: Array,
+      type: [String],
       default: [],
     },
     comments: [
       {
-        userId: { type: String, required: true },
-        text: { type: String, required: true },
-        createdAt: { type: Date, default: Date.now },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
       },
     ],
     content: {

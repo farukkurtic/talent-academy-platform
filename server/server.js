@@ -23,19 +23,16 @@ const startServer = async () => {
   app.use(cookieParser());
 
   app.use(xss());
-  // Use CORS middleware
   app.use(cors());
 
   app.use(express.json());
-
   app.use(compression());
-  // Connect to DB
+
   await connectDB();
   console.log("MongoDB connected. Starting server...");
 
   app.use(bodyParser.json());
   initializeSocket(server);
-  // Routes
   app.use("/", routes);
 
   server.listen(PORT, () => console.log(`Server running on ${PORT}`));

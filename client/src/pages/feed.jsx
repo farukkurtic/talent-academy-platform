@@ -50,25 +50,35 @@ export default function Feed() {
     try {
       const response = await axios.get("http://localhost:5000/api/posts");
       const posts = response.data.posts;
+
       const postsWithUsers = await Promise.all(
         posts.map(async (post) => {
           try {
+            if (!post.userId || typeof post.userId !== "string") {
+              console.warn("Invalid userId for post:", post._id);
+              return { ...post, user: null, badge: null };
+            }
+
             const userResponse = await axios.get(
               `http://localhost:5000/api/user/id/${post.userId}`
             );
-            if (userResponse.data.user.major in majorBadges) {
+
+            if (userResponse.data.user?.major in majorBadges) {
               return {
                 ...post,
                 user: userResponse.data.user,
                 badge: majorBadges[userResponse.data.user.major],
               };
+            } else {
+              return { ...post, user: userResponse.data.user, badge: null };
             }
           } catch (userError) {
             console.error("Error fetching user:", userError);
-            return { ...post, user: null };
+            return { ...post, user: null, badge: null };
           }
         })
       );
+
       setAllPosts(postsWithUsers);
     } catch (err) {
       console.error("Error fetching posts:", err);
@@ -140,8 +150,8 @@ export default function Feed() {
                   ? `http://localhost:5000/api/posts/image/${post.user.image}`
                   : defaultPic
               }
-              firstName={post.user?.firstName}
-              lastName={post.user.lastName}
+              firstName={post.user?.firstName || "Unknown"}
+              lastName={post.user?.lastName || "User"}
               content={post.content}
               picture={
                 post?.image
