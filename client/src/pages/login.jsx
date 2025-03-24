@@ -81,7 +81,7 @@ export default function Login() {
           </div>
           <div className="color-white text-wrap">
             <h1 className="text-2xl lg:text-7xl font-black mb-4 tracking-wider lg:whitespace-pre-line">
-              Dobro {"\n"} došli nazad
+              Prijavite se!
             </h1>
             <p className="text-lg font-medium tracking-wide text-center lg:text-left">
               Lorem ipsum dolor sit amet.

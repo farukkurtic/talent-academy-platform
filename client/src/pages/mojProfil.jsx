@@ -339,7 +339,7 @@ export default function MyProfile() {
                 </div>
               )}
               <button className="w-5/6 rounded-full bg-primary text-white tracking-wider cursor-pointer p-3 mt-5">
-                <a href="/filteri">Prikaži sve korisnike</a>
+                <a href="/svi-korisnici">Prikaži sve korisnike</a>
               </button>
             </div>
           )}

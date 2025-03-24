@@ -7,13 +7,13 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     likes: {
-      type: [String], // Array of user IDs who liked the post
+      type: [String],
       default: [],
     },
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment", // Reference to the Comment model
+        ref: "Comment",
       },
     ],
     content: {

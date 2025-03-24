@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const CommentSchema = new mongoose.Schema(
   {
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     text: {
@@ -12,18 +13,22 @@ const CommentSchema = new mongoose.Schema(
     },
     postId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post", // Reference to the Post model
+      ref: "Post",
     },
     likes: {
-      type: [String], // Array of user IDs who liked the comment
+      type: [String],
       default: [],
     },
     replies: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment", // Self-referencing for nested replies
+        ref: "Comment",
       },
     ],
+    parentCommentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+    },
   },
   { timestamps: true }
 );

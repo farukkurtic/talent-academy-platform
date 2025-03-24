@@ -3,6 +3,7 @@ const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcrypt");
 const { getGfsBucket } = require("../config/db");
 const stream = require("stream");
+const mongoose = require("mongoose");
 
 const getUsers = async (filter, options) => {
   try {
@@ -89,6 +90,10 @@ const createUser = async ({ email, password }) => {
 
 const getUserById = async (userId) => {
   try {
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      throw new ApiError(400, "Invalid user ID");
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       throw new ApiError(404, "User not found");

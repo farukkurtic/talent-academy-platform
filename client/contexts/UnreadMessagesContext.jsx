@@ -25,7 +25,6 @@ export const UnreadMessagesProvider = ({ children }) => {
     const decoded = jwtDecode(token);
     const currentUser = decoded.id;
 
-    // Handle real-time messages
     const handleMessage = (message) => {
       if (message.receiver === currentUser) {
         setUnreadMessages((prev) => ({

@@ -1,34 +1,26 @@
 const { status } = require("http-status");
-const { Post, Comment } = require("../models"); // Ensure Comment is imported
+const { Post, Comment } = require("../models");
 const ApiError = require("../utils/ApiError");
 const { getGfsBucket } = require("../config/db");
 const stream = require("stream");
 
-// Add a comment to a post
 const addComment = async (postId, userId, text) => {
   const post = await Post.findById(postId);
   if (!post) throw new ApiError(404, "Post not found");
 
-  // Create a new comment
   const newComment = new Comment({
     userId,
     text,
     postId,
   });
 
-  // Save the new comment
   await newComment.save();
-
-  // Push only the ObjectId of the new comment into the Post's comments array
   post.comments.push(newComment._id);
-
-  // Save the updated Post document
   await post.save();
 
   return newComment;
 };
 
-// Add a reply to a comment
 const addReply = async (commentId, userId, text) => {
   const parentComment = await Comment.findById(commentId);
   if (!parentComment) throw new ApiError(404, "Parent comment not found");
@@ -41,14 +33,12 @@ const addReply = async (commentId, userId, text) => {
   });
 
   await newReply.save();
-
   parentComment.replies.push(newReply._id);
   await parentComment.save();
 
   return newReply;
 };
 
-// Like a comment
 const likeComment = async (commentId, userId) => {
   const comment = await Comment.findById(commentId);
   if (!comment) throw new ApiError(404, "Comment not found");
@@ -99,8 +89,8 @@ const getPosts = async () => {
       .populate({
         path: "comments",
         populate: {
-          path: "replies",
-          model: "Comment",
+          path: "userId",
+          select: "firstName lastName image",
         },
       })
       .sort({ createdAt: -1 });

@@ -1,5 +1,6 @@
 const express = require("express");
 const { feedController } = require("../controllers");
+const { feedService } = require("../services");
 const multer = require("multer");
 const { getGfsBucket } = require("../config/db");
 const mongoose = require("mongoose");
@@ -12,19 +13,25 @@ const upload = multer({ storage });
 
 const router = express.Router();
 
-router.post("/:postId/comments", authMiddleware, async (req, res) => {
+router.post("/:postId/comment", authMiddleware, async (req, res) => {
   try {
-    const { postId } = req.params;
     const { userId, text } = req.body;
+    const { postId } = req.params;
 
-    // Call the addComment function
     const comment = await feedService.addComment(postId, userId, text);
 
-    // Return the new comment
-    res.status(201).json({ comment });
+    const userResponse = await axios.get(
+      `http://localhost:5000/api/user/id/${userId}`
+    );
+    const user = userResponse.data.user;
+
+    res.status(201).json({
+      ...comment.toObject(),
+      user,
+    });
   } catch (err) {
     console.error("Error adding comment:", err);
-    res.status(500).json({ error: "Failed to add comment" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 router.post("/:commentId/replies", authMiddleware, feedController.addReply);
@@ -119,25 +126,35 @@ router.post("/:postId/comment", authMiddleware, async (req, res) => {
 
 router.get("/:postId/comments", async (req, res) => {
   try {
-    const post = await Post.findById(req.params.postId);
+    const post = await Post.findById(req.params.postId).populate({
+      path: "comments",
+      populate: [
+        {
+          path: "userId",
+          select: "firstName lastName image major",
+        },
+        {
+          path: "replies",
+          populate: {
+            path: "userId",
+            select: "firstName lastName image major",
+          },
+        },
+      ],
+    });
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    const commentsWithUserDetails = await Promise.all(
-      post.comments.map(async (comment) => {
-        const userResponse = await axios.get(
-          `http://localhost:5000/api/user/id/${comment.userId}`
-        );
-        const user = userResponse.data.user;
-
-        return {
-          ...comment.toObject(),
-          user,
-        };
-      })
-    );
+    const commentsWithUserDetails = post.comments.map((comment) => ({
+      ...comment.toObject(),
+      user: comment.userId,
+      replies: comment.replies.map((reply) => ({
+        ...reply.toObject(),
+        user: reply.userId,
+      })),
+    }));
 
     res.status(200).json(commentsWithUserDetails);
   } catch (err) {
@@ -145,5 +162,4 @@ router.get("/:postId/comments", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 module.exports = router;

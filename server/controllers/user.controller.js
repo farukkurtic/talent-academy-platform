@@ -53,7 +53,9 @@ const getUsersByName = catchAsync(async (req, res) => {
 
 const getUser = catchAsync(async (req, res) => {
   try {
-    const user = await userService.getUserById(req.params.userID);
+    const { userID } = req.params;
+
+    const user = await userService.getUserById(userID);
     res.status(status.OK).json({ user });
   } catch (err) {
     console.error("Error:", err);

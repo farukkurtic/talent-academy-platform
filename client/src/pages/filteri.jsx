@@ -294,7 +294,7 @@ export default function Filters() {
           <h3 className="text-xl font-semibold mb-5 tracking-wider">
             Generacija
           </h3>
-          {["2024"].map((year) => (
+          {["2024", "2025"].map((year) => (
             <label
               key={year}
               className="flex items-center mb-4 border border-1 p-2 rounded-full w-3/4"
@@ -494,7 +494,7 @@ export default function Filters() {
               <h3 className="text-xl font-semibold mb-5 tracking-wider">
                 Generacija
               </h3>
-              {["2024"].map((year) => (
+              {["2024", "2025"].map((year) => (
                 <label
                   key={year}
                   className="flex items-center mb-4 border border-1 p-2 rounded-full w-3/4"
