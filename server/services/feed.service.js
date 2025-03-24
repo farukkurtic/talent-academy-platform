@@ -54,32 +54,58 @@ const likeComment = async (commentId, userId) => {
 };
 
 const createPost = async (postBody) => {
-  const { text, gif, image, userId } = postBody;
+  const { text, gifs, images, userId } = postBody;
 
   try {
+    console.log("Creating post with:", {
+      text: text?.length,
+      gifs: gifs?.length,
+      images: images?.length,
+    });
+
     const newPost = new Post({
       userId,
       content: text,
-      image: null,
-      gif: gif || "",
+      images: [],
+      gifs: gifs || [],
       likes: [],
       comments: [],
     });
 
     const savedPost = await newPost.save();
+    console.log("Post saved, ID:", savedPost._id);
 
-    if (image) {
-      const imageId = await uploadImageToGridFS(image, savedPost._id);
-      savedPost.image = imageId;
+    if (images?.length > 0) {
+      console.log(`Uploading ${images.length} images...`);
+      const uploadPromises = images.map((image, index) => {
+        console.log(
+          `Uploading image ${index}:`,
+          image.originalname,
+          image.mimetype
+        );
+        return uploadImageToGridFS(image, savedPost._id)
+          .then((id) => {
+            console.log(`Image ${index} uploaded successfully, ID:`, id);
+            return id;
+          })
+          .catch((err) => {
+            console.error(`Error uploading image ${index}:`, err);
+            throw err;
+          });
+      });
+
+      const imageIds = await Promise.all(uploadPromises);
+      console.log("All images uploaded, IDs:", imageIds);
+
+      savedPost.images = imageIds;
       await savedPost.save();
+      console.log("Post updated with image references");
     }
 
     return savedPost;
   } catch (err) {
-    console.error("Error in createPost:", err);
-    throw err instanceof ApiError
-      ? err
-      : new ApiError(500, "Došlo je do greške na serveru");
+    console.error("Error in createPost service:", err);
+    throw err;
   }
 };
 
@@ -95,7 +121,7 @@ const getPosts = async () => {
       })
       .sort({ createdAt: -1 });
 
-    return posts;
+    return posts.map((post) => post.toObject());
   } catch (err) {
     console.error("Error in getPosts:", err);
     throw new ApiError(500, "Failed to fetch posts");

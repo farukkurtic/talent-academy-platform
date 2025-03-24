@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Image, SearchIcon, ImagePlay, X } from "lucide-react";
@@ -8,13 +10,12 @@ import axios from "axios";
 
 const gf = new GiphyFetch("czM41rghaxLbQ1BT2TP9HOHpk8AfzxfW");
 
-// eslint-disable-next-line react/prop-types
 const CreatePost = ({ userId, refreshFeed }) => {
   const { register, handleSubmit, setValue, reset } = useForm();
   const [postContent, setPostContent] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [selectedGif, setSelectedGif] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [selectedGifs, setSelectedGifs] = useState([]);
   const [isGifModalOpen, setIsGifModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const textareaRef = useRef(null);
@@ -25,7 +26,15 @@ const CreatePost = ({ userId, refreshFeed }) => {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
-  }, [postContent, selectedImage, selectedGif, searchQuery]);
+  }, [postContent, selectedImages, selectedGifs, searchQuery]);
+
+  const getMediaGridClass = () => {
+    const totalMedia = selectedImages.length + selectedGifs.length;
+    if (totalMedia === 0) return "";
+    if (totalMedia === 1) return "w-full";
+    if (totalMedia === 2) return "grid grid-cols-2 gap-2";
+    return "grid grid-cols-2 gap-2";
+  };
 
   const openGifModal = () => setIsGifModalOpen(true);
   const closeGifModal = () => {
@@ -40,55 +49,78 @@ const CreatePost = ({ userId, refreshFeed }) => {
   };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setImageFile(file);
-      setSelectedImage(URL.createObjectURL(file));
-    } else {
+    const files = Array.from(e.target.files);
+    const validImages = files.filter((file) => file.type.startsWith("image/"));
+
+    if (validImages.length === 0) {
       alert("Molimo odaberite sliku.");
       e.target.value = "";
+      return;
     }
+
+    const newImageFiles = [...imageFiles, ...validImages];
+    const newImagePreviews = [
+      ...selectedImages,
+      ...validImages.map((file) => URL.createObjectURL(file)),
+    ];
+
+    setImageFiles(newImageFiles);
+    setSelectedImages(newImagePreviews);
+    e.target.value = "";
   };
 
-  const handleRemoveImage = () => {
-    setSelectedImage(null);
-    setImageFile(null);
-    fileInputRef.current.value = "";
+  const handleRemoveImage = (index) => {
+    const newImages = [...selectedImages];
+    const newFiles = [...imageFiles];
+
+    newImages.splice(index, 1);
+    newFiles.splice(index, 1);
+
+    setSelectedImages(newImages);
+    setImageFiles(newFiles);
+  };
+
+  const handleRemoveGif = (index) => {
+    const newGifs = [...selectedGifs];
+    newGifs.splice(index, 1);
+    setSelectedGifs(newGifs);
   };
 
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("text", data.text);
-    if (imageFile) formData.append("image", imageFile);
-    if (selectedGif) formData.append("gif", selectedGif);
+
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    formData.append("gifs", JSON.stringify(selectedGifs));
     formData.append("userId", userId);
 
     try {
-      // eslint-disable-next-line no-unused-vars
       const response = await axios.post(
         "http://localhost:5000/api/posts",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
       );
 
-      setSelectedImage(null);
-      setImageFile(null);
-      setSelectedGif(null);
+      setSelectedImages([]);
+      setImageFiles([]);
+      setSelectedGifs([]);
       setPostContent("");
       reset({ text: "" });
+
       if (textareaRef.current) {
         textareaRef.current.value = "";
+        textareaRef.current.style.height = "auto";
       }
+
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+
       refreshFeed();
     } catch (err) {
-      console.log("Error creating post:", err);
+      console.error("Error creating post:", err.response?.data || err.message);
     }
   };
 
@@ -105,43 +137,47 @@ const CreatePost = ({ userId, refreshFeed }) => {
             setPostContent(e.target.value.trim());
           }}
         />
-        <div
-          className={`mt-2 flex gap-3 ${
-            selectedImage && selectedGif ? "flex-row" : "flex-col"
-          }`}
-        >
-          {selectedImage && (
-            <div className={`${selectedGif ? "w-1/2" : "w-full"} relative`}>
+        <div className={`mt-2 ${getMediaGridClass()}`}>
+          {selectedImages.map((image, index) => (
+            <div key={`image-${index}`} className="relative">
               <img
-                src={selectedImage}
-                alt="Selected"
-                className="w-full rounded-lg"
+                src={image}
+                alt={`Selected ${index}`}
+                className={`${
+                  selectedImages.length + selectedGifs.length === 1
+                    ? "w-full"
+                    : "w-full h-40"
+                } object-cover rounded-lg`}
               />
               <button
                 type="button"
-                onClick={handleRemoveImage}
+                onClick={() => handleRemoveImage(index)}
                 className="absolute top-2 right-2 bg-gray-700 text-white rounded-full p-1 hover:bg-gray-800"
               >
                 <X size={18} />
               </button>
             </div>
-          )}
-          {selectedGif && (
-            <div className={`${selectedImage ? "w-1/2" : "w-full"} relative`}>
+          ))}
+          {selectedGifs.map((gif, index) => (
+            <div key={`gif-${index}`} className="relative">
               <img
-                src={selectedGif}
-                alt="Selected GIF"
-                className="w-full rounded-lg"
+                src={gif}
+                alt={`Selected GIF ${index}`}
+                className={`${
+                  selectedImages.length + selectedGifs.length === 1
+                    ? "w-full"
+                    : "w-full h-40"
+                } object-cover rounded-lg`}
               />
               <button
                 type="button"
-                onClick={() => setSelectedGif(null)}
+                onClick={() => handleRemoveGif(index)}
                 className="absolute top-2 right-2 bg-gray-700 text-white rounded-full p-1 hover:bg-gray-800"
               >
                 <X size={18} />
               </button>
             </div>
-          )}
+          ))}
         </div>
         <div className="flex items-center gap-3 mt-3">
           <label className="cursor-pointer">
@@ -152,6 +188,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
               accept="image/*"
               className="hidden"
               onChange={handleImageUpload}
+              multiple
             />
           </label>
           <button type="button" onClick={openGifModal}>
@@ -159,8 +196,12 @@ const CreatePost = ({ userId, refreshFeed }) => {
           </button>
           <button
             type="submit"
-            className="bg-primary text-black p-2 rounded-full ml-auto w-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!postContent}
+            className="bg-primary text-white p-2 rounded-full ml-auto w-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={
+              !postContent &&
+              selectedImages.length === 0 &&
+              selectedGifs.length === 0
+            }
           >
             Objavi
           </button>
@@ -192,7 +233,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
             fetchGifs={fetchGifs}
             onGifClick={(gif, e) => {
               e.preventDefault();
-              setSelectedGif(gif.images.fixed_width.url);
+              setSelectedGifs([...selectedGifs, gif.images.fixed_width.url]);
               closeGifModal();
             }}
           />

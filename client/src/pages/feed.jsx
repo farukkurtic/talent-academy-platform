@@ -153,12 +153,8 @@ export default function Feed() {
               firstName={post.user?.firstName || "Unknown"}
               lastName={post.user?.lastName || "User"}
               content={post.content}
-              picture={
-                post?.image
-                  ? `http://localhost:5000/api/posts/image/${post?.image}`
-                  : null
-              }
-              gif={post.gif}
+              picture={post.images}
+              gif={post.gifs}
               badge={post.badge}
               likes={post.likes}
               postId={post._id}

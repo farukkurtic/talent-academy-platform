@@ -20,14 +20,18 @@ const PostSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "fs.files",
-    },
-    gif: {
-      type: String,
-      default: "",
-    },
+    images: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "fs.files",
+      },
+    ],
+    gifs: [
+      {
+        type: String,
+        default: "",
+      },
+    ],
   },
   { timestamps: true }
 );

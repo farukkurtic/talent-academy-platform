@@ -4,20 +4,35 @@ const { feedService } = require("../services");
 
 const createPost = catchAsync(async (req, res) => {
   try {
-    const { text, gif, userId } = req.body;
-    const imageFile = req.file;
+    console.log("Received files:", req.files);
+    console.log("Received body:", req.body);
+
+    const { text, userId } = req.body;
+    const imageFiles = req.files || [];
+
+    let gifs = [];
+    try {
+      gifs = req.body.gifs ? JSON.parse(req.body.gifs) : [];
+    } catch (e) {
+      console.error("Error parsing GIFs:", e);
+      gifs = [];
+    }
+
+    if (!text?.trim() && imageFiles.length === 0 && gifs.length === 0) {
+      return res.status(400).send("Post must contain text, images, or GIFs");
+    }
 
     const post = await feedService.createPost({
-      text,
-      gif,
-      image: imageFile,
+      text: text?.trim(),
+      gifs,
+      images: imageFiles,
       userId,
     });
 
-    res.status(status.CREATED).json({ post });
+    res.status(201).json({ post });
   } catch (err) {
-    console.log("Error:", err);
-    res.status(status.INTERNAL_SERVER_ERROR).send("Failed to create post");
+    console.error("Error in createPost controller:", err);
+    res.status(500).send(err.message || "Failed to create post");
   }
 });
 

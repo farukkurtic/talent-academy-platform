@@ -317,6 +317,20 @@ export default function Post({
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
+  const getMediaDisplayClass = () => {
+    const totalMedia = (picture?.length || 0) + (gif?.length || 0);
+    if (totalMedia === 0) return "";
+    if (totalMedia === 1) return "w-full";
+    if (totalMedia === 2) return "grid grid-cols-2 gap-2";
+    return "grid grid-cols-2 gap-2";
+  };
+
+  const allMedia = [
+    ...(picture?.map((img) => `http://localhost:5000/api/posts/image/${img}`) ||
+      []),
+    ...(gif || []),
+  ];
+
   return (
     <div className="text-white w-xs lg:w-md border rounded-3xl p-5 mb-10 relative">
       <div className="w-full flex items-center mb-3">
@@ -359,34 +373,43 @@ export default function Post({
       <div className="w-full mb-3">
         <p className="text-sm tracking-wider break-words">{content}</p>
       </div>
-      {(picture || gif) && (
-        <div
-          className={`w-full flex gap-2 ${
-            picture && gif ? "flex-row" : "flex-col"
-          }`}
-        >
-          {picture && (
+      <div className={`mt-3 ${getMediaDisplayClass()}`}>
+        {picture?.map((img, index) => (
+          <div key={`img-${index}`} className="relative">
             <img
               crossOrigin="anonymous"
-              src={picture}
-              className={gif ? "w-1/2 rounded-lg" : "w-full rounded-lg"}
-              alt="Uploaded Image"
-              onClick={() => openModal(picture)}
+              src={`http://localhost:5000/api/posts/image/${img}`}
+              className={`${
+                picture.length + (gif?.length || 0) === 1
+                  ? "w-full"
+                  : "w-full h-40"
+              } object-cover rounded-lg`}
+              alt={`Post image ${index}`}
+              onClick={() =>
+                openModal(`http://localhost:5000/api/posts/image/${img}`)
+              }
               style={{ cursor: "pointer" }}
             />
-          )}
-          {gif && (
+          </div>
+        ))}
+
+        {gif?.map((gifUrl, index) => (
+          <div key={`gif-${index}`} className="relative">
             <img
               crossOrigin="anonymous"
-              src={gif}
-              className={picture ? "w-1/2 rounded-lg" : "w-full rounded-lg"}
-              alt="Uploaded GIF"
-              onClick={() => openModal(gif)}
+              src={gifUrl}
+              className={`${
+                gif.length + (picture?.length || 0) === 1
+                  ? "w-full"
+                  : "w-full h-40"
+              } object-cover rounded-lg`}
+              alt={`Post GIF ${index}`}
+              onClick={() => openModal(gifUrl)}
               style={{ cursor: "pointer" }}
             />
-          )}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
       {postUserId === currentUserId && (
         <div className="absolute top-8 right-10">
           <button onClick={() => setMenuOpen(!menuOpen)}>
@@ -408,22 +431,22 @@ export default function Post({
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center bg-transparent"
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75"
         ariaHideApp={false}
       >
-        <div className="bg-black p-4 rounded-lg relative">
+        <div className="relative max-w-4xl w-full">
           <button
             onClick={closeModal}
-            className="absolute top-5 right-5 p-1 rounded-full bg-gray-200 transition-colors"
+            className="absolute top-4 right-4 z-50 p-2 rounded-full bg-gray-800 text-white"
           >
-            <X size={24} className="text-gray-700" />
+            <X size={24} />
           </button>
           {selectedImage && (
             <img
               crossOrigin="anonymous"
               src={selectedImage}
-              alt="Expanded"
-              className="max-w-full max-h-[90vh] rounded-lg"
+              alt="Expanded media"
+              className="max-w-full max-h-[90vh] mx-auto rounded-lg"
             />
           )}
         </div>
@@ -766,7 +789,7 @@ export default function Post({
                       replyTextareaRef.current.style.height = "40px";
                     }
                   }}
-                  className="mt-5 flex items-center justify-center gap-2"
+                  className="mt-5 lg:flex lg:items-center lg:justify-center gap-2"
                 >
                   <textarea
                     name="reply"
@@ -779,7 +802,7 @@ export default function Post({
                   />
                   <button
                     type="submit"
-                    className="bg-primary p-2 rounded-lg text-white hover:bg-opacity-80 cursor-pointer"
+                    className="bg-primary p-2 rounded-lg text-white hover:bg-opacity-80 cursor-pointer w-full lg:w-auto mt-2 lg:mt-0"
                   >
                     Odgovori
                   </button>

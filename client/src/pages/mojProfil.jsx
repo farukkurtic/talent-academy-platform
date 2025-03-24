@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import axios from "axios";
+import Modal from "react-modal";
 
 import {
   MessageSquare,
@@ -16,6 +17,7 @@ import {
   Twitter,
   Linkedin,
   Globe,
+  X,
 } from "lucide-react";
 
 import hntaLogo from "../assets/logos/hnta-logo.png";
@@ -63,6 +65,7 @@ export default function MyProfile() {
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [bioLength, setBioLength] = useState(0);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const {
     register,
@@ -93,6 +96,14 @@ export default function MyProfile() {
   useEffect(() => {
     setBioLength(biography.length);
   }, [biography]);
+
+  const openProfileModal = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const closeProfileModal = () => {
+    setIsProfileModalOpen(false);
+  };
 
   const getIcon = (platform) => {
     switch (platform) {
@@ -138,8 +149,6 @@ export default function MyProfile() {
       setSearchResults([]);
     }
   };
-
-  const openModal = () => setIsModalOpen(true);
 
   const [profileImage, setProfileImage] = useState(null);
 
@@ -251,6 +260,32 @@ export default function MyProfile() {
 
   return (
     <div className="text-white min-h-screen relative flex flex-col lg:flex-row lg:items-center lg:justify-center">
+      <Modal
+        isOpen={isProfileModalOpen}
+        onRequestClose={closeProfileModal}
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75"
+        ariaHideApp={false}
+      >
+        <div className="relative max-w-4xl w-full">
+          <button
+            onClick={closeProfileModal}
+            className="absolute top-5 right-5 p-1 rounded-full bg-gray-800 text-white"
+          >
+            <X size={24} />
+          </button>
+          <img
+            crossOrigin="anonymous"
+            src={
+              imagePreviewUrl ||
+              (userData?.image
+                ? `http://localhost:5000/api/posts/image/${userData?.image}`
+                : defaultPic)
+            }
+            alt="Expanded profile"
+            className="max-w-full max-h-[90vh] mx-auto rounded-lg"
+          />
+        </div>
+      </Modal>
       <div className="lg:hidden fixed top-0 left-0 right-0 p-4 flex justify-between items-center border-b border-gray-700 z-50 bg-black">
         <a href="/feed">
           <div className="flex items-center">
@@ -512,7 +547,7 @@ export default function MyProfile() {
               onClick={
                 isEditing
                   ? () => document.getElementById("profile-image-input").click()
-                  : openModal
+                  : openProfileModal
               }
             />
             {isEditing && (
