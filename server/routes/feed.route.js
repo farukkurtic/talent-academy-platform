@@ -9,7 +9,13 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const axios = require("axios");
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 10,
+  },
+});
 
 const router = express.Router();
 
@@ -40,7 +46,7 @@ router.post(
   authMiddleware,
   feedController.likeComment
 );
-router.post("/", upload.single("image"), feedController.createPost);
+router.post("/", upload.array("images"), feedController.createPost);
 router.get("/", feedController.getPosts);
 router.post("/:postId/like", feedController.postReact);
 router.post("/:postId/unlike", feedController.postUnreact);

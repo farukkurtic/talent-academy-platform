@@ -351,7 +351,7 @@ export default function Profile() {
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center bg-transparent"
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75"
         ariaHideApp={false}
       >
         <div className="bg-black p-4 rounded-lg relative">
