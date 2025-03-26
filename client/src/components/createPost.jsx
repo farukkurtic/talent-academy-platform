@@ -8,7 +8,7 @@ import { Grid } from "@giphy/react-components";
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import axios from "axios";
 
-const gf = new GiphyFetch("czM41rghaxLbQ1BT2TP9HOHpk8AfzxfW");
+const gf = new GiphyFetch(import.meta.env.VITE_GIPHY_KEY);
 
 const CreatePost = ({ userId, refreshFeed }) => {
   const { register, handleSubmit, setValue, reset } = useForm();
