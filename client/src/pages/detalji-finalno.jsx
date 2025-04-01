@@ -12,7 +12,15 @@ import defaultPic from "../assets/defaults/defaultPic.svg";
 
 import { X, Instagram, Facebook, Twitter, Linkedin, Globe } from "lucide-react";
 
+// Updated schema with required image validation
 const schema = yup.object().shape({
+  image: yup
+    .mixed()
+    .required("Profilna slika je obavezna")
+    .test("fileType", "Molimo odaberite sliku", (value) => {
+      if (!value) return false;
+      return value && value.type.startsWith("image/");
+    }),
   instagram: yup.string().url("URL format nije ispravan").nullable(),
   facebook: yup.string().url("URL format nije ispravan").nullable(),
   twitter: yup.string().url("URL format nije ispravan").nullable(),
@@ -23,11 +31,21 @@ const schema = yup.object().shape({
 export default function DetaljiFinalno() {
   const [userId, setUserId] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const fromRegister = location.state?.from === "profil-detalji";
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -49,42 +67,44 @@ export default function DetaljiFinalno() {
     }
   }, [fromRegister, navigate, userId]);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
-      setImageFile(file);
       setSelectedImage(URL.createObjectURL(file));
+      setValue("image", file); // Set value for form validation
+      clearErrors("image"); // Clear any previous errors
     } else {
-      alert("Molimo odaberite sliku.");
+      setError("image", {
+        type: "manual",
+        message: "Molimo odaberite ispravnu sliku",
+      });
       e.target.value = "";
     }
   };
 
   const handleRemoveImage = () => {
     setSelectedImage(null);
-    setImageFile(null);
+    setValue("image", null); // Reset form value
     fileInputRef.current.value = "";
+    setError("image", {
+      type: "manual",
+      message: "Profilna slika je obavezna",
+    });
   };
 
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-      const linksArray = Object.entries(data).map(([key, value]) => ({
-        platform: key,
-        url: value,
-      }));
+      const linksArray = Object.entries(data)
+        .filter(([key]) => key !== "image")
+        .map(([key, value]) => ({
+          platform: key,
+          url: value,
+        }));
+
       formData.append("links", JSON.stringify(linksArray));
-      if (imageFile) {
-        formData.append("image", imageFile);
-      }
+      formData.append("image", data.image);
+
       const response = await axios.put(
         `http://localhost:5000/api/user/${userId}/details`,
         formData,
@@ -94,6 +114,7 @@ export default function DetaljiFinalno() {
           },
         }
       );
+
       if (response.status === 200) {
         navigate("/feed");
       } else {
@@ -106,6 +127,7 @@ export default function DetaljiFinalno() {
 
   return (
     <div className="text-white flex flex-col lg:flex-row min-h-screen">
+      {/* Left box remains the same */}
       <div className="left-box w-full lg:w-1/2 flex items-center justify-center">
         <img
           src={doorIcon}
@@ -113,6 +135,8 @@ export default function DetaljiFinalno() {
           className="w-3xs h-3xs lg:w-5/6 lg:h-5/6"
         />
       </div>
+
+      {/* Right box with form */}
       <div className="right-box w-full lg:w-1/2 flex flex-col lg:items-start justify-center lg:overflow-y-auto">
         <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-start mt-10 lg:mt-60 xl:mt-10 mb-10 px-4">
           <img
@@ -129,12 +153,15 @@ export default function DetaljiFinalno() {
             </p>
           </div>
         </div>
+
         <div className="w-full flex items-center justify-center p-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="w-full flex flex-col items-center"
+            noValidate
           >
-            <div className="relative mb-15">
+            {/* Profile image upload section */}
+            <div className="relative mb-4">
               {selectedImage ? (
                 <div className="relative">
                   <img
@@ -166,7 +193,15 @@ export default function DetaljiFinalno() {
                   </p>
                 </label>
               )}
+              {/* Error message for image */}
+              {errors.image && (
+                <p className="text-red-500 text-sm mt-2 text-center">
+                  {errors.image.message}
+                </p>
+              )}
             </div>
+
+            {/* Social links inputs */}
             <div className="mt-6 w-4/5 lg:w-3/5 grid grid-cols-1 lg:grid-cols-2 gap-4">
               {[
                 {
@@ -197,13 +232,15 @@ export default function DetaljiFinalno() {
                   )}
                 </div>
               ))}
-              <button
-                type="submit"
-                className="w-full bg-primary text-white p-3 rounded-full font-semibold tracking-wider cursor-pointer mt-5 lg:mt-0"
-              >
-                Završi
-              </button>
+
+              {/* Submit button */}
             </div>
+            <button
+              type="submit"
+              className="w-4/5 lg:w-2/3 bg-primary text-white p-3 rounded-full font-semibold tracking-wider cursor-pointer mt-5 lg:mt-5"
+            >
+              Završi
+            </button>
           </form>
         </div>
       </div>
