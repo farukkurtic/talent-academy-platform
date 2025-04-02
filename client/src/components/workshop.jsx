@@ -4,6 +4,8 @@ import axios from "axios";
 
 import defaultPic from "../assets/logos/textLogo.svg";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Workshop({
   imageId,
   title,
