@@ -9,6 +9,7 @@ import { GiphyFetch } from "@giphy/js-fetch-api";
 import axios from "axios";
 
 const gf = new GiphyFetch(import.meta.env.VITE_GIPHY_KEY);
+const API_URL = import.meta.env.VITE_API_URL;
 
 const CreatePost = ({ userId, refreshFeed }) => {
   const { register, handleSubmit, setValue, reset } = useForm();
@@ -98,10 +99,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
     formData.append("userId", userId);
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/posts",
-        formData
-      );
+      const response = await axios.post(`${API_URL}/api/posts`, formData);
 
       setSelectedImages([]);
       setImageFiles([]);

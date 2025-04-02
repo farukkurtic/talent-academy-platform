@@ -24,6 +24,8 @@ import muzika from "../assets/badges/muzickaProdukcija.svg";
 
 import defaultPic from "../assets/defaults/defaultPic.svg";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Radionice() {
   const [userId, setUserId] = useState(null);
   const [workshops, setWorkshops] = useState([]);
@@ -52,7 +54,7 @@ export default function Radionice() {
 
   const fetchWorkshops = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/workshop");
+      const response = await axios.get(`${API_URL}/api/workshop`);
       setWorkshops(response.data.workshop);
     } catch (err) {
       console.error("Error fetching workshops:", err);
@@ -72,7 +74,7 @@ export default function Radionice() {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {
@@ -149,7 +151,7 @@ export default function Radionice() {
                         crossOrigin="anonymous"
                         src={
                           user?.image
-                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            ? `${API_URL}/api/posts/image/${user?.image}`
                             : defaultPic
                         }
                         alt={`${user.firstName} ${user.lastName}`}
@@ -251,7 +253,7 @@ export default function Radionice() {
                           crossOrigin="anonymous"
                           src={
                             user?.image
-                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              ? `${API_URL}/api/posts/image/${user?.image}`
                               : defaultPic
                           }
                           alt={`${user.firstName} ${user.lastName}`}

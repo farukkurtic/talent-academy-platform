@@ -19,6 +19,8 @@ import line2 from "../assets/lines/s2.svg";
 
 import { MessageSquare, GraduationCap, UserPen, Menu } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Filters() {
   const [userId, setUserId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +51,7 @@ export default function Filters() {
 
   const fetchAllUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/user/");
+      const response = await axios.get(`${API_URL}/api/user/`);
       setAllUsers(response.data.users);
       setFilteredUsers(response.data.users.results);
     } catch (err) {
@@ -62,7 +64,7 @@ export default function Filters() {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {
@@ -108,7 +110,7 @@ export default function Filters() {
         queryParams.append("yearOfAttend", filters.yearOfAttend);
       }
       const response = await axios.get(
-        `http://localhost:5000/api/user/filter?${queryParams.toString()}`
+        `${API_URL}/api/user/filter?${queryParams.toString()}`
       );
       setFilteredUsers(response.data.users);
     } catch (err) {
@@ -166,7 +168,7 @@ export default function Filters() {
                         crossOrigin="anonymous"
                         src={
                           user?.image
-                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            ? `${API_URL}/api/posts/image/${user?.image}`
                             : defaultPic
                         }
                         alt={`${user.firstName} ${user.lastName}`}
@@ -337,7 +339,7 @@ export default function Filters() {
                   crossOrigin="anonymous"
                   src={
                     user?.image
-                      ? `http://localhost:5000/api/posts/image/${user?.image}`
+                      ? `${API_URL}/api/posts/image/${user?.image}`
                       : defaultPic
                   }
                   alt={`${user.firstName} ${user.lastName}`}
@@ -406,7 +408,7 @@ export default function Filters() {
                           crossOrigin="anonymous"
                           src={
                             user?.image
-                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              ? `${API_URL}/api/posts/image/${user?.image}`
                               : defaultPic
                           }
                           alt={`${user.firstName} ${user.lastName}`}

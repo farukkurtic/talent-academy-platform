@@ -3,7 +3,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:5000", { transports: ["websocket"] });
+const socket = io("${API_URL}", { transports: ["websocket"] });
 
 const UnreadMessagesContext = createContext();
 

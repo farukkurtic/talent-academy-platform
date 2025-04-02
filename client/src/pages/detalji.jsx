@@ -30,6 +30,8 @@ const schema = yup.object().shape({
     .max(500, "Biografija ne smije biti duža od 500 karaktera"),
 });
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function ProfileDetails() {
   const [userId, setUserId] = useState(null);
   const [bioLength, setBioLength] = useState(0);
@@ -81,10 +83,7 @@ export default function ProfileDetails() {
         ...data,
         _id: userId,
       };
-      const response = await axios.put(
-        "http://localhost:5000/api/user",
-        newObj
-      );
+      const response = await axios.put(`${API_URL}/api/user`, newObj);
       if (response.status === 200) {
         navigate("/profil-detalji-dodatno", {
           state: { from: "profil-detalji" },

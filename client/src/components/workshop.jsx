@@ -17,9 +17,7 @@ export default function Workshop({
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/api/user/id/${createdBy}`
-        );
+        const response = await axios.get(`${API_URL}/api/user/id/${createdBy}`);
         const { firstName, lastName } = response.data.user;
         setUserName(`${firstName} ${lastName}`);
       } catch (err) {
@@ -48,7 +46,7 @@ export default function Workshop({
       ) : (
         <img
           crossOrigin="anonymous"
-          src={`http://localhost:5000/api/posts/image/${imageId}`}
+          src={`${API_URL}/api/posts/image/${imageId}`}
           alt={title}
           className="w-full h-48 object-cover"
         />

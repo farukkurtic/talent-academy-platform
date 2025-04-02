@@ -14,6 +14,8 @@ const schema = yup.object().shape({
   password: yup.string().required("Ovo polje je obavezno"),
 });
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
@@ -31,10 +33,7 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/prijava",
-        data
-      );
+      const response = await axios.post(`${API_URL}/api/auth/prijava`, data);
 
       if (response.status === 201) {
         localStorage.setItem("token", response.data.token);

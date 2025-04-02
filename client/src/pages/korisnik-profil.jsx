@@ -30,6 +30,8 @@ import graficki from "../assets/badges/grafickiDizajn.svg";
 import novinarstvo from "../assets/badges/novinarstvo.svg";
 import muzika from "../assets/badges/muzickaProdukcija.svg";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Profile() {
   const badges = {
     "Odgovorno kodiranje": kodiranje,
@@ -63,7 +65,7 @@ export default function Profile() {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {
@@ -88,9 +90,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/api/user/id/${paramsId}`
-        );
+        const response = await axios.get(`${API_URL}/api/user/id/${paramsId}`);
         setUserData(response.data.user);
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -169,7 +169,7 @@ export default function Profile() {
                         crossOrigin="anonymous"
                         src={
                           user?.image
-                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            ? `${API_URL}/api/posts/image/${user?.image}`
                             : defaultPic
                         }
                         alt={`${user.firstName} ${user.lastName}`}
@@ -271,7 +271,7 @@ export default function Profile() {
                           crossOrigin="anonymous"
                           src={
                             user?.image
-                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              ? `${API_URL}/api/posts/image/${user?.image}`
                               : defaultPic
                           }
                           alt={`${user.firstName} ${user.lastName}`}
@@ -363,7 +363,7 @@ export default function Profile() {
           </button>
           <img
             crossOrigin="anonymous"
-            src={`http://localhost:5000/api/posts/image/${userData?.image}`}
+            src={`${API_URL}/api/posts/image/${userData?.image}`}
             alt="Expanded"
             className="max-w-full max-h-[90vh] rounded-lg"
           />
@@ -383,7 +383,7 @@ export default function Profile() {
             crossOrigin="anonymous"
             src={
               userData?.image
-                ? `http://localhost:5000/api/posts/image/${userData?.image}`
+                ? `${API_URL}/api/posts/image/${userData?.image}`
                 : defaultPic
             }
             className="w-40 h-40 mb-10 rounded-full"

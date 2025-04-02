@@ -28,6 +28,8 @@ import muzika from "../assets/badges/muzickaProdukcija.svg";
 
 Modal.setAppElement("#root");
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function WorkshopDetails() {
   const { workshopId } = useParams();
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ export default function WorkshopDetails() {
     const fetchWorkshop = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/workshop/${workshopId}`
+          `${API_URL}/api/workshop/${workshopId}`
         );
         setWorkshop(response.data.workshop);
         setCharCount(response.data.workshop.details.length);
@@ -80,9 +82,7 @@ export default function WorkshopDetails() {
 
   const fetchOrganizer = async (organizerId) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/user/id/${organizerId}`
-      );
+      const response = await axios.get(`${API_URL}/api/user/id/${organizerId}`);
       setOrganizer(response.data.user);
     } catch (err) {
       console.error("Error fetching organizer:", err);
@@ -93,9 +93,7 @@ export default function WorkshopDetails() {
     try {
       const attendeesData = await Promise.all(
         attendeeIds.map(async (id) => {
-          const response = await axios.get(
-            `http://localhost:5000/api/user/id/${id}`
-          );
+          const response = await axios.get(`${API_URL}/api/user/id/${id}`);
           return response.data.user;
         })
       );
@@ -107,13 +105,10 @@ export default function WorkshopDetails() {
 
   const handleAttend = async () => {
     try {
-      await axios.post(
-        `http://localhost:5000/api/workshop/${workshopId}/attend`,
-        { userId }
-      );
-      const response = await axios.get(
-        `http://localhost:5000/api/workshop/${workshopId}`
-      );
+      await axios.post(`${API_URL}/api/workshop/${workshopId}/attend`, {
+        userId,
+      });
+      const response = await axios.get(`${API_URL}/api/workshop/${workshopId}`);
       setWorkshop(response.data.workshop);
       fetchAttendees(response.data.workshop.attendes);
     } catch (err) {
@@ -126,7 +121,7 @@ export default function WorkshopDetails() {
     setDateTime(new Date(workshop?.dateOfStart));
     setSelectedImage(
       workshop?.coverImage
-        ? `http://localhost:5000/api/posts/image/${workshop?.coverImage}`
+        ? `${API_URL}/api/posts/image/${workshop?.coverImage}`
         : null
     );
   };
@@ -163,15 +158,11 @@ export default function WorkshopDetails() {
         formData.append("removeCoverImage", "true");
       }
 
-      const response = await axios.put(
-        "http://localhost:5000/api/workshop",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.put(`${API_URL}/api/workshop`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setIsEditing(false);
       setWorkshop(response.data.workshop);
@@ -205,7 +196,7 @@ export default function WorkshopDetails() {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {
@@ -225,7 +216,7 @@ export default function WorkshopDetails() {
   const handleDelete = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/workshop/${workshopId}`
+        `${API_URL}/api/workshop/${workshopId}`
       );
       if (response.status === 200) {
         navigate("/radionice");
@@ -312,7 +303,7 @@ export default function WorkshopDetails() {
                         crossOrigin="anonymous"
                         src={
                           user?.image
-                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            ? `${API_URL}/api/posts/image/${user?.image}`
                             : defaultPic
                         }
                         alt={`${user.firstName} ${user.lastName}`}
@@ -414,7 +405,7 @@ export default function WorkshopDetails() {
                           crossOrigin="anonymous"
                           src={
                             user?.image
-                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              ? `${API_URL}/api/posts/image/${user?.image}`
                               : defaultPic
                           }
                           alt={`${user.firstName} ${user.lastName}`}
@@ -552,7 +543,7 @@ export default function WorkshopDetails() {
             ) : (
               <img
                 crossOrigin="anonymous"
-                src={`http://localhost:5000/api/posts/image/${workshop?.coverImage}`}
+                src={`${API_URL}/api/posts/image/${workshop?.coverImage}`}
                 alt={workshop?.name}
                 className="w-full h-auto object-cover mb-6 rounded-lg"
               />
@@ -613,7 +604,7 @@ export default function WorkshopDetails() {
                     crossOrigin="anonymous"
                     src={
                       organizer?.image
-                        ? `http://localhost:5000/api/posts/image/${organizer.image}`
+                        ? `${API_URL}/api/posts/image/${organizer.image}`
                         : defaultPic
                     }
                     alt={`${organizer?.firstName} ${organizer?.lastName}`}
@@ -646,7 +637,7 @@ export default function WorkshopDetails() {
                         crossOrigin="anonymous"
                         src={
                           attendee.image
-                            ? `http://localhost:5000/api/posts/image/${attendee.image}`
+                            ? `${API_URL}/api/posts/image/${attendee.image}`
                             : defaultPic
                         }
                         alt={`${attendee.firstName} ${attendee.lastName}`}

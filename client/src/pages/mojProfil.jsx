@@ -45,6 +45,8 @@ const validationSchema = Yup.object().shape({
     .required("Ovo polje je obavezno"),
 });
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function MyProfile() {
   const badges = {
     "Odgovorno kodiranje": kodiranje,
@@ -138,7 +140,7 @@ export default function MyProfile() {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {
@@ -176,7 +178,7 @@ export default function MyProfile() {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/id/${currentUserId}`
+          `${API_URL}/api/user/id/${currentUserId}`
         );
         const user = response.data.user;
         reset({
@@ -235,7 +237,7 @@ export default function MyProfile() {
       }
 
       const response = await axios.put(
-        `http://localhost:5000/api/user/${currentUserId}/currentUser`,
+        `${API_URL}/api/user/${currentUserId}/currentUser`,
         formDataToSend,
         {
           headers: {
@@ -278,7 +280,7 @@ export default function MyProfile() {
             src={
               imagePreviewUrl ||
               (userData?.image
-                ? `http://localhost:5000/api/posts/image/${userData?.image}`
+                ? `${API_URL}/api/posts/image/${userData?.image}`
                 : defaultPic)
             }
             alt="Expanded profile"
@@ -344,7 +346,7 @@ export default function MyProfile() {
                         crossOrigin="anonymous"
                         src={
                           user?.image
-                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            ? `${API_URL}/api/posts/image/${user?.image}`
                             : defaultPic
                         }
                         alt={`${user.firstName} ${user.lastName}`}
@@ -446,7 +448,7 @@ export default function MyProfile() {
                           crossOrigin="anonymous"
                           src={
                             user?.image
-                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              ? `${API_URL}/api/posts/image/${user?.image}`
                               : defaultPic
                           }
                           alt={`${user.firstName} ${user.lastName}`}
@@ -539,7 +541,7 @@ export default function MyProfile() {
               src={
                 imagePreviewUrl ||
                 (userData?.image
-                  ? `http://localhost:5000/api/posts/image/${userData?.image}`
+                  ? `${API_URL}/api/posts/image/${userData?.image}`
                   : defaultPic)
               }
               className="w-40 h-40 mb-10 rounded-full cursor-pointer"

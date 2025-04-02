@@ -12,6 +12,8 @@ import defaultPic from "../assets/defaults/defaultPic.svg";
 
 import { X, Instagram, Facebook, Twitter, Linkedin, Globe } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Updated schema with required image validation
 const schema = yup.object().shape({
   image: yup
@@ -106,7 +108,7 @@ export default function DetaljiFinalno() {
       formData.append("image", data.image);
 
       const response = await axios.put(
-        `http://localhost:5000/api/user/${userId}/details`,
+        `${API_URL}/api/user/${userId}/details`,
         formData,
         {
           headers: {

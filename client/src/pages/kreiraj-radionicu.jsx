@@ -30,6 +30,8 @@ const schema = yup.object().shape({
   coverPhoto: yup.mixed(),
 });
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function KreirajRadionicu() {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
@@ -117,15 +119,11 @@ export default function KreirajRadionicu() {
         formData.append("coverImage", imageFile);
       }
 
-      const response = await axios.post(
-        "http://localhost:5000/api/workshop",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/workshop`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       if (response.status === 201) {
         navigate("/radionice");
@@ -141,7 +139,7 @@ export default function KreirajRadionicu() {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {

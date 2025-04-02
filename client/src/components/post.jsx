@@ -15,6 +15,8 @@ import graficki from "../assets/badges/grafickiDizajn.svg";
 import novinarstvo from "../assets/badges/novinarstvo.svg";
 import muzika from "../assets/badges/muzickaProdukcija.svg";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Post({
   profilePic,
   firstName,
@@ -93,7 +95,7 @@ export default function Post({
         const users = await Promise.all(
           comment.likes.map(async (userId) => {
             const response = await axios.get(
-              `http://localhost:5000/api/user/id/${userId}`
+              `${API_URL}/api/user/id/${userId}`
             );
             return response.data.user;
           })
@@ -131,7 +133,7 @@ export default function Post({
         const users = await Promise.all(
           reply.likes.map(async (userId) => {
             const response = await axios.get(
-              `http://localhost:5000/api/user/id/${userId}`
+              `${API_URL}/api/user/id/${userId}`
             );
             return response.data.user;
           })
@@ -148,7 +150,7 @@ export default function Post({
       const users = await Promise.all(
         likes.map(async (userId) => {
           const response = await axios.get(
-            `http://localhost:5000/api/user/id/${userId}`
+            `${API_URL}/api/user/id/${userId}`
           );
           return response.data.user;
         })
@@ -163,7 +165,7 @@ export default function Post({
     try {
       if (isLiked) {
         await axios.post(
-          `http://localhost:5000/api/posts/${postId}/unlike`,
+          `${API_URL}/api/posts/${postId}/unlike`,
           { userId: currentUserId },
           {
             headers: {
@@ -174,7 +176,7 @@ export default function Post({
         setLikes((prev) => prev.filter((id) => id !== currentUserId));
       } else {
         await axios.post(
-          `http://localhost:5000/api/posts/${postId}/like`,
+          `${API_URL}/api/posts/${postId}/like`,
           { userId: currentUserId },
           {
             headers: {
@@ -183,7 +185,7 @@ export default function Post({
           }
         );
         const response = await axios.get(
-          `http://localhost:5000/api/user/id/${currentUserId}`
+          `${API_URL}/api/user/id/${currentUserId}`
         );
         setLikes((prev) => [...prev, currentUserId]);
         setLikedUsers((prev) => [...prev, response.data.user]);
@@ -196,7 +198,7 @@ export default function Post({
   const fetchComments = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/posts/${postId}/comments`
+        `${API_URL}/api/posts/${postId}/comments`
       );
       setComments(response.data);
     } catch (err) {
@@ -212,7 +214,7 @@ export default function Post({
     if (commentText.trim() === "") return;
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/posts/${postId}/comment`,
+        `${API_URL}/api/posts/${postId}/comment`,
         {
           userId: currentUserId,
           text: commentText,
@@ -225,7 +227,7 @@ export default function Post({
       );
 
       const userResponse = await axios.get(
-        `http://localhost:5000/api/user/id/${currentUserId}`
+        `${API_URL}/api/user/id/${currentUserId}`
       );
       const userDetails = userResponse.data.user;
 
@@ -276,7 +278,7 @@ export default function Post({
   const handleLikeComment = async (commentId) => {
     try {
       await axios.post(
-        `http://localhost:5000/api/posts/comments/${commentId}/like`,
+        `${API_URL}/api/posts/comments/${commentId}/like`,
         { userId: currentUserId },
         {
           headers: {
@@ -294,7 +296,7 @@ export default function Post({
     if (replyText.trim() === "") return;
     try {
       await axios.post(
-        `http://localhost:5000/api/posts/${commentId}/replies`,
+        `${API_URL}/api/posts/${commentId}/replies`,
         {
           userId: currentUserId,
           text: replyText,
@@ -326,7 +328,7 @@ export default function Post({
   };
 
   const allMedia = [
-    ...(picture?.map((img) => `http://localhost:5000/api/posts/image/${img}`) ||
+    ...(picture?.map((img) => `${API_URL}/api/posts/image/${img}`) ||
       []),
     ...(gif || []),
   ];
@@ -378,7 +380,7 @@ export default function Post({
           <div key={`img-${index}`} className="relative">
             <img
               crossOrigin="anonymous"
-              src={`http://localhost:5000/api/posts/image/${img}`}
+              src={`${API_URL}/api/posts/image/${img}`}
               className={`${
                 picture.length + (gif?.length || 0) === 1
                   ? "w-full"
@@ -386,7 +388,7 @@ export default function Post({
               } object-cover rounded-lg`}
               alt={`Post image ${index}`}
               onClick={() =>
-                openModal(`http://localhost:5000/api/posts/image/${img}`)
+                openModal(`${API_URL}/api/posts/image/${img}`)
               }
               style={{ cursor: "pointer" }}
             />
@@ -480,7 +482,7 @@ export default function Post({
                     crossOrigin="anonymous"
                     src={
                       user.image
-                        ? `http://localhost:5000/api/posts/image/${user?.image}`
+                        ? `${API_URL}/api/posts/image/${user?.image}`
                         : defaultPic
                     }
                     className="w-10 h-10 mr-3 rounded-full"
@@ -523,7 +525,7 @@ export default function Post({
                     crossOrigin="anonymous"
                     src={
                       user.image
-                        ? `http://localhost:5000/api/posts/image/${user?.image}`
+                        ? `${API_URL}/api/posts/image/${user?.image}`
                         : defaultPic
                     }
                     className="w-10 h-10 mr-3 rounded-full"
@@ -594,7 +596,7 @@ export default function Post({
                     crossOrigin="anonymous"
                     src={
                       user.image
-                        ? `http://localhost:5000/api/posts/image/${user?.image}`
+                        ? `${API_URL}/api/posts/image/${user?.image}`
                         : defaultPic
                     }
                     className="w-10 h-10 mr-3 rounded-full"
@@ -648,7 +650,7 @@ export default function Post({
                   crossOrigin="anonymous"
                   src={
                     cmt?.userId.image
-                      ? `http://localhost:5000/api/posts/image/${cmt?.userId.image}`
+                      ? `${API_URL}/api/posts/image/${cmt?.userId.image}`
                       : defaultPic
                   }
                   className="w-10 h-10 rounded-full mr-3"
@@ -728,7 +730,7 @@ export default function Post({
                           crossOrigin="anonymous"
                           src={
                             reply?.userId.image
-                              ? `http://localhost:5000/api/posts/image/${reply?.userId.image}`
+                              ? `${API_URL}/api/posts/image/${reply?.userId.image}`
                               : defaultPic
                           }
                           className="w-8 h-8 rounded-full mr-2"
