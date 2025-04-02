@@ -13,6 +13,8 @@ import graficki from "../assets/badges/grafickiDizajn.svg";
 import novinarstvo from "../assets/badges/novinarstvo.svg";
 import muzika from "../assets/badges/muzickaProdukcija.svg";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Sidebar({
   userId,
   searchQuery,
@@ -89,7 +91,7 @@ export default function Sidebar({
                         crossOrigin="anonymous"
                         src={
                           user?.image
-                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            ? `${API_URL}/api/posts/image/${user?.image}`
                             : defaultPic
                         }
                         alt={`${user.firstName} ${user.lastName}`}
@@ -191,7 +193,7 @@ export default function Sidebar({
                           crossOrigin="anonymous"
                           src={
                             user?.image
-                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              ? `${API_URL}/api/posts/image/${user?.image}`
                               : defaultPic
                           }
                           alt={`${user.firstName} ${user.lastName}`}

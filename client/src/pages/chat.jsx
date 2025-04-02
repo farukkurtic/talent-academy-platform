@@ -18,7 +18,8 @@ import muzika from "../assets/badges/muzickaProdukcija.svg";
 
 import { MessageSquare, GraduationCap, UserPen, Menu } from "lucide-react";
 
-const socket = io("http://localhost:5000", { transports: ["websocket"] });
+const API_URL = import.meta.env.VITE_API_URL;
+const socket = io(`${API_URL}`, { transports: ["websocket"] });
 
 const Chat = () => {
   const [users, setUsers] = useState([]);
@@ -44,7 +45,7 @@ const Chat = () => {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {
@@ -73,13 +74,13 @@ const Chat = () => {
   useEffect(() => {
     if (!currentUser) return;
     axios
-      .get(`http://localhost:5000/api/chat/${currentUser}`)
+      .get(`${API_URL}/api/chat/${currentUser}`)
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
     const fetchUnreadMessages = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/chat/unread-messages/${currentUser}`
+          `${API_URL}/api/chat/unread-messages/${currentUser}`
         );
         const unreadMessagesData = response.data;
         const newUnreadMessages = {};
@@ -110,9 +111,7 @@ const Chat = () => {
   useEffect(() => {
     if (!currentUser || !selectedUser) return;
     axios
-      .get(
-        `http://localhost:5000/api/chat/messages/${currentUser}/${selectedUser._id}`
-      )
+      .get(`${API_URL}/api/chat/messages/${currentUser}/${selectedUser._id}`)
       .then((res) => {
         const validMessages = Array.isArray(res.data)
           ? res.data.filter(
@@ -172,7 +171,7 @@ const Chat = () => {
         [selectedUser._id]: 0,
       }));
       axios
-        .post(`http://localhost:5000/api/chat/mark-as-read`, {
+        .post(`${API_URL}/api/chat/mark-as-read`, {
           sender: selectedUser._id,
           receiver: currentUser,
         })
@@ -282,7 +281,7 @@ const Chat = () => {
                         crossOrigin="anonymous"
                         src={
                           user?.image
-                            ? `http://localhost:5000/api/posts/image/${user?.image}`
+                            ? `${API_URL}/api/posts/image/${user?.image}`
                             : defaultPic
                         }
                         alt={`${user.firstName} ${user.lastName}`}
@@ -384,7 +383,7 @@ const Chat = () => {
                           crossOrigin="anonymous"
                           src={
                             user?.image
-                              ? `http://localhost:5000/api/posts/image/${user?.image}`
+                              ? `${API_URL}/api/posts/image/${user?.image}`
                               : defaultPic
                           }
                           alt={`${user.firstName} ${user.lastName}`}
@@ -484,7 +483,7 @@ const Chat = () => {
                   crossOrigin="anonymous"
                   src={
                     user?.image
-                      ? `http://localhost:5000/api/posts/image/${user?.image}`
+                      ? `${API_URL}/api/posts/image/${user?.image}`
                       : defaultPic
                   }
                   alt={`${user.firstName} ${user.lastName}`}
@@ -524,7 +523,7 @@ const Chat = () => {
                   crossOrigin="anonymous"
                   src={
                     user?.image
-                      ? `http://localhost:5000/api/posts/image/${user?.image}`
+                      ? `${API_URL}/api/posts/image/${user?.image}`
                       : defaultPic
                   }
                   alt={`${user.firstName} ${user.lastName}`}

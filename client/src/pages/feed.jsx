@@ -19,6 +19,8 @@ import Sidebar from "../components/sidebar";
 import CreatePost from "../components/createPost";
 import Post from "../components/post";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Feed() {
   const [allPosts, setAllPosts] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -48,7 +50,7 @@ export default function Feed() {
 
   const fetchPosts = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/posts");
+      const response = await axios.get(`${API_URL}/api/posts`);
       const posts = response.data.posts;
 
       const postsWithUsers = await Promise.all(
@@ -60,7 +62,7 @@ export default function Feed() {
             }
 
             const userResponse = await axios.get(
-              `http://localhost:5000/api/user/id/${post.userId}`
+              `${API_URL}/api/user/id/${post.userId}`
             );
 
             if (userResponse.data.user?.major in majorBadges) {
@@ -87,14 +89,11 @@ export default function Feed() {
 
   const deletePost = async (postId) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/posts/${postId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.delete(`${API_URL}/api/posts/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       fetchPosts();
     } catch (err) {
       console.error("Error deleting post:", err.response?.data || err.message);
@@ -106,7 +105,7 @@ export default function Feed() {
     if (query.length > 1) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/user/search?name=${query}`
+          `${API_URL}/api/user/search?name=${query}`
         );
         setSearchResults(response.data.users);
       } catch (err) {
@@ -147,7 +146,7 @@ export default function Feed() {
               key={post._id}
               profilePic={
                 post.user?.image
-                  ? `http://localhost:5000/api/posts/image/${post.user.image}`
+                  ? `${API_URL}/api/posts/image/${post.user.image}`
                   : defaultPic
               }
               firstName={post.user?.firstName || "Unknown"}
