@@ -113,7 +113,7 @@ export default function ProfileDetails() {
             className="h-20 w-20 lg:h-40 lg:w-40"
           />
           <div className="color-white text-center lg:text-left">
-            <h1 className="text-2xl lg:text-7xl font-black mb-4 tracking-wider">
+            <h1 className="text-2xl lg:text-7xl font-black mb-4 mt-4 lg:mt-0 tracking-wider">
               Registruj se
             </h1>
             <p className="text-lg font-medium tracking-wide">

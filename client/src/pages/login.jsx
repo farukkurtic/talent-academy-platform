@@ -43,7 +43,7 @@ export default function Login() {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 400) {
-          setResponseErr(<>Neispravni podaci za prijavu.</>);
+          setResponseErr(<>Neispravni podaci za prijavu. Pokušajte opet.</>);
         } else if (status === 404) {
           setResponseErr(
             <div>
@@ -78,8 +78,8 @@ export default function Login() {
               className="h-20 w-20 lg:h-40 lg:w-40"
             />
           </div>
-          <div className="color-white text-wrap">
-            <h1 className="text-2xl lg:text-7xl font-black mb-4 tracking-wider lg:whitespace-pre-line">
+          <div className="color-white text-wrap text-center">
+            <h1 className="text-2xl lg:text-7xl font-black mb-4 mt-4 lg:mt-0 tracking-wider lg:whitespace-pre-line">
               Prijavite se!
             </h1>
             <p className="text-lg font-medium tracking-wide text-center lg:text-left">
@@ -98,6 +98,7 @@ export default function Login() {
                 type="email"
                 className="lg:w-full w-xs p-4 mb-5 border rounded mt-1 rounded-full placeholder-white"
                 placeholder="Email"
+                autoComplete="off"
               />
               {errors.email && (
                 <p className="text-red-500 tracking-wider text-sm">
@@ -110,7 +111,8 @@ export default function Login() {
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
                 className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-1 pr-12 flex items-center justify-center mr-5"
-                placeholder="Password"
+                placeholder="Šifra"
+                autoComplete="off"
               />
               {showPassword ? (
                 <EyeOff size={30} onClick={togglePassword} />
@@ -140,7 +142,7 @@ export default function Login() {
               </p>
             )}
             <a href="/kontakt">
-              <p className="text-center mt-5 tracking-wider cursor-pointer">
+              <p className="text-center mt-5 tracking-wider cursor-pointer text-gray-400">
                 Zaboravili ste šifru?
               </p>
             </a>

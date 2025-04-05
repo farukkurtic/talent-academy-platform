@@ -342,7 +342,7 @@ const Chat = () => {
             </li>
           </ul>
           <button
-            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer"
+            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer tracking-wider"
             onClick={handleLogout}
           >
             Odjavi se
@@ -449,7 +449,7 @@ const Chat = () => {
                 </li>
               </ul>
               <button
-                className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer"
+                className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer tracking-wider"
                 onClick={handleLogout}
               >
                 Odjavi se
@@ -593,14 +593,14 @@ const Chat = () => {
                         sendMessage();
                       }
                     }}
-                    placeholder="Type a message..."
-                    className="flex-1 p-2 rounded-lg bg-gray-800 text-white"
+                    placeholder="Napiši poruku..."
+                    className="flex-1 p-2 rounded-lg bg-gray-800 text-white tracking-wider"
                   />
                   <button
                     onClick={sendMessage}
-                    className="bg-primary text-white p-2 rounded-lg"
+                    className="bg-primary text-white p-2 rounded-lg tracking-wider"
                   >
-                    Send
+                    Pošalji
                   </button>
                 </div>
               </div>

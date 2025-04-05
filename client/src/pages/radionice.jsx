@@ -212,7 +212,7 @@ export default function Radionice() {
             </li>
           </ul>
           <button
-            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer"
+            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer tracking-wider"
             onClick={handleLogout}
           >
             Odjavi se
@@ -321,7 +321,7 @@ export default function Radionice() {
                 </li>
               </ul>
               <button
-                className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer"
+                className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer tracking-wider"
                 onClick={handleLogout}
               >
                 Odjavi se

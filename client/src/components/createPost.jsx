@@ -123,7 +123,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
   };
 
   return (
-    <div className="p-4 border rounded-3xl shadow-md w-xs lg:w-md">
+    <div className="p-4 border rounded-3xl shadow-md w-sm lg:w-md">
       <form onSubmit={handleSubmit(onSubmit)}>
         <textarea
           {...register("text")}
@@ -194,7 +194,7 @@ const CreatePost = ({ userId, refreshFeed }) => {
           </button>
           <button
             type="submit"
-            className="bg-primary text-white p-2 rounded-full ml-auto w-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-primary text-white p-2 rounded-full ml-auto w-20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed tracking-wider"
             disabled={
               !postContent &&
               selectedImages.length === 0 &&

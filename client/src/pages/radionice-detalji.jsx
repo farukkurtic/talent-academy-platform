@@ -364,7 +364,7 @@ export default function WorkshopDetails() {
             </li>
           </ul>
           <button
-            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer"
+            className="bg-primary p-2 rounded-full w-3/4 mt-10 cursor-pointer tracking-wider"
             onClick={handleLogout}
           >
             Odjavi se
@@ -473,7 +473,7 @@ export default function WorkshopDetails() {
                 </li>
               </ul>
               <button
-                className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer"
+                className="bg-primary p-2 rounded-full w-full mt-10 cursor-pointer tracking-wider"
                 onClick={handleLogout}
               >
                 Odjavi se
@@ -713,7 +713,7 @@ export default function WorkshopDetails() {
               <select
                 name="type"
                 defaultValue={workshop?.type}
-                className="w-full p-2.5 rounded bg-gray-700 text-white focus:ring-2 focus:ring-primary"
+                className="w-full p-2.5 rounded bg-gray-700 text-white focus:ring-2 focus:ring-primary appearance-none"
                 required
               >
                 <option value="Kreativno pisanje">Kreativno pisanje</option>

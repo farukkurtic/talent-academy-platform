@@ -54,6 +54,7 @@ export default function Post({
   const [commentLikedUsers, setCommentLikedUsers] = useState([]);
   const [isCommentLikesModalOpen, setIsCommentLikesModalOpen] = useState(false);
   const [currentCommentId, setCurrentCommentId] = useState(null);
+  const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
     setIsLiked(likes.includes(currentUserId));
@@ -149,9 +150,7 @@ export default function Post({
     try {
       const users = await Promise.all(
         likes.map(async (userId) => {
-          const response = await axios.get(
-            `${API_URL}/api/user/id/${userId}`
-          );
+          const response = await axios.get(`${API_URL}/api/user/id/${userId}`);
           return response.data.user;
         })
       );
@@ -328,13 +327,12 @@ export default function Post({
   };
 
   const allMedia = [
-    ...(picture?.map((img) => `${API_URL}/api/posts/image/${img}`) ||
-      []),
+    ...(picture?.map((img) => `${API_URL}/api/posts/image/${img}`) || []),
     ...(gif || []),
   ];
 
   return (
-    <div className="text-white w-xs lg:w-md border rounded-3xl p-5 mb-10 relative">
+    <div className="text-white w-sm lg:w-md border rounded-3xl p-5 mb-10 relative">
       <div className="w-full flex items-center mb-3">
         {profilePic && (
           <a
@@ -387,9 +385,7 @@ export default function Post({
                   : "w-full h-40"
               } object-cover rounded-lg`}
               alt={`Post image ${index}`}
-              onClick={() =>
-                openModal(`${API_URL}/api/posts/image/${img}`)
-              }
+              onClick={() => openModal(`${API_URL}/api/posts/image/${img}`)}
               style={{ cursor: "pointer" }}
             />
           </div>
@@ -618,7 +614,7 @@ export default function Post({
           {...register("comment")}
           ref={textareaRef}
           placeholder="Napiši komentar..."
-          className="w-full p-2 bg-gray-800 text-white rounded-lg resize-none border border-gray-600 focus:outline-none"
+          className="w-full p-2 bg-gray-800 text-white rounded-lg resize-none border border-gray-600 focus:outline-none tracking-wider"
           style={{ height: "auto", overflowY: "hidden" }}
           rows={1}
           onInput={handleInput}
@@ -627,7 +623,10 @@ export default function Post({
         />
         <button
           type="submit"
-          className="bg-primary mt-2 px-4 py-2 rounded-lg text-white w-full hover:bg-opacity-80"
+          className={`bg-primary mt-2 px-4 py-2 rounded-lg text-white w-full hover:bg-opacity-80 tracking-wider ${
+            !commentValue.trim() ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!commentValue.trim()}
         >
           Objavi
         </button>
@@ -784,9 +783,8 @@ export default function Post({
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    const replyText = e.target.reply.value;
                     handleAddReply(cmt._id, replyText);
-                    e.target.reply.value = "";
+                    setReplyText("");
                     if (replyTextareaRef.current) {
                       replyTextareaRef.current.style.height = "40px";
                     }
@@ -799,12 +797,17 @@ export default function Post({
                     className="w-full p-2 bg-gray-700 text-white rounded-lg resize-none border border-gray-600 focus:outline-none overflow-hidden"
                     rows={1}
                     ref={replyTextareaRef}
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
                     onInput={handleReplyInput}
                     style={{ minHeight: "40px", height: "40px" }}
                   />
                   <button
                     type="submit"
-                    className="bg-primary p-2 rounded-lg text-white hover:bg-opacity-80 cursor-pointer w-full lg:w-auto mt-2 lg:mt-0"
+                    className={`bg-primary p-2 rounded-lg text-white hover:bg-opacity-80 cursor-pointer w-full lg:w-auto mt-2 lg:mt-0 ${
+                      !replyText.trim() ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={!replyText.trim()}
                   >
                     Odgovori
                   </button>
