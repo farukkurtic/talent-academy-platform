@@ -26,7 +26,9 @@ router.post("/:postId/comment", authMiddleware, async (req, res) => {
 
     const comment = await feedService.addComment(postId, userId, text);
 
-    const userResponse = await axios.get(`${API_URL}/api/user/id/${userId}`);
+    const userResponse = await axios.get(
+      `${process.env.API_URL}/api/user/id/${userId}`
+    );
     const user = userResponse.data.user;
 
     res.status(201).json({
@@ -113,7 +115,9 @@ router.post("/:postId/comment", authMiddleware, async (req, res) => {
     post.comments.push(newComment);
     await post.save();
 
-    const userResponse = await axios.get(`${API_URL}/api/user/id/${userId}`);
+    const userResponse = await axios.get(
+      `${process.env.API_URL}/api/user/id/${userId}`
+    );
     const user = userResponse.data.user;
 
     res.status(201).json({

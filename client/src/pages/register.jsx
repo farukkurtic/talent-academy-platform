@@ -56,7 +56,9 @@ export default function Register() {
           setResponseErr(
             <>
               Korisnik je već registrovan.{" "}
-              <span className="text-primary cursor-pointer">Prijavi se</span>
+              <a href="/prijava">
+                <span className="text-primary cursor-pointer">Prijavi se</span>
+              </a>
             </>
           );
         } else if (status === 401) {
@@ -89,7 +91,7 @@ export default function Register() {
             />
           </div>
           <div className="color-white text-center">
-            <h1 className="text-2xl lg:text-7xl font-black mb-4 tracking-wider">
+            <h1 className="text-2xl lg:text-7xl font-black mb-4 mt-4 lg:mt-0 tracking-wider">
               Registruj se
             </h1>
             <p className="text-lg font-medium tracking-wide text-center lg:text-left">
@@ -108,6 +110,7 @@ export default function Register() {
                 type="email"
                 className="lg:w-full w-xs p-4 mb-5 border rounded mt-1 rounded-full placeholder-white"
                 placeholder="Email"
+                autoComplete="off"
               />
               {errors.email && (
                 <p className="text-red-500 tracking-wider text-sm">
@@ -120,8 +123,8 @@ export default function Register() {
                 autoComplete="off"
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
-                className="w-full p-4 border rounded mt-1 rounded-full placeholder-white mb-5 pr-12 flex items-center justify-center mr-5"
-                placeholder="Password"
+                className="w-full p-4 border rounded mt-1 rounded-full placeholder-white pr-12 flex items-center justify-center mr-5"
+                placeholder="Šifra"
               />
               {showPassword ? (
                 <EyeOff size={30} onClick={togglePassword} />
@@ -136,24 +139,25 @@ export default function Register() {
             )}
             <button
               type="submit"
-              className="w-xs lg:w-full bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-10 cursor-pointer"
+              className="w-xs lg:w-full bg-primary text-white p-2 rounded-full font-semibold tracking-wider mt-5 cursor-pointer"
             >
               Nastavi
             </button>
-            <a href="/prijava">
-              <p className="text-center mt-5 tracking-wider">
-                {responseErr ? (
-                  responseErr
-                ) : (
-                  <>
-                    Već imaš račun?{" "}
+
+            <p className="text-center mt-5 tracking-wider">
+              {responseErr ? (
+                responseErr
+              ) : (
+                <>
+                  Već imaš račun?{" "}
+                  <a href="/prijava">
                     <span className="text-primary cursor-pointer">
                       Prijavi se.
                     </span>
-                  </>
-                )}
-              </p>
-            </a>
+                  </a>
+                </>
+              )}
+            </p>
           </form>
         </div>
       </div>

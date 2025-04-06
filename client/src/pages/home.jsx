@@ -19,13 +19,16 @@ export default function Home() {
       <div className="text-white relative overflow-hidden">
         <img src={s4} className="absolute right-0 top-0 w-xl hidden lg:block" />
         <img src={s3} className="absolute left-60 top-0 w-xl hidden lg:block" />
-        <img src={s2} className="absolute left-0 top-0 w-2xs" />
+        <img src={s2} className="absolute left-0 top-0 w-2xs hidden lg:block" />
         <img
           src={s1}
-          className="absolute right-0 top-0 lg:right-auto lg:top-auto lg:left-0 lg:-bottom-50 rotate-180 lg:rotate-0 w-3xs lg:w-sm"
+          className="absolute right-0 -top-30 lg:right-auto lg:top-auto lg:left-0 lg:-bottom-50 rotate-180 lg:rotate-0 w-2xs lg:w-sm lg:block"
         />
-        <img src={s5} className="absolute left-75 -bottom-35 w-sm " />
-        <div className="h-screen flex flex-col justify-end lg:items-end lg:pr-25 text-center">
+        <img
+          src={s5}
+          className="absolute left-75 -bottom-35 w-sm hidden lg:block"
+        />
+        <div className="h-screen flex flex-col justify-end lg:justify-end lg:items-end lg:pr-25 text-center">
           <div className="flex flex-col lg:flex-row items-center">
             <img src={logo} alt="logo" className="w-35 h-35" />
             <h1 className="text-5xl lg:text-8xl font-black">
@@ -53,8 +56,6 @@ export default function Home() {
         </div>
       </div>
       <div className="text-white w-full flex flex-col lg:flex-row bg-secondary relative overflow-hidden">
-        <img src={s5} className="absolute -right-50  w-sm " />
-        <img src={s5} className="absolute -bottom-70 -left-50 rotate-240" />
         <div className="lg:w-1/2 p-10 pt-15 flex items-center justify-center">
           <img src={pic} alt="lecture-1" className="w-xl h-xl rounded-2xl" />
         </div>
@@ -72,7 +73,6 @@ export default function Home() {
         </div>
       </div>
       <div className="text-white w-full flex flex-col lg:flex-row bg-black relative overflow-hidden">
-        <img src={s3} className="absolute w-xl right-0" />
         <div className="lg:w-1/2 flex flex-col items-center lg:items-end justify-center text-white p-10">
           <h1 className="text-6xl font-bold mb-10">Skill sharing</h1>
           <p className="lg:w-3/4 tracking-wider">
