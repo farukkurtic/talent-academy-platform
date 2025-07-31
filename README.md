@@ -1,12 +1,12 @@
-# 🎓 Talent Academy Alumni Platform
+# Talent Academy Alumni Platform
 
 A full-stack web application designed to connect alumni from the Helem Nejse Talent Academy program. This platform allows users to stay in touch, engage in discussions, and collaborate through a centralized, modern interface.
 
-> ✅ **Actively maintained** — currently used by over **100 users**, with new features being regularly developed.
+>  **Actively maintained** — currently used by over **100 users**, with new features being regularly developed.
 
 ---
 
-## 🚀 Purpose
+## Purpose
 
 The goal of this platform is to strengthen the **Helem Nejse Talent Academy Alumni Network** by providing a space for:
 - Networking and maintaining connections
@@ -15,16 +15,16 @@ The goal of this platform is to strengthen the **Helem Nejse Talent Academy Alum
 
 ---
 
-## 🧠 Key Features
+## Key Features
 
-- 📰 **User Feed** – Share updates, achievements, and announcements  
-- 💬 **Real-time Chat** – Private and group messaging powered by WebSockets  
-- 👤 **Alumni Profiles** – Custom user profiles with personal and professional info  
-- 🛠️ **Workshop System** – Create, join, and manage workshops and learning events
+- **User Feed** – Share updates, achievements, and announcements  
+- **Real-time Chat** – Private and group messaging powered by WebSockets  
+- **Alumni Profiles** – Custom user profiles with personal and professional info  
+- **Workshop System** – Create, join, and manage workshops and learning events
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Framework**: React + Vite
@@ -45,8 +45,11 @@ The goal of this platform is to strengthen the **Helem Nejse Talent Academy Alum
 
 ---
 
-## 🛠️ Status
+## Status
 This project is still under active development. Expect new features, improved UI, and performance enhancements soon.
+
+## Demo video
+https://youtu.be/y58O4jlxJAg
 
 ## Preview
 ![screencapture-139-59-152-120-2025-04-29-07_11_18](https://github.com/user-attachments/assets/b5ee19c5-62b6-4a94-81bd-73add41a8d9d)
